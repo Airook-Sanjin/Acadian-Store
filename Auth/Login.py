@@ -1,15 +1,25 @@
 from flask import Blueprint
-from globals import Flask, secrets, redirect, url_for, Connecttodb,text,render_template
+from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
 from .Register import register_who
 
-login_bp = Blueprint('login_bp',__name__,url_prefix='/login',template_folder='templates')
+login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='templates')
+conn = Connecttodb()
 
-@login_bp.route('/Login')
+@login_bp.route('/Login',methods="GET")
 def Login():
-    conn = Connecttodb()
-    # Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
-    
     return render_template('login.html')
+
+@login_bp.route('/Login',methods ="POST")
+def Signin():
+    
+    Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
+    Allcustomer = conn.execute(text('Select * from customer')).mappings().fetchall()
+    AllAdmins = conn.execute(text('Select * from admin')).mappings().fetchall()
+    
+    if request.form('Email') in Allcustomer['email']:
+            return "CUSTOMER"
+    if request.form('Email') in AllAdmins['email']:
+            return "Admin"
 
 @login_bp.route('/Logout')
 def Logout():

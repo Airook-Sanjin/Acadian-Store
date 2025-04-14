@@ -7,6 +7,7 @@ def register_who():
     return render_template('Register.html')
 
 def register_view_customer():
+    # EMAIL = 
     # USERS = Connecttodb.execute(text("""INSERT INTO users (email,username,name,password) 
     #                                       values ()"""), {})
     # CUSTOMER = Connecttodb.execute(text("""INSERT INTO customer (email) 
@@ -22,6 +23,7 @@ def register_view_vendor():
     return render_template()
 
 def register_view_admin():
+    # EMAIL = 
     # USERS = Connecttodb.execute(text("""INSERT INTO users (email,username,name,password) 
     #                                       values ()"""), {})
     # ADMIN = Connecttodb.execute(text("""INSERT INTO customer (email) 
