@@ -1,15 +1,15 @@
 from flask import Blueprint
-from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
+from ..globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
 from .Register import register_who
 
 login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='templates')
 conn = Connecttodb()
 
-@login_bp.route('/Login',methods="GET")
+@login_bp.route('/Login',methods=["GET"])
 def Login():
     return render_template('login.html')
 
-@login_bp.route('/Login',methods ="POST")
+@login_bp.route('/Login',methods=["POST"])
 def Signin():
     
     Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
