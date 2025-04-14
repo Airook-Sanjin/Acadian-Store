@@ -1,4 +1,4 @@
-from globals import render_template, Flask, secrets, redirect, url_for, Connecttocb,text
+from globals import render_template, Flask, secrets, redirect, url_for, Connecttodb,text
 
 def register_who():
     # is logic for who is registering

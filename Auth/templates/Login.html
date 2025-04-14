@@ -9,10 +9,10 @@
   <body>
     {% block body%}
     <section class="form">
-      <input type="email" name="Email" id="Email" />
-      <input type="password" name="Pass" id="Pass" />
+      <input type="email" name="Email" id="Email" placeholder="Email"/>
+      <input type="password" name="Pass" id="Pass" placeholder="Password"/>
     </section>
-    <button onclick="window.location.href='{{ url_for('auth_bp.register') }}'">Sign In</button>
+    <button onclick="window.location.href='{{ url_for('login_bp.register') }}'">LOG IN</button>
   {% endblock body %}
 </body>
 </html>
