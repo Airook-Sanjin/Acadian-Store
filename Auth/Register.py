@@ -13,15 +13,15 @@ def register_view_customer():
     PASSWORD = request.form.get("password")
     
     USERS = Connecttodb.execute(text("""INSERT INTO users (email,username,name,password) 
-                                          values (email,username,name,password)"""),
+                                          values (:email, :username, :name, :password)"""),
                                                     {'email': EMAIL,
                                                      'username': USERNAME,
                                                      'name': FULL_NAME,
-                                                     'password':PASSWORD})
+                                                     'password': PASSWORD})
     
     CUSTOMER = Connecttodb.execute(text("""INSERT INTO customer (email) 
-                                          values (email)"""),{'email':EMAIL})
-    return render_template()
+                                          values (:email)"""),{'email':EMAIL})
+    return render_template('Register_Admin.html')
 
 def register_view_vendor():
     # EMAIL = 
@@ -32,7 +32,7 @@ def register_view_vendor():
     #                                       values ()"""), {})
     # VENDOR = Connecttodb.execute(text("""INSERT INTO customer (email) 
     #                                       values ()"""),{})
-    return render_template()
+    return render_template('Register_Admin.html')
 
 def register_view_admin():
     # EMAIL = 

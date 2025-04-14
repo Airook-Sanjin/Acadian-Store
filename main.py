@@ -1,4 +1,4 @@
-from globals import Flask, secrets, redirect, url_for, Connecttodb,text
+from globals import Flask, secrets, redirect, url_for, Connecttodb, text
 from Auth import login_bp
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key for session with the secrets module
@@ -17,4 +17,3 @@ def start():
 
 if __name__ == '__main__':
         app.run(debug=True)
-    
