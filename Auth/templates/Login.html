@@ -8,11 +8,12 @@
   </head>
   <body>
     {% block body%}
-    <section class="form">
+    <section class="form" methods="POST">
       <input type="email" name="Email" id="Email" />
       <input type="password" name="Pass" id="Pass" />
+      <input type="submit" value="LOG IN">
     </section>
-    <button onclick="window.location.href='{{ url_for('login_bp.register') }}'">Sign In</button>
+    <button onclick="window.location.href='{{ url_for('login_bp.register') }}'">Sign up</button>
   {% endblock body %}
 </body>
 </html>
