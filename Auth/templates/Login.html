@@ -2,16 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="Auth.static.style.css" />
+    <link rel="stylesheet" href="{{ url_for('login_bp.static', filename='style/Auth.css') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
   </head>
   <body>
     {% block body%}
-    <section class="form" methods="POST">
+    <section class="form" >
+      <form action="{{ url_for('login_bp.Signin')}}" method="POST">
       <input type="email" name="Email" id="Email" />
       <input type="password" name="Pass" id="Pass" />
       <input type="submit" value="LOG IN">
+    </form>
     </section>
     <button onclick="window.location.href='{{ url_for('login_bp.register') }}'">Sign up</button>
   {% endblock body %}
