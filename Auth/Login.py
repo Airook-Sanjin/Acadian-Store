@@ -1,6 +1,6 @@
 from flask import Blueprint
-from ..globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
-from .Register import register_who
+from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
+from Auth.Register import register_who
 
 login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='templates')
 conn = Connecttodb()
@@ -15,11 +15,15 @@ def Signin():
     Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
     Allcustomer = conn.execute(text('Select * from customer')).mappings().fetchall()
     AllAdmins = conn.execute(text('Select * from admin')).mappings().fetchall()
-    
-    if request.form('Email') in Allcustomer['email']:
-            return "CUSTOMER"
-    if request.form('Email') in AllAdmins['email']:
-            return "Admin"
+    try:
+        if request.form('Email') in Allcustomer['email']:
+                return "CUSTOMER"
+        if request.form('Email') in AllAdmins['email']:
+                return "Admin"
+        else:
+            return"Vendor"
+    except Exception as e:
+        print(e)
 
 @login_bp.route('/Logout')
 def Logout():
