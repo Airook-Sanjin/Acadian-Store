@@ -53,8 +53,8 @@ def VendorAddProductPage():
             })
         
         # conn.commit()
-        return render_template('VendorHomePage.html', message="Added product successfully.", success=True)
+        return render_template('AddProduct.html', message="Added product successfully.", success=True)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('VendorHomePage.html', message="Product failed to add.", success=False)
+        return render_template('AddProduct.html', message="Product failed to add.", success=False)
 
