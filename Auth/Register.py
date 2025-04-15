@@ -24,7 +24,17 @@ def register_view_customer():
         USERNAME = request.form.get("username")
         FULL_NAME = request.form.get("full_name")
         PASSWORD = request.form.get("password")
-        
+
+        # Validate input fields
+        if not EMAIL or not USERNAME or not FULL_NAME or not PASSWORD:
+            return render_template('Register.html', message="All fields are required.", success=False)
+
+        # Check if email already exists
+        existing_user = conn.execute(text("SELECT * FROM users WHERE email = :email"), {'email': EMAIL}).fetchone()
+        if existing_user:
+            return render_template('Register.html', message="Email is already registered.", success=False)
+
+        # Insert into users and customer tables
         conn.execute(text("""INSERT INTO users (email, username, name, password) 
                               VALUES (:email, :username, :name, :password)"""),
                      {'email': EMAIL, 'username': USERNAME, 'name': FULL_NAME, 'password': PASSWORD})
@@ -34,9 +44,15 @@ def register_view_customer():
         
         return render_template('Register.html', message="Registered successfully!", success=True)
     except Exception as e:
-        print(f"Error during registration: {e}")
-        return render_template('Register.html', message="Registration failed. Please try again.", success=False)
-    
+        error_message = str(e)
+        print(f"Error during registration: {error_message}")
+        if "Duplicate entry" in error_message:
+            return render_template('Register.html', message="This email is already in use.", success=False)
+        elif "cannot be null" in error_message:
+            return render_template('Register.html', message="A required field is missing.", success=False)
+        else:
+            return render_template('Register.html', message="An unexpected error occurred. Please try again.", success=False)
+
 @register_bp.route('/register/vendor', methods=["POST"])
 def register_view_vendor():
     try:
@@ -47,6 +63,13 @@ def register_view_vendor():
         USERNAME = request.form.get("username")
         FULL_NAME = request.form.get("full_name")
         PASSWORD = request.form.get("password")
+
+        if not EMAIL or not USERNAME or not FULL_NAME or not PASSWORD:
+            return render_template('Register.html', message="All fields are required.", success=False)
+
+        existing_user = conn.execute(text("SELECT * FROM users WHERE email = :email"), {'email': EMAIL}).fetchone()
+        if existing_user:
+            return render_template('Register.html', message="Email is already registered.", success=False)
         
         conn.execute(text("""INSERT INTO users (email, username, name, password) 
                               VALUES (:email, :username, :name, :password)"""),
@@ -57,9 +80,15 @@ def register_view_vendor():
         
         return render_template('Register.html', message="Registered successfully!", success=True)
     except Exception as e:
-        print(f"Error during registration: {e}")
-        return render_template('Register.html', message="Registration failed. Please try again.", success=False)
-    
+        error_message = str(e)
+        print(f"Error during registration: {error_message}")
+        if "Duplicate entry" in error_message:
+            return render_template('Register.html', message="This email is already in use.", success=False)
+        elif "cannot be null" in error_message:
+            return render_template('Register.html', message="A required field is missing.", success=False)
+        else:
+            return render_template('Register.html', message="An unexpected error occurred.", success=False)
+
 @register_bp.route('/register/admin', methods=["POST"])
 def register_view_admin():
     try:
@@ -70,7 +99,16 @@ def register_view_admin():
         USERNAME = request.form.get("username")
         FULL_NAME = request.form.get("full_name")
         PASSWORD = request.form.get("password")
-        
+
+        if not EMAIL or not USERNAME or not FULL_NAME or not PASSWORD:
+            return render_template('Register.html', message="All fields are required.", success=False)
+
+        # Check if email already exists
+        existing_user = conn.execute(text("SELECT * FROM users WHERE email = :email"), {'email': EMAIL}).fetchone()
+        if existing_user:
+            return render_template('Register.html', message="Email is already registered.", success=False)
+
+        # Insert into users and admin tables
         conn.execute(text("""INSERT INTO users (email, username, name, password) 
                               VALUES (:email, :username, :name, :password)"""),
                      {'email': EMAIL, 'username': USERNAME, 'name': FULL_NAME, 'password': PASSWORD})
@@ -78,7 +116,7 @@ def register_view_admin():
         conn.execute(text("""INSERT INTO admin (email) 
                               VALUES (:email)"""), {'email': EMAIL})
         
-        return render_template('Register.html', message="Registered successfully!", success=True)
+        return render_template('Register.html', message="Registered successfully.", success=True)
     except Exception as e:
         print(f"Error during registration: {e}")
-        return render_template('Register.html', message="Registration failed. Please try again.", success=False)
+        message = "An error occurred during registration."

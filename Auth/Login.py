@@ -13,14 +13,14 @@ login_bp.register_blueprint(vendor_bp)
 
 conn = Connecttodb()
 
-@login_bp.route('/Login',methods=["GET"])
+@login_bp.route('/Login',methods = ["GET"])
 def Login():
     print('in LOgin')
     return render_template('login.html')
 
-@login_bp.route('/Login',methods=["POST"])
+@login_bp.route('/Login',methods = ["POST"])
 def Signin():
-
+    message = None
     # Creates dictionary view of all users,customer, vendor and admin
     
     result = conn.execute(text(
@@ -40,6 +40,7 @@ def Signin():
     
     
     try:
+
         if role=='customer': # * Looks through all customers and see if any match with the email
             
             print('INTO Customer')
@@ -47,6 +48,7 @@ def Signin():
         
         elif role=='admin':
             
+
             print('INTO Admin')
             
             return redirect(url_for('login_bp.admin.AdminHomePage')) # * Takes you to admin page
@@ -55,13 +57,15 @@ def Signin():
             
             print('INTO VENDOR')
             return redirect(url_for('login_bp.vendor_bp.VendorHomePage')) # * Takes you to vendor page
+        
         else:
-            print('Not a User')
-            return"Not A USER"
+            message = "Email not found."
+            return render_template('login.html', message=message)
         
     except Exception as e:
         print(e)
-        return 'Error'
+        message = "An error occurred during login."
+        return render_template('login.html', message=message)
 
 @login_bp.route('/Logout')
 def Logout():

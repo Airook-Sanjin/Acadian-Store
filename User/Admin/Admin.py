@@ -1,7 +1,9 @@
-from flask import Blueprint,render_template,g,session
 
+from flask import Blueprint,render_template,g,session
+from User.chat import chat_bp
 
 admin=Blueprint('admin',__name__, url_prefix='/admin',template_folder='templates',static_folder='static',static_url_path='/static') # * init blueprint
+admin.register_blueprint(chat_bp)
 
 @admin.before_request # Before each request it will look for the values below
 def load_user():
@@ -10,6 +12,7 @@ def load_user():
         g.User = session["User"]
     else:
         g.User = None
+
 
 @admin.route('/Home')
 def AdminHomePage():
