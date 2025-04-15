@@ -1,33 +1,45 @@
 from flask import Blueprint
-from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template, request
-# from Auth.Register import register_wh
 
-login_bp = Blueprint('login_bp',__name__,url_prefix='/auth', template_folder='templates', static_folder='static', static_url_path='/static')
+from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
+from Auth.Register import register_who
+from User.Admin import admin
+
+login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='templates',static_folder='static',static_url_path='/static')
+login_bp.register_blueprint(admin)
+
 conn = Connecttodb()
 
 @login_bp.route('/Login',methods=["GET"])
 def Login():
+    print('in LOgin')
     return render_template('login.html')
 
 @login_bp.route('/Login',methods=["POST"])
 def Signin():
-    try:
-        # Fetch all users, customers and admins
-        Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
-        Allcustomer = conn.execute(text('Select * from customer')).mappings().fetchall()
-        AllAdmins = conn.execute(text('Select * from admin')).mappings().fetchall()
-        
-        # email from the form
-        email = request.form.get('Email')
-        
-        if email in [customer['email'] for customer in Allcustomer]:
-            return "CUSTOMER"
 
-        if email in [admin['email'] for admin in AllAdmins]:
-            return "Admin"
+    # Creates dictionary view of all users,customer, vendor and admin
+    Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
+    Allcustomers = conn.execute(text('Select * from customer')).mappings().fetchall()
+    AllAdmins = conn.execute(text('Select * from admin')).mappings().fetchall()
+    AllVendors = conn.execute(text('Select * from vendor')).mappings().fetchall()
+    print(Allusers)
+    email = request.form.get('Email')
+    
+    try:
+        if any(customer['email'] == email for customer in Allcustomers ):
+            print('INTO EMAIL')
+            return redirect(url_for('login_bp.admin.AdminHomePage'))
+        elif any(admin['email'] == email for admin in AllAdmins ):
+            login_bp.add_url_rule('/admin/Home', view_func=admin.AdminHomePage, endpoint='Admin')
+            print('INTO Admin')
+            return redirect(url_for('login_bp.Admin'))
+        elif any(vendor['email'] == email for vendor in AllVendors ):
+            print('INTO VENDOR')
+            return 'Vendor'
         else:
-            # If not found in customers or admins, assume it's a vendor
-            return"Vendor"
+            print('Not a User')
+            return"Not A USER"
+        
     except Exception as e:
         print(e)
 
