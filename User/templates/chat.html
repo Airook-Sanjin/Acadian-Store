@@ -1,11 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+    body{
+        display: flex;
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        margin: 0;
+    }
+    .chat-page{
+        width: 60%;
+        height: 70%;
+        border-radius: 30px;
+        background-color: #f0f0f0;
+    }
+    .chat-header{
+        width: 100%;
+        height: 10%;
+        background-color: lightblue;
+        border-radius: 30px 30px 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .chat-body{
+        width: auto;
+        height: 80%;
+        background-color: #f0f0f0;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    .incoming-message-info{
+        display: flex;
+    }
+    .incoming-message-text{
+        height: auto;
+        background-color: lightblue;
+        border-radius: 20px 20px 20px 0px;
+        margin: 10px 0;
+        padding: 10px;
+    }
+    .outgoing-message-info{
+        display: flex;
+    }
+    .outgoing-message-text{
+        height: auto;
+        background-color: lightgreen;
+        border-radius: 20px 20px 0px 20px;
+        margin: 10px 0;
+        padding: 10px;
+    }
+    .chat-footer{
+        width: 100%;
+        height: 10%;
+        background-color: lightblue;
+        border-radius: 0 0 30px 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
 </head>
 <body>
-    <p>Chat page</p>
+
+    <section class="chat-page">
+
+        <div class="chat-header">
+            <h1>Chat</h1>
+        </div>
+
+        <div class="chat-body">
+
+            <div class="incoming-message">
+                <div class="incoming-message-info">
+                    <p>incominguser</p>
+                    <p>Sent 00/00/00 00:00</p>
+                </div>
+                <div class="incoming-message-text">
+                    <p>text text text text text text text</p>
+                </div>
+            </div>
+
+            <div class="outgoing-message">
+                <div class="outgoing-message-info">
+                    <p>incominguser</p>
+                    <p>Sent 00/00/00 00:00</p>
+                </div>
+                <div class="outgoing-message-text">
+                    <p>text text text text text text text</p>
+                </div>
+            </div>
+
+            <div class="incoming-message">
+                <div class="incoming-message-info">
+                    <p>incominguser</p>
+                    <p>Sent 00/00/00 00:00</p>
+                </div>
+                <div class="incoming-message-text">
+                    <p>text text text text text text text</p>
+                </div>
+            </div>
+
+            <div class="outgoing-message">
+                <div class="outgoing-message-info">
+                    <p>incominguser</p>
+                    <p>Sent 00/00/00 00:00</p>
+                </div>
+                <div class="outgoing-message-text">
+                    <p>text text text text text text text</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" id="message" placeholder="Type your message here...">
+            <input type="submit" value="Send">
+        </div>
+
+    </section>
+
 </body>
 </html>
