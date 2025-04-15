@@ -1,10 +1,12 @@
 from flask import Blueprint
+
 from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
 from Auth.Register import register_who
 from User.Admin import admin
 
 login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='templates',static_folder='static',static_url_path='/static')
 login_bp.register_blueprint(admin)
+
 conn = Connecttodb()
 
 @login_bp.route('/Login',methods=["GET"])
@@ -14,6 +16,7 @@ def Login():
 
 @login_bp.route('/Login',methods=["POST"])
 def Signin():
+
     # Creates dictionary view of all users,customer, vendor and admin
     Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
     Allcustomers = conn.execute(text('Select * from customer')).mappings().fetchall()
@@ -43,14 +46,3 @@ def Signin():
 @login_bp.route('/Logout')
 def Logout():
     return 'logout'
-
-login_bp.add_url_rule('/register', view_func=register_who, endpoint='register')
-
-@login_bp.route('/register')
-def redirect_to_register_view():
-    return redirect(url_for('register_who'))
-
-
-
-
-
