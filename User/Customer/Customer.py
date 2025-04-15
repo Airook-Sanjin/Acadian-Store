@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template
+from User.chat import chat_bp
 
 customer_bp = Blueprint('customer_bp', __name__, url_prefix='/cust', template_folder='templates')
+customer_bp.register_blueprint(chat_bp)
 
 @customer_bp.route('/Home')
 def CustomerHomePage():
