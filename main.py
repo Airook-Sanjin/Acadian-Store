@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for
 from Auth.Login import login_bp
 from Auth.Register import register_bp
 
-app = Flask(__name__)
+app = Flask(__name__,template_folder='templates') #* This makes it easier to set base templates
 
 # Register blueprints
 app.register_blueprint(login_bp)
