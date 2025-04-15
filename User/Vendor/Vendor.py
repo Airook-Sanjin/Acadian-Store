@@ -1,10 +1,24 @@
-from flask import Blueprint, render_template, request
+
+from flask import Blueprint, render_template, request,g,session
 from dbconnect import Connecttodb  # Import the updated Connecttodb function
 from sqlalchemy import text
 
-vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
 
-@vendor_bp.route('/Home', methods=["GET", "POST"])
+vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
+@vendor_bp.before_request # Before each request it will look for the values below
+def load_user():
+        
+    if "User" in session:
+        g.User = session["User"]
+    else:
+        g.User = None
+        
+@vendor_bp.route('/Home')
+def VendorHomePage():
+    return render_template('VendorHomepage.html')
+  
+
+@vendor_bp.route('/AddProduct', methods=["GET", "POST"])
 def VendorAddProductPage():
     try:
         # Get database connection
@@ -43,3 +57,4 @@ def VendorAddProductPage():
     except Exception as e:
         print(f"Error adding product: {e}")
         return render_template('VendorHomePage.html', message="Product failed to add.", success=False)
+
