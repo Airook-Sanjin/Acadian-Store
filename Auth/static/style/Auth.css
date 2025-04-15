@@ -1,3 +1,15 @@
+
+:root{
+    --FONT: #473C33;
+    --Primary:#ABC270;
+    --Secondary:#FEC868;
+    --Tertiary:#FDA769;
+    --DropShadow:6px 6px 10px hsl(217, 72%, 18%,16%),
+    -6px -6px 10px hsla(0, 0%, 99%,100%);
+  
+    --InnerShadow:-2px -2px 2px #00000026,
+    2px 2px 2px hsla(0, 0%, 99%,100%);
+  }
 body{
     display: flex;
     justify-content: center; 

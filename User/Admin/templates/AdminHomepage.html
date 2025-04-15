@@ -2,5 +2,8 @@
 
 {% block body %}
     <h1>Admin</h1>
-    <a href="{{ url_for('login_bp.admin.chat_bp.chat_view') }}">Go to Chat</a>
+    <section class="Main">
+        <a href="{{ url_for('login_bp.admin.chat_bp.chat_view') }}">Go to Chat</a> <!-- Add this to NAV-->
+    </section>
+
 {% endblock body %}

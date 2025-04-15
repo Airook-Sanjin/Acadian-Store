@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request
+from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request,session,g
 from Auth.Register import register_who
 from User.Admin.Admin import admin
 from User.Customer.Customer import customer_bp
@@ -22,23 +22,39 @@ def Login():
 def Signin():
     message = None
     # Creates dictionary view of all users,customer, vendor and admin
-    Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
-    Allcustomers = conn.execute(text('Select * from customer')).mappings().fetchall()
-    AllAdmins = conn.execute(text('Select * from admin')).mappings().fetchall()
-    AllVendors = conn.execute(text('Select * from vendor')).mappings().fetchall()
-    print(Allusers)
-    email = request.form.get('Email')
+    
+    result = conn.execute(text(
+        """ SELECT u.username,c.email, 'customer' AS role FROM customer as c Natural JOIN users as u
+            WHERE c.email = :email
+            UNION
+            SELECT u.username, a.email, 'admin' AS role FROM admin as a Natural JOIN users as u
+            WHERE a.email = :email
+            UNION
+            SELECT u.username, v.email,'vendor' AS role FROM vendor as v Natural JOIN users as u
+            WHERE v.email = :email"""
+    ),{'email':request.form.get('Email')}).mappings().fetchone()
+    
+    role = result['role']
+    session['User'] = {'Name':result['username'],'Role':role}
+    g.User = session['User']
+    
     
     try:
-        if any(customer['email'] == email for customer in Allcustomers ): # * Looks through all customers and see if any match with the email
+
+        if role=='customer': # * Looks through all customers and see if any match with the email
+            
             print('INTO Customer')
             return redirect(url_for('login_bp.customer_bp.CustomerHomePage')) # * Takes you to Customer page
         
-        elif any(admin['email'] == email for admin in AllAdmins ):
+        elif role=='admin':
+            
+
             print('INTO Admin')
+            
             return redirect(url_for('login_bp.admin.AdminHomePage')) # * Takes you to admin page
         
-        elif any(vendor['email'] == email for vendor in AllVendors ): # * Looks through all Vendors and see if any match with the email
+        elif role=='vendor': # * Looks through all Vendors and see if any match with the email
+            
             print('INTO VENDOR')
             return redirect(url_for('login_bp.vendor_bp.VendorHomePage')) # * Takes you to vendor page
         
