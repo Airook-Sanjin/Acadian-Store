@@ -20,7 +20,7 @@ def Login():
 
 @login_bp.route('/Login',methods = ["POST"])
 def Signin():
-
+    message = None
     # Creates dictionary view of all users,customer, vendor and admin
     Allusers = conn.execute(text('Select * from users')).mappings().fetchall()
     Allcustomers = conn.execute(text('Select * from customer')).mappings().fetchall()
@@ -31,25 +31,25 @@ def Signin():
     
     try:
         if any(customer['email'] == email for customer in Allcustomers ): # * Looks through all customers and see if any match with the email
-            
             print('INTO Customer')
             return redirect(url_for('login_bp.customer_bp.CustomerHomePage')) # * Takes you to Customer page
         
         elif any(admin['email'] == email for admin in AllAdmins ):
-        
             print('INTO Admin')
             return redirect(url_for('login_bp.admin.AdminHomePage')) # * Takes you to admin page
         
         elif any(vendor['email'] == email for vendor in AllVendors ): # * Looks through all Vendors and see if any match with the email
             print('INTO VENDOR')
             return redirect(url_for('login_bp.vendor_bp.VendorHomePage')) # * Takes you to vendor page
+        
         else:
-            print('Not a User')
-            return"Not A USER"
+            message = "Email not found."
+            return render_template('login.html', message=message)
         
     except Exception as e:
         print(e)
-        return 'Error'
+        message = "An error occurred during login."
+        return render_template('login.html', message=message)
 
 @login_bp.route('/Logout')
 def Logout():
