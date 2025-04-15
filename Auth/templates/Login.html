@@ -2,18 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="Auth.static.style.css" />
+
+    <link rel="stylesheet" href="{{ url_for('login_bp.static', filename='style/Auth.css') }}" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
   </head>
   <body>
-    {% block body%}
-    <section class="form" methods="POST">
-      <input type="email" name="Email" id="Email" />
-      <input type="password" name="Pass" id="Pass" />
-      <input type="submit" value="LOG IN">
+    {% block body %}
+    <section class="leftSide">
     </section>
-    <button onclick="window.location.href='{{ url_for('login_bp.register') }}'">Sign up</button>
-  {% endblock body %}
-</body>
+    <section class="rightSide">
+      <form class="form-css" method="POST">
+        <input type="email" name="Email" id="Email" />
+        <input type="password" name="Pass" id="Pass" />
+        <input type="submit" value="LOG IN">
+      </form>
+      <button onclick="window.location.href='{{ url_for('register_bp.register_who') }}'">Sign up</button>
+    </section>
+    {% endblock body %}
+  </body>
 </html>
