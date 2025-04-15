@@ -1,14 +1,92 @@
+<style>
+    body{
+        display: flex;
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        margin: 0;
+    }
+    .sign-up-page{
+        display: flex;
+        flex-direction:column;
+        justify-content: space-around;
+        align-items: center;
+        width: 80%;
+        height: 70%;
+        border-radius: 30px;
+        background-color: antiquewhite;
+    }
+
+    .form-css{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        margin: 0;
+        width: 200px;
+        height: 200px;
+        background-color: aqua;
+    }
+    .other-options{
+        display:flex;
+        flex-direction: row;
+        justify-content: space-around;
+        width: 200px;
+        min-height: 50px;
+        background-color: aquamarine;
+    }
+</style>
 <title>Register</title>
 {% extends 'Login.html' %}
 
 {% block body %}
-    <section class="form" action="/auth/register">
-        <form method="POST">
-            <input type="text" name="username">
-            <input type="email" name="email">
-            <input type="text" name="full_name">
-            <input type="password" name="password">
-            <input type="submit" name="submit">
-        </form>
-    </section>
+<section class="sign-up-page">
+    <!-- Display success or error message -->
+    {% if success == True %}
+        <h2 style="color: green; margin: 0%;">{{ message }}</h2>
+    {% elif success == False %}
+        <h2 style="color: red; margin: 0%;">{{ message }}</h2>
+    {% endif %}
+    
+    <!-- Conditional Forms -->
+    {% if reg_type == 'customer' %}
+    <form class="form-css" method="POST" action="{{ url_for('register_bp.register_view_customer') }}">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="text" name="full_name" placeholder="Full Name" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="submit" value="Sign-up as Customer">
+    </form>
+    {% elif reg_type == 'vendor' %}
+    <form class="form-css" method="POST" action="{{ url_for('register_bp.register_view_vendor') }}">
+        <input type="text" name="username" placeholder="Vendor Username" required>
+        <input type="email" name="email" placeholder="Vendor Email" required>
+        <input type="text" name="full_name" placeholder="Vendor Full Name" required>
+        <input type="password" name="password" placeholder="Vendor Password" required>
+        <input type="submit" value="Sign-up as Vendor">
+    </form>
+    {% elif reg_type == 'admin' %}
+    <form class="form-css" method="POST" action="{{ url_for('register_bp.register_view_admin') }}">
+        <input type="text" name="username" placeholder="Admin Username" required>
+        <input type="email" name="email" placeholder="Admin Email" required>
+        <input type="text" name="full_name" placeholder="Admin Full Name" required>
+        <input type="password" name="password" placeholder="Admin Password" required>
+        <input type="submit" value="Sign-up as Admin">
+    </form>
+    {% endif %}
+
+    <div class="other-options">
+        <!-- Link to Customer registration -->
+        <a href="{{ url_for('register_bp.register_who', type='customer') }}">
+            <h3>Customer</h3>
+        </a>
+        <!-- Link to Vendor registration -->
+        <a href="{{ url_for('register_bp.register_who', type='vendor') }}">
+            <h3>Vendor</h3>
+        </a>
+        <!-- Link to Admin registration -->
+        <a href="{{ url_for('register_bp.register_who', type='admin') }}">
+            <h3>Admin</h3>
+        </a>
+    </div>
+</section>
 {% endblock body %}
