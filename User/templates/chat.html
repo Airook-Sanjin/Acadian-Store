@@ -71,50 +71,38 @@
 
         <div class="chat-header">
             <h1>Chat</h1>
+            {% if message %}
+                <p style="color: red;">{{ message }}</p>
+            {% endif %}
         </div>
 
         <div class="chat-body">
-
-            <div class="incoming-message">
-                <div class="incoming-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
+            {% for message in messages %}
+                {% if message['CID'] is not none %}
+                <div class="incoming-message">
+                    <div class="incoming-message-info">
+                        <p>{{ message['CID'] }}</p>
+                        <p>{{ message['timestamp'] }}</p>
+                    </div>
+                    <div class="incoming-message-text">
+                        <p>{{ message['message'] }}</p>
+                    </div>
                 </div>
-                <div class="incoming-message-text">
-                    <p>text text text text text text text</p>
+                {% elif message['VID'] is not none %}
+                <div class="outgoing-message">
+                    <div class="outgoing-message-info">
+                        <p>{{ message['VID'] }}</p>
+                        <p>{{ message['timestamp'] }}</p>
+                    </div>
+                    <div class="outgoing-message-text">
+                        <p>{{ message['message'] }}</p>
+                        {% if message['images'] %}
+                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-
-            <div class="outgoing-message">
-                <div class="outgoing-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
-                </div>
-                <div class="outgoing-message-text">
-                    <p>text text text text text text text</p>
-                </div>
-            </div>
-
-            <div class="incoming-message">
-                <div class="incoming-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
-                </div>
-                <div class="incoming-message-text">
-                    <p>text text text text text text text</p>
-                </div>
-            </div>
-
-            <div class="outgoing-message">
-                <div class="outgoing-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
-                </div>
-                <div class="outgoing-message-text">
-                    <p>text text text text text text text</p>
-                </div>
-            </div>
-
+                {% endif %}
+            {% endfor %}
         </div>
 
         <div class="chat-footer">
