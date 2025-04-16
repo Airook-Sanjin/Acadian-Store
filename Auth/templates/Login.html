@@ -9,7 +9,7 @@
   <body>
     {% block body %}
     <section class="log-in-page">
-      <form class="form-css" method="POST">
+      <form class="form-css" method="POST" action="{{ url_for('login_bp.Signin') }}">
         {% if message %}
           <p style="color: red;">{{ message }}</p>
         {% endif %}
