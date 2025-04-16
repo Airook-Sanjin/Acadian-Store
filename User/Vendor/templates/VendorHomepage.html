@@ -1,32 +1,46 @@
 <style>
-    body{
-        display: flex;
-        justify-content: center; 
-        align-items: center; 
-        height: 100vh; 
-        margin: 0;
-    }
     .add-product-page{
         display: flex;
         flex-direction:row;
         justify-content: space-around;
-        align-items: center;
+        align-content: center ;
+        /* align-items: center; */
         width: 80%;
         min-height: 70%;
         border-radius: 30px;
         background-color: antiquewhite;
     }
 
-    .form-css{
+    .forms-holder {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: flex-start; /* Align items at the top to prevent stretching */
+        width: 60%;
+        height: auto; /* Allow the container to grow naturally */
+    }
+
+    .form-css {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
         margin: 0;
         min-width: 200px;
-        min-height: 300px;
         padding: 20px;
         background-color: rgb(207, 239, 239);
     }
+
+    .form1 {
+        justify-content: space-around;
+        min-height: 300px; /* Keep min-height for form1 */
+        /* background-color: rgb(31, 77, 77); */
+    }
+
+    .form2 {
+        justify-content: space-between;
+        height: auto; /* Allow form2 to grow naturally based on content */
+        /* background-color: rgb(212, 235, 235); */
+    }
+
     .discount_field_css{
         display: flex;
         flex-direction: column;
@@ -46,123 +60,102 @@
         text-align: center;
         align-content: center;
         width: 20%;
-        height: 10vh;
+        height: 100%;
+    }
+
+    .Main {
+        display: flex;
+        justify-content: center; 
+        align-items: center; 
+        min-height: calc(100vh - 200px); /* Adjust for header/footer height */
+        padding: 20px; 
+        box-sizing: border-box; /* Include padding in width/height calculations */
     }
 </style>
 {% extends 'GuestHomepage.html'%}
 
 {% block body %}
-<!--  Darlins vendor-->
+<!-- Erick vendor -->
+    <!-- <h1>Vendor</h1> -->
+<section class="Main">
+        <!--  Darlins vendor-->
  <section class="add-product-page">
-    <div class="leftside-of-add-product-page">
-        <h1>Vendor</h1><br>
-        {% if success == True %}
-            <h2 style="color: green; margin: 0%;">{{ message }}</h2>
-        {% elif success == False %}
-            <h2 style="color: red; margin: 0%;">{{ message }}</h2>
-        {% endif %}
-    </div>
-    <div>
-        <!-- Form for adding a product -->
-        <form class="form-css" method="POST" action="{{ url_for('login_bp.vendor_bp.VendorAddProductPage') }}">
-            <!-- Title -->
-            <label for="title">Product Title:</label>
-            <input type="text" id="title" name="title" placeholder="Title" required>
+        <div class="leftside-of-add-product-page">
+            <h1>Vendor</h1><br>
+            {% if success == True %}
+                <h2 style="color: green; margin: 0%;">{{ message }}</h2>
+            {% elif success == False %}
+                <h2 style="color: red; margin: 0%;">{{ message }}</h2>
+            {% endif %}
+        </div>
+        <div class="forms-holder">
+            <!-- Form for adding a product -->
+            <form class="form-css form1" method="POST" action="{{ url_for('login_bp.vendor_bp.VendorAddProductPage') }}">
+                <!-- Title -->
+                <label for="title">Product Title:</label>
+                <input type="text" id="title" name="title" placeholder="Title" required>
 
-            <!-- Price -->
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" placeholder="Price" required>
+                <!-- Price -->
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" placeholder="Price" required>
 
-            <!-- Description -->
-            <label for="description">Description:</label>
-            <input type="text" id="description" name="description" placeholder="Description" required>
+                <!-- Description -->
+                <label for="description">Description:</label>
+                <input type="text" id="description" name="description" placeholder="Description" required>
 
-            <!-- Warranty -->
-            <label for="warranty">Warranty:</label>
-            <input type="date" id="warranty" name="warranty" placeholder="Warranty" required>
+                <!-- Warranty -->
+                <label for="warranty">Warranty:</label>
+                <input type="date" id="warranty" name="warranty" placeholder="Warranty" required>
 
-            <!-- Add Discount Radio Buttons -->
-            <label>Do you want to add a discount?</label>
-            <div>
-                <input type="radio" id="add_discount_yes" name="add_discount" value="yes" onclick="toggleDiscountFields(true)" required>
-                <label for="add_discount_yes">Yes</label>
-                <input type="radio" id="add_discount_no" name="add_discount" value="no" onclick="toggleDiscountFields(false)" required>
-                <label for="add_discount_no">No</label>
-            </div>
+                <!-- Add Discount Radio Buttons -->
+                <label>Do you want to add a discount?</label>
+                <div>
+                    <input type="radio" id="add_discount_yes" name="add_discount" value="yes" onclick="toggleDiscountFields(true)" required>
+                    <label for="add_discount_yes">Yes</label>
+                    <input type="radio" id="add_discount_no" name="add_discount" value="no" onclick="toggleDiscountFields(false)" required>
+                    <label for="add_discount_no">No</label>
+                </div>
 
-            <!-- Discount Fields (Initially Hidden) -->
-            <div id="discount_fields" style="display: none;" class="discount_field_css">
-                <label for="discount">Discount (%):</label>
-                <input type="number" id="discount" name="discount" placeholder="Discount">
-                <label for="discount_date">Discount End Date:</label>
-                <input type="date" id="discount_date" name="discount_date" placeholder="Discount End Date">
-            </div>
+                <!-- Discount Fields (Initially Hidden) -->
+                <div id="discount_fields" style="display: none;" class="discount_field_css">
+                    <label for="discount">Discount (%):</label>
+                    <input type="number" id="discount" name="discount" placeholder="Discount">
+                    <label for="discount_date">Discount End Date:</label>
+                    <input type="date" id="discount_date" name="discount_date" placeholder="Discount End Date">
+                </div>
 
-            <!-- Availability -->
-            <label for="availability">Availability:</label>
-            <select id="availability" name="availability" required>
-                <option value="" disabled selected>Select availability</option>
-                <option value="IN STOCK">IN STOCK</option>
-                <option value="OUT OF STOCK">OUT OF STOCK</option>
-            </select>
+                <!-- Availability -->
+                <label for="availability">Availability:</label>
+                <select id="availability" name="availability" required>
+                    <option value="" disabled selected>Select availability</option>
+                    <option value="IN STOCK">IN STOCK</option>
+                    <option value="OUT OF STOCK">OUT OF STOCK</option>
+                </select>
 
-            <!-- Vendor ID -->
-            <label for="VID">Vendor ID:</label>
-            <input type="number" id="VID" name="VID" placeholder="Enter your Vendor ID" required>
+                <!-- Vendor ID -->
+                <label for="VID">Vendor ID:</label>
+                <input type="number" id="VID" name="VID" placeholder="Enter your Vendor ID" required>
 
-            <input type="submit" value="Add Product to Acadia">
-        </form>
+                <input type="submit" value="Add Product to Acadia">
+            </form>
 
-        <!-- Form for adding a product -->
-        <form class="form-css" method="POST" action="{{ url_for('login_bp.vendor_bp.VendorAddProductPage') }}">
-            <!-- Title -->
-            <label for="title">Product Title:</label>
-            <input type="text" id="title" name="title" placeholder="Title" required>
+            <!-- Form for adding a inventory for Product -->
+            <form class="form-css form2" method="POST">
+                <label for="PID">PID:</label>
+                <input type="text" name="PID" placeholder="PID">
 
-            <!-- Price -->
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" placeholder="Price" required>
+                <label for="Color">Color:</label>
+                <input type="text" name="Color" placeholder="Color">
 
-            <!-- Description -->
-            <label for="description">Description:</label>
-            <input type="text" id="description" name="description" placeholder="Description" required>
+                <label for="Size">Size:</label>
+                <input type="text" name="Size" placeholder="Size">
 
-            <!-- Warranty -->
-            <label for="warranty">Warranty:</label>
-            <input type="date" id="warranty" name="warranty" placeholder="Warranty" required>
-
-            <!-- Add Discount Radio Buttons -->
-            <label>Do you want to add a discount?</label>
-            <div>
-                <input type="radio" id="add_discount_yes" name="add_discount" value="yes" onclick="toggleDiscountFields(true)" required>
-                <label for="add_discount_yes">Yes</label>
-                <input type="radio" id="add_discount_no" name="add_discount" value="no" onclick="toggleDiscountFields(false)" required>
-                <label for="add_discount_no">No</label>
-            </div>
-
-            <!-- Discount Fields (Initially Hidden) -->
-            <div id="discount_fields" style="display: none;" class="discount_field_css">
-                <label for="discount">Discount (%):</label>
-                <input type="number" id="discount" name="discount" placeholder="Discount">
-                <label for="discount_date">Discount End Date:</label>
-                <input type="date" id="discount_date" name="discount_date" placeholder="Discount End Date">
-            </div>
-
-            <!-- Availability -->
-            <label for="availability">Availability:</label>
-            <select id="availability" name="availability" required>
-                <option value="" disabled selected>Select availability</option>
-                <option value="IN STOCK">IN STOCK</option>
-                <option value="OUT OF STOCK">OUT OF STOCK</option>
-            </select>
-
-            <!-- Vendor ID -->
-            <label for="VID">Vendor ID:</label>
-            <input type="number" id="VID" name="VID" placeholder="Enter your Vendor ID" required>
-
-            <input type="submit" value="Add Product to Acadia">
-        </form>
-    </div>
+                <label for="amount">Amount:</label>
+                <input type="number" name="amount" placeholder="amount">
+                <input type="submit" value="Add Inventory for Product">
+            </form>
+        </div>
+    </section>
 </section>
 
 <script>
@@ -178,10 +171,4 @@ function toggleDiscountFields(show) {
     }
 }
 </script> 
-
-<!-- Erick vendor -->
-    <h1>Vendor</h1>
-    <section class="Main">
-        
-    </section>
-{% endblock body %}
+{% endblock body%}
