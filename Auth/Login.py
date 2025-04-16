@@ -18,50 +18,36 @@ def Login():
     print('in LOgin')
     return render_template('login.html')
 
-@login_bp.route('/Login',methods = ["POST"])
+@login_bp.route('/Login', methods=["POST"])
 def Signin():
     message = None
-    # Creates dictionary view of all users,customer, vendor and admin
-    
-    result = conn.execute(text(
-        """ SELECT u.username,c.email, 'customer' AS role FROM customer as c Natural JOIN users as u
-            WHERE c.email = :email
-            UNION
-            SELECT u.username, a.email, 'admin' AS role FROM admin as a Natural JOIN users as u
-            WHERE a.email = :email
-            UNION
-            SELECT u.username, v.email,'vendor' AS role FROM vendor as v Natural JOIN users as u
-            WHERE v.email = :email"""
-    ),{'email':request.form.get('Email')}).mappings().fetchone()
-    
+    result = conn.execute(text(""" SELECT u.username, c.email, c.CID AS ID, 'customer' AS role FROM customer AS c 
+                            NATURAL JOIN users AS u WHERE c.email = :email UNION SELECT u.username, a.email, a.AID AS ID, 'admin' AS role 
+                            FROM admin AS a NATURAL JOIN users AS u
+                            WHERE a.email = :email,UNION SELECT u.username, v.email, v.VID AS ID, 'vendor' AS role
+                            FROM vendor AS v NATURAL JOIN users AS u WHERE v.email = :email"""),
+                            {'email': request.form.get('Email')}).mappings().fetchone()
+    if not result:
+        message = "Email not found."
+        return render_template('login.html', message=message)
+
     role = result['role']
-    session['User'] = {'Name':result['username'],'Role':role}
+    session['User'] = {'Name': result['username'], 'Role': role, 'ID': result['ID']}
     g.User = session['User']
-    
-    
+
     try:
-
-        if role=='customer': # * Looks through all customers and see if any match with the email
-            
+        if role=='customer':
             print('INTO Customer')
-            return redirect(url_for('login_bp.customer_bp.CustomerHomePage')) # * Takes you to Customer page
-        
+            return redirect(url_for('login_bp.customer_bp.CustomerHomePage'))
         elif role=='admin':
-            
-
             print('INTO Admin')
-            
-            return redirect(url_for('login_bp.admin.AdminHomePage')) # * Takes you to admin page
-        
-        elif role=='vendor': # * Looks through all Vendors and see if any match with the email
-            
-            print('INTO VENDOR')
-            return redirect(url_for('login_bp.vendor_bp.VendorHomePage')) # * Takes you to vendor page
-        
+            return redirect(url_for('login_bp.admin.AdminHomePage'))
+        elif role=='vendor':
+            print('INTO Vendor')
+            return redirect(url_for('login_bp.vendor_bp.VendorHomePage'))
         else:
             message = "Email not found."
             return render_template('login.html', message=message)
-        
     except Exception as e:
         print(e)
         message = "An error occurred during login."
