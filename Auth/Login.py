@@ -21,12 +21,11 @@ def Login():
 @login_bp.route('/Login', methods=["POST"])
 def Signin():
     message = None
-    result = conn.execute(text(""" SELECT u.username, c.email, c.CID AS ID, 'customer' AS role FROM customer AS c 
-                            NATURAL JOIN users AS u WHERE c.email = :email UNION SELECT u.username, a.email, a.AID AS ID, 'admin' AS role 
-                            FROM admin AS a NATURAL JOIN users AS u
-                            WHERE a.email = :email,UNION SELECT u.username, v.email, v.VID AS ID, 'vendor' AS role
-                            FROM vendor AS v NATURAL JOIN users AS u WHERE v.email = :email"""),
-                            {'email': request.form.get('Email')}).mappings().fetchone()
+    result = conn.execute(text(""" SELECT u.username, c.email, c.CID AS ID, 'customer' AS role FROM customer AS c NATURAL JOIN users AS u
+        WHERE c.email = :email UNION SELECT u.username, a.email, a.AID AS ID, 'admin' AS role FROM admin AS a NATURAL JOIN users AS u
+        WHERE a.email = :email UNION SELECT u.username, v.email, v.VID AS ID, 'vendor' AS role FROM vendor AS v NATURAL JOIN users AS u
+        WHERE v.email = :email"""), {'email': request.form.get('Email')}).mappings().fetchone()
+
     if not result:
         message = "Email not found."
         return render_template('login.html', message=message)
@@ -36,13 +35,13 @@ def Signin():
     g.User = session['User']
 
     try:
-        if role=='customer':
+        if role == 'customer':
             print('INTO Customer')
             return redirect(url_for('login_bp.customer_bp.CustomerHomePage'))
-        elif role=='admin':
+        elif role == 'admin':
             print('INTO Admin')
             return redirect(url_for('login_bp.admin.AdminHomePage'))
-        elif role=='vendor':
+        elif role == 'vendor':
             print('INTO Vendor')
             return redirect(url_for('login_bp.vendor_bp.VendorHomePage'))
         else:
