@@ -3,10 +3,11 @@ from flask import Blueprint, render_template, request,g,session
 from dbconnect import Connecttodb  # Import the updated Connecttodb function
 from sqlalchemy import text
 from User.chat import chat_bp
+vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
 
 vendor_bp.register_blueprint(chat_bp)
 
-vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
+
 @vendor_bp.before_request # Before each request it will look for the values below
 def load_user():
         
@@ -18,7 +19,10 @@ def load_user():
 @vendor_bp.route('/Home')
 def VendorHomePage():
     return render_template('VendorHomepage.html')
-  
+
+###########################################################
+# IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
+###########################################################
 
 @vendor_bp.route('/AddProduct', methods=["GET", "POST"])
 def VendorAddProductPage():

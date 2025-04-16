@@ -18,17 +18,17 @@
               <li><button id="ViewAccounts" onclick="window.location.href = ''">HOMEPAGE</button></li>
               
              {%if g.User['Role']=='admin' %}
-              <li><button id="ViewAccounts" onclick="window.location.href = ''">CHAT</button></li>
+              <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('login_bp.admin.chat_bp.chat_view') }}'">CHAT</button></li>
               <li><button id="ViewAccounts" onclick="window.location.href = ''">Pending Accounts</button></li>
               <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
               
              
               {%elif g.User['Role']=='vendor'%}
-                <li><button id="ViewAccounts" onclick="window.location.href = ''">CHAT</button></li>
+                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('login_bp.vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
                 <li><button id="ViewAccounts" onclick="window.location.href = ''">SEE YOUR PRODUCTS</button></li>
                 <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
               {% elif g.User['Role']=='customer' %}
-                <li><button id="ViewAccounts" onclick="window.location.href = ''">CHAT</button></li>
+                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('login_bp.customer_bp.chat_bp.chat_view') }}'">CHAT</button></li>
               {%endif%}
               
   
@@ -72,10 +72,10 @@
         <div class="footer__section">
           <h2 class="footer__title">Quick Links</h2>
           <ul class="footer__links">
-            <li><a href="/Homepage">Home</a></li>
-            <li><a href="/UserPage">My Accounts</a></li>
-            <li><a href="/Contact">Contact Us</a></li>
-            <li><a href="/PrivacyPolicy">Privacy Policy</a></li>
+            <li><a class="footer__link" href="/Homepage">Home</a></li>
+            <li><a class="footer__link" href="/UserPage">My Accounts</a></li>
+            <li><a class="footer__link" href="/Contact">Contact Us</a></li>
+            <li><a class="footer__link" href="/PrivacyPolicy">Privacy Policy</a></li>
           </ul>
         </div>
       </div>
