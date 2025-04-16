@@ -2,9 +2,12 @@
 from flask import Blueprint, render_template, request,g,session
 from dbconnect import Connecttodb  # Import the updated Connecttodb function
 from sqlalchemy import text
-
-
+from User.chat import chat_bp
 vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
+
+vendor_bp.register_blueprint(chat_bp)
+
+
 @vendor_bp.before_request # Before each request it will look for the values below
 def load_user():
         
@@ -56,8 +59,8 @@ def VendorAddProductPage():
             })
         
         # conn.commit()
-        return render_template('VendorHomePage.html', message="Added product successfully.", success=True)
+        return render_template('AddProduct.html', message="Added product successfully.", success=True)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('VendorHomePage.html', message="Product failed to add.", success=False)
+        return render_template('AddProduct.html', message="Product failed to add.", success=False)
 
