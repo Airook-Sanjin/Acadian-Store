@@ -19,7 +19,10 @@ def load_user():
 @vendor_bp.route('/Home')
 def VendorHomePage():
     return render_template('VendorHomepage.html')
-  
+
+###########################################################
+# IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
+###########################################################
 
 @vendor_bp.route('/AddProduct', methods=["GET", "POST"])
 def VendorAddProductPage():
