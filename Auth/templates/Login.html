@@ -2,24 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
-    <link rel="stylesheet" href="{{ url_for('login_bp.static', filename='style/Auth.css') }}" />
-
+    <link rel="stylesheet" href="{{ url_for('register_bp.static', filename='style/Auth.css') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
   </head>
   <body>
     {% block body %}
-    <section class="leftSide">
-    </section>
-    <section class="rightSide">
-      <form class="Form-Container" method="POST">
-        <input type="email" name="Email" id="Email" />
-        <input type="password" name="Pass" id="Pass" />
+    <section class="log-in-page">
+      <form class="form-css" method="POST" action="{{ url_for('login_bp.Signin') }}">
+        {% if message %}
+          <p style="color: red;">{{ message }}</p>
+        {% endif %}
+        <input type="email" name="Email" id="Email" placeholder="Email" />
+        <input type="password" name="Pass" id="Pass" placeholder="Password" />
         <input type="submit" value="LOG IN">
       </form>
-      <button onclick="window.location.href='{{ url_for('register_bp.register_who') }}'">Sign up</button>
+      <div class="other-options">
+        <a href="{{ url_for('register_bp.register_who') }}">
+          <h3>Sign Up</h3>
+        </a>
+      </div>
     </section>
-    {% endblock body %}
+    {% endblock %}
   </body>
 </html>

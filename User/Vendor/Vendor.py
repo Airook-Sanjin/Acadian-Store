@@ -1,11 +1,19 @@
 
-from flask import Blueprint, render_template, request,g,session
+from globals import Blueprint, render_template, request,g,session
 from dbconnect import Connecttodb  # Import the updated Connecttodb function
 from sqlalchemy import text
+from User.chat import chat_bp
 from globals import redirect, url_for
 
 
 vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
+
+vendor_bp.register_blueprint(chat_bp)
+
+# Get database connection
+conn = Connecttodb()
+
+
 @vendor_bp.before_request # Before each request it will look for the values below
 def load_user():
         
@@ -76,9 +84,8 @@ def VendorAddProduct():
 
         # Commit the changes to the database
         # conn.commit()
-
-        # Redirect to the ViewProducts route to display the updated product list
-        return redirect(url_for('login_bp.vendor_bp.VendorAddProduct', success=True))
+        return render_template('AddProduct.html', message="Added product successfully.", success=True)
     except Exception as e:
-        print(f"Error: {e}")
-        return redirect(url_for('login_bp.vendor_bp.VendorAddProduct', success=False))
+        print(f"Error adding product: {e}")
+        return render_template('AddProduct.html', message="Product failed to add.", success=False)
+

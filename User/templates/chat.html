@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    body{
+        display: flex;
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        margin: 0;
+    }
+    .chat-page{
+        width: 60%;
+        height: 70%;
+        border-radius: 30px;
+        background-color: #f0f0f0;
+    }
+    .chat-header{
+        width: 100%;
+        height: 10%;
+        background-color: lightblue;
+        border-radius: 30px 30px 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .chat-body{
+        width: auto;
+        height: 80%;
+        background-color: #f0f0f0;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    .incoming-message-info{
+        display: flex;
+    }
+    .incoming-message-text{
+        height: auto;
+        background-color: lightblue;
+        border-radius: 20px 20px 20px 0px;
+        margin: 10px 0;
+        padding: 10px;
+    }
+    .outgoing-message-info{
+        display: flex;
+    }
+    .outgoing-message-text{
+        height: auto;
+        background-color: lightgreen;
+        border-radius: 20px 20px 0px 20px;
+        margin: 10px 0;
+        padding: 10px;
+    }
+    .chat-footer{
+        width: 100%;
+        height: 10%;
+        background-color: lightblue;
+        border-radius: 0 0 30px 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<body>
+
+    <section class="chat-page">
+
+        <div class="chat-header">
+            <h1>Chat</h1>
+            {% if message %}
+                <p style="color: red;">{{ message }}</p>
+            {% endif %}
+        </div>
+
+        <div class="chat-body">
+            <div class="chat-start">
+                <div class="chat-search">
+                    <h3>Search for Vendor and Product</h3>
+                    <form method="POST" action="{{ url_for('chat_bp.chat_view') }}">
+                        <input type="text" name="vendor_id" placeholder="Enter vendor ID" required>
+                        <input type="text" name="product_id" placeholder="Enter product ID (optional)">
+                        <input type="submit" value="Begin Chat">
+                    </form>
+                </div>
+            
+                <div class="previous-chat">
+                    <h3>Select Previous Chat</h3>
+                    <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
+                        <select name="chat_id" required>
+                            <option value="" disabled selected>Select a chat</option>
+                            {% for chat in previous_chats %}
+                                <option value="{{ chat['CHAT_ID'] }}">
+                                    Vendor: {{ chat['vendor_name'] }} - Product: {{ chat['product_name'] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="Continue Chat">
+                    </form>
+                </div>
+            </div>
+
+            {% for message in messages %}
+                {% if message['CID'] is not none %}
+                <div class="incoming-message">
+                    <div class="incoming-message-info">
+                        <p>{{ message['CID'] }}</p>
+                        <p>{{ message['timestamp'] }}</p>
+                    </div>
+                    <div class="incoming-message-text">
+                        <p>{{ message['message'] }}</p>
+                    </div>
+                </div>
+                {% elif message['VID'] is not none %}
+                <div class="outgoing-message">
+                    <div class="outgoing-message-info">
+                        <p>{{ message['VID'] }}</p>
+                        <p>{{ message['timestamp'] }}</p>
+                    </div>
+                    <div class="outgoing-message-text">
+                        <p>{{ message['message'] }}</p>
+                        {% if message['images'] %}
+                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" id="message" placeholder="Type your message here..." style="width: 80%;">
+            <input type="submit" value="Send">
+        </div>
+
+    </section>
+
+</body>
+</html>
