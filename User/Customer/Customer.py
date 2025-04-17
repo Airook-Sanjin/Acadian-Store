@@ -2,11 +2,11 @@
 from globals import Blueprint, render_template,redirect,url_for,session,g,text,Connecttodb
 
 from User.chat import chat_bp
-from User.user_util.cart.cart import cart_bp
+
 
 customer_bp = Blueprint('customer_bp', __name__, url_prefix='/cust', template_folder='templates')
 customer_bp.register_blueprint(chat_bp)
-customer_bp.register_blueprint(cart_bp)
+
 
 
 
@@ -28,10 +28,3 @@ def CustomerHomePage():
            LEFT JOIN product_inventory as inv on pi.PID = inv.PID""")).mappings().fetchall()
     return render_template('CustomerHomepage.html',Allproducts=Allproducts)
 
-@customer_bp.route('/Cart/<username>') # Customer Cart
-def GotoCart(username):
-    from Auth.Login import login_bp #* Importing from here prevents circular imports.
-    
-    if g.User:
-        return redirect(url_for('cart_bp.UserCart', username = g.User['Name']))
-    return redirect(url_for('login_bp.Login'))

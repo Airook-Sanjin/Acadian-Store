@@ -1,4 +1,45 @@
-{% extends 'GuestHomepage.html %}
+<style>
+    .Cart-Container{
+        display: flex;
+        flex-direction: column;
+        background-color: var(--Primary);
+        padding: 2em;
+        gap:3em;
+    }
+    .item-Card{
+        display: flex;
+        flex-direction: row;
+        background-color: white;
+        padding:2em;
+        border-radius: 20px;
+        justify-content: space-between;
+        }
+    .item-info{
+        display: flex;
+        flex-direction: row;
+        gap:2em;
+        width:50%;
+    }
+    .product_container{
+        display: none;
+    }
+</style>
+{% extends 'GuestHomepage.html' %}
 {% block body %}
-<h1>{{g.User}}'s Cart</h1>
+
+<h1>{{username.title()}}'s' Cart</h1>
+<section class="Cart-Container">
+{% for item in CartList %}
+<section class="item-Card">
+    <section class="item-info">
+<h3>{{item['title']}}</h3>
+<h4>{{item['size']}}</h4>
+<p>{{item['description']}}</p>
+</section>
+<section class="item-remove">
+    <input type="submit" value="Remove-item">
+</section>
+</section>
+{% endfor %}
+</section>
 {% endblock %}

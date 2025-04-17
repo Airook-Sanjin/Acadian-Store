@@ -34,7 +34,7 @@ def Signin():
 
         role = result['role']
         ID= result['ID']
-        session['User'] = {'Name':result['username'],'Role':role,'ID':ID}
+        session['User'] = {'Name':result['username'],'Role':role,'ID': ID}
         g.User = session['User']
         if role=='customer': # * Looks through all customers and see if any match with the email
             
