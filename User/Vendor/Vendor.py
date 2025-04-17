@@ -22,9 +22,9 @@ def load_user():
     else:
         g.User = None
         
-# @vendor_bp.route('/Home', methods=["GET"])
-# def VendorHomePage():
-#     return render_template('VendorHomepage.html')
+@vendor_bp.route('/Home', methods=["GET"])
+def VendorHomePage():
+    return render_template('VendorHomepage.html')
 
 ###########################################################
 # IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
