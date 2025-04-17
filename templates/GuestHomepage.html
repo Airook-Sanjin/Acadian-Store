@@ -18,22 +18,24 @@
               <li><button id="ViewAccounts" onclick="window.location.href = ''">HOMEPAGE</button></li>
               
              {%if g.User['Role']=='admin' %}
-              <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('login_bp.admin.chat_bp.chat_view') }}'">CHAT</button></li>
+              <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('admin.chat_bp.chat_view') }}'">CHAT</button></li>
               <li><button id="ViewAccounts" onclick="window.location.href = ''">Pending Accounts</button></li>
               <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
               
              
               {%elif g.User['Role']=='vendor'%}
-                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('login_bp.vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
+                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
                 <li><button id="ViewAccounts" onclick="window.location.href = ''">SEE YOUR PRODUCTS</button></li>
                 <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
               {% elif g.User['Role']=='customer' %}
-                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('login_bp.customer_bp.chat_bp.chat_view') }}'">CHAT</button></li>
+                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('customer_bp.chat_bp.chat_view') }}'">CHAT</button></li>
+              {% else %}
               {%endif%}
               
   
              
             </ul>
+            <input type="search" name="Search" id="Search" placeholder="Search">
           </div>
   
           <div class="Right-side">
@@ -41,8 +43,15 @@
             <h4>Hello {{g.User["Name"]}}</h4>
             {%else%}
             {% endif %}
+            
+            {%if not g.User  %}
+            
+            <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
+            {% else %}
             <iconify-icon class="Profile" icon="mdi:account-circle">   </iconify-icon>
-            <button id="ViewAccounts" onclick="window.location.href = '/'">Log Out</button>
+            <button id='GotoCart' onclick="window.location.href='{{ url_for('customer_bp.GotoCart',username= g.User['Name']) }}'"> <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon></button>
+            <button id="ViewAccounts" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log Out</button>
+            {% endif %}
             
            
             
@@ -50,9 +59,37 @@
   
         </div>
       </header>
-    {% block body %}
-    <h1>GUEST</h1>
-    {% endblock body %}
+      <section class="Main">
+        {% block body %}
+    
+        <h1>GUEST</h1>
+        
+      
+        {% endblock body %}
+        {%if not g.User or g.User['Role'] == 'customer' %}
+        <section class = product_container>
+          {% for product in Allproducts %}
+            <section class="product_card">
+            <section class = product_img>
+              <img src="{{product['image']}}" alt="{{product['title']}}">
+            </section>
+            <section class="product">
+              <h3 class='title'>{{product['title']}}</h3>
+              <h4 class="price">${{product['price']}}</h4>
+              <p class="desc">{{product['description']}}</p>
+              <select name="Colors" id="Colors">
+                <option value=""></option>
+              </select>
+              <p class="inventory">{{product['amount']}}</p>
+            </section>
+            </section> 
+          {% endfor %}
+        </section>
+        {% else %}
+        {% endif %}
+        
+        
+  </section>
     <footer class="footer">
       <div class="footer__container">
         <div class="footer__section">
