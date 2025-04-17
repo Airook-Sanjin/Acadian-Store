@@ -71,50 +71,64 @@
 
         <div class="chat-header">
             <h1>Chat</h1>
+            {% if message %}
+                <p style="color: red;">{{ message }}</p>
+            {% endif %}
         </div>
 
         <div class="chat-body">
-
-            <div class="incoming-message">
-                <div class="incoming-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
+            <div class="chat-start">
+                <div class="chat-search">
+                    <h3>Search for Vendor and Product</h3>
+                    <form method="POST" action="{{ url_for('chat_bp.chat_view') }}">
+                        <input type="text" name="vendor_id" placeholder="Enter vendor ID" required>
+                        <input type="text" name="product_id" placeholder="Enter product ID (optional)">
+                        <input type="submit" value="Begin Chat">
+                    </form>
                 </div>
-                <div class="incoming-message-text">
-                    <p>text text text text text text text</p>
-                </div>
-            </div>
-
-            <div class="outgoing-message">
-                <div class="outgoing-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
-                </div>
-                <div class="outgoing-message-text">
-                    <p>text text text text text text text</p>
-                </div>
-            </div>
-
-            <div class="incoming-message">
-                <div class="incoming-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
-                </div>
-                <div class="incoming-message-text">
-                    <p>text text text text text text text</p>
+            
+                <div class="previous-chat">
+                    <h3>Select Previous Chat</h3>
+                    <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
+                        <select name="chat_id" required>
+                            <option value="" disabled selected>Select a chat</option>
+                            {% for chat in previous_chats %}
+                                <option value="{{ chat['CHAT_ID'] }}">
+                                    Vendor: {{ chat['vendor_name'] }} - Product: {{ chat['product_name'] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="Continue Chat">
+                    </form>
                 </div>
             </div>
 
-            <div class="outgoing-message">
-                <div class="outgoing-message-info">
-                    <p>incominguser</p>
-                    <p>Sent 00/00/00 00:00</p>
+            {% for message in messages %}
+                {% if message['CID'] is not none %}
+                <div class="incoming-message">
+                    <div class="incoming-message-info">
+                        <p>{{ message['CID'] }}</p>
+                        <p>{{ message['timestamp'] }}</p>
+                    </div>
+                    <div class="incoming-message-text">
+                        <p>{{ message['message'] }}</p>
+                    </div>
                 </div>
-                <div class="outgoing-message-text">
-                    <p>text text text text text text text</p>
+                {% elif message['VID'] is not none %}
+                <div class="outgoing-message">
+                    <div class="outgoing-message-info">
+                        <p>{{ message['VID'] }}</p>
+                        <p>{{ message['timestamp'] }}</p>
+                    </div>
+                    <div class="outgoing-message-text">
+                        <p>{{ message['message'] }}</p>
+                        {% if message['images'] %}
+                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-
+                {% endif %}
+            {% endfor %}
         </div>
 
         <div class="chat-footer">

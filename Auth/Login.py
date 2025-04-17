@@ -16,14 +16,10 @@ def Login():
     print('in LOgin')
     return render_template('login.html')
 
-@login_bp.route('/Login',methods = ["POST"])
+@login_bp.route('/Login', methods=["POST"])
 def Signin():
     message = None
     # Creates dictionary view of all users,customer, vendor and admin
-    
-    
-    
-    
     try:
         result = conn.execute(text(
         """ SELECT u.username,c.email, 'customer' AS role, CID as ID FROM customer as c Natural JOIN users as u
@@ -46,8 +42,6 @@ def Signin():
             return redirect(url_for('customer_bp.CustomerHomePage')) # * Takes you to Customer page
         
         elif role=='admin':
-            
-
             print('INTO Admin')
             
             return redirect(url_for('admin.AdminHomePage')) # * Takes you to admin page
@@ -56,11 +50,10 @@ def Signin():
             
             print('INTO VENDOR')
             return redirect(url_for('vendor_bp.VendorHomePage')) # * Takes you to vendor page
-        
+ 
         else:
             message = "Email not found."
             return render_template('login.html', message=message)
-        
     except Exception as e:
         print(e)
         message = "An error occurred during login."
