@@ -118,6 +118,57 @@
      .description{
  
      }
+
+     /* Modal */
+    #InventoryModal {
+        flex-direction: row;
+        justify-content: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        /* width: 400px; */
+        width: auto;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: none; /* Hidden by default */
+    }
+
+    .modal-dialog {
+        height: auto;
+        align-content: center;
+        padding: 20px;
+    }
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .modal-footer{
+        display: flex;
+        width: 100%;
+        justify-content: center
+    }
+
+    .btn{
+        background-color: antiquewhite;
+    }
+    .btn-primary{
+        margin-top: 3%;
+    }
+
+    .Inventory-form{
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        align-items: center;
+    }
  
      
  </style>
@@ -136,7 +187,7 @@
          </div>
  
          <form class="form-css form1" method="POST" action="{{ url_for('vendor_bp.VendorAddProduct') }}">
-             
+            <h1 class="modal-title" id="accountModalLabel">Add Product</h1>
              <!-- URL -->
              <label for="URL">Image URL:</label>
              <input type="url" id="URL" name="URL" placeholder="IMG" required>
@@ -188,38 +239,54 @@
  
              <input type="submit" value="Add Product to Acadia">
          </form>
- 
-         <!-- Form for adding a inventory for Product -->
-         <!-- <form class="form-css form2" method="POST">
-                 <label for="PID">PID:</label>
-                 <input type="text" name="PID" placeholder="PID">
- 
-                 <label for="Color">Color:</label>
-                 <input type="text" name="Color" placeholder="Color">
- 
-                 <label for="Size">Size:</label>
-                 <input type="text" name="Size" placeholder="Size">
- 
-                 <label for="amount">Amount:</label>
-                 <input type="number" name="amount" placeholder="amount">
-                 <input type="submit" value="Add Inventory for Product">
-             </form> -->
      </section>
     
      <section class="vendor-Products"> 
          <h1>Your Products</h1>
              <div class="grid-products">
                  {% for Product in AllProducts %}
-                     <div class="product-card">
-                         <img class="img-holder" src="{{ Product[10] }}" alt="Product Image">
-                         <div class="title"><p>{{ Product[1] }}</p></div>
-                         <div class="price"><p>${{ Product[2] }}</p></div>
-                         <button class="inventory-button">Add Inventory Item</button>
-                     </div> 
+                    
+                        <div class="product-card">
+                            <img class="img-holder" src="{{ Product[10] }}" alt="Product Image">
+                            <div class="title"><p>{{ Product[1] }}</p></div>
+                            <div class="price"><p>${{ Product[2] }}</p></div>
+                            <button onclick="OpenModal('{{Product[0]}}')" class="inventory-button">Add Inventory Item</button>
+                        </div> 
+                    
                  {% endfor %}
              </div>
      </section>
-    
+        <!-- Modal Structure -->
+<div id="InventoryModal" class="modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title" id="accountModalLabel">Add Inventory Item</h1>
+            </div>
+            <div class="modal-body">
+                <!-- Form for adding inventory -->
+                <form class="Inventory-form" method="POST" action="{{ url_for('vendor_bp.AddInventory') }}">
+                    <label for="PID">Product ID:</label>
+                    <input type="text" id="PID" name="PID" placeholder="Enter Product ID" readonly required>
+
+                    <label for="Color">Color:</label>
+                    <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
+
+                    <label for="Size">Size:</label>
+                    <input type="text" id="Size" name="Size" placeholder="example: 18''" required>
+
+                    <label for="Amount">Amount:</label>
+                    <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
+
+                    <button type="submit" class="btn btn-primary">Add Inventory</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CloseModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
  </section>
  
  <script>
@@ -227,12 +294,26 @@
  function toggleDiscountFields(show) {
      const discountFields = document.getElementById('discount_fields');
      if (show) {
-         // discountFields.style.display = 'block';
          discountFields.style.display = 'flex';
  
      } else {
          discountFields.style.display = 'none';
      }
- }
+}
+
+    window.OpenModal = function(PID) {
+        let modal = document.querySelector("#InventoryModal");
+        let productIdInput = document.querySelector("#PID");
+        if (productIdInput) {
+            productIdInput.value = PID; // Set the Product ID in the modal form
+        }
+        modal.style.display = "flex"; // Show the modal
+    };
+
+    window.CloseModal = function() {
+        let modal = document.querySelector("#InventoryModal");
+        modal.style.display = "none"; // Hide the modal
+    };
+ 
  </script> 
  {% endblock body%}
