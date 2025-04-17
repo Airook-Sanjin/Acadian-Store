@@ -22,9 +22,9 @@ def load_user():
     else:
         g.User = None
         
-# @vendor_bp.route('/Home', methods=["GET"])
-# def VendorHomePage():
-#     return render_template('VendorHomepage.html')
+@vendor_bp.route('/Home', methods=["GET"])
+def VendorHomePage():
+    return render_template('VendorHomepage.html')
 
 ###########################################################
 # IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
@@ -40,10 +40,10 @@ def VendorViewProducts():
         AllProducts = conn.execute(text("SELECT * FROM product")).fetchall()
         print(AllProducts)  # Debugging: Print the fetched products
 
-        return render_template('VendorHomepage.html', AllProducts=AllProducts, message="Successfully added", success=True)
+        return render_template('AddProduct.html', AllProducts=AllProducts, message="Successfully added", success=True)
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('VendorHomepage.html', AllProducts=[], message="Failed to add product.", success=False)
+        return render_template('AddProduct.html', AllProducts=[], message="Failed to add product.", success=False)
     
 @vendor_bp.route('/AddProduct', methods=["POST"])
 def VendorAddProduct():
