@@ -1,16 +1,38 @@
 <style>
-    .add-product-page{
+   .add-product-page {
         display: flex;
-        flex-direction:row;
+        flex-direction: row;
         justify-content: space-around;
-        align-content: center ;
+        align-items: center; 
+        width: 90%; 
+        margin: 20px auto; /* Center horizontally and add vertical spacing */
+        padding: 30px; 
+        border-radius: 20px;
+        background-color: rgb(159, 146, 129);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    }
+    .Main {
+        display: flex;
+        flex-direction:column;
+        justify-content: space-around;
+        align-content: center;
         /* align-items: center; */
         width: 80%;
-        min-height: 70%;
-        border-radius: 30px;
+        height: auto;
         background-color: antiquewhite;
     }
-
+    .vendor-Products {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 90%; 
+        height: 600px; 
+        margin: 20px auto; 
+        padding: 20px; 
+        background-color: aquamarine;
+        border-radius: 15px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better appearance */
+    }
     .forms-holder {
         display: flex;
         flex-direction: row;
@@ -23,28 +45,32 @@
     .form-css {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        align-content: center;
         margin: 0;
         min-width: 200px;
         padding: 20px;
         background-color: rgb(207, 239, 239);
+        box-shadow: 2px 1px 2px 1px rgb(152, 152, 152);
+        border-radius: 10px;
     }
 
     .form1 {
         justify-content: space-around;
-        min-height: 300px; /* Keep min-height for form1 */
-        /* background-color: rgb(31, 77, 77); */
+        height: auto; /* Allow form1 to grow naturally based on content */
     }
 
     .form2 {
         justify-content: space-between;
         height: auto; /* Allow form2 to grow naturally based on content */
-        /* background-color: rgb(212, 235, 235); */
     }
 
     .discount_field_css{
         display: flex;
         flex-direction: column;
         justify-content: space-around;
+        align-items: center;
+        align-content: center;
         width: 100%;
         height: 100%;
     }
@@ -55,92 +81,116 @@
         margin-top: 5%;
         padding: 5px 0px;
     }
-    .leftside-of-add-product-page{
-        /* background-color: aqua; */
-        text-align: center;
+    .leftside-of-add-product-page {
         align-content: center;
+        text-align: center;
         width: 20%;
-        height: 100%;
+        height: auto; /* Allow the height to adjust based on content */
     }
 
-    .Main {
-        display: flex;
-        justify-content: center; 
-        align-items: center; 
-        min-height: calc(100vh - 200px); /* Adjust for header/footer height */
-        padding: 20px; 
-        box-sizing: border-box; /* Include padding in width/height calculations */
+    .grid-products{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        min-width: 60%;
+        height: auto;
+        overflow-y: scroll;
     }
+    /* product card */
+    .product-card p{
+        margin: 0;
+    }
+    .product-card{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        width: 300px;
+        min-height: auto;
+        background-color: rgb(192, 151, 229);
+    }
+    .img-holder{
+        width: 100%; 
+        height: auto;
+        background-color: aquamarine;
+        
+    }
+    .description{
+
+    }
+
+    
 </style>
 {% extends 'GuestHomepage.html'%}
 
 {% block body %}
-<!-- Erick vendor -->
-    <!-- <h1>Vendor</h1> -->
 <section class="Main">
-        <!--  Darlins vendor-->
- <section class="add-product-page">
+    <section class="add-product-page">
         <div class="leftside-of-add-product-page">
-            <h1>Vendor</h1><br>
+            <h1 style="font-size: 40px;">Vendor</h1><br>
             {% if success == True %}
                 <h2 style="color: green; margin: 0%;">{{ message }}</h2>
             {% elif success == False %}
                 <h2 style="color: red; margin: 0%;">{{ message }}</h2>
             {% endif %}
         </div>
-        <div class="forms-holder">
-            <!-- Form for adding a product -->
-            <form class="form-css form1" method="POST" action="{{ url_for('login_bp.vendor_bp.VendorAddProductPage') }}">
-                <!-- Title -->
-                <label for="title">Product Title:</label>
-                <input type="text" id="title" name="title" placeholder="Title" required>
 
-                <!-- Price -->
-                <label for="price">Price:</label>
-                <input type="number" id="price" name="price" placeholder="Price" required>
+        <form class="form-css form1" method="POST" action="{{ url_for('login_bp.vendor_bp.VendorAddProduct') }}">
+            
+            <!-- URL -->
+            <label for="URL">Image URL:</label>
+            <input type="url" id="URL" name="URL" placeholder="IMG" required>
 
-                <!-- Description -->
-                <label for="description">Description:</label>
-                <input type="text" id="description" name="description" placeholder="Description" required>
+            <!-- Title -->
+            <label for="title">Product Title:</label>
+            <input type="text" id="title" name="title" placeholder="Title" required>
 
-                <!-- Warranty -->
-                <label for="warranty">Warranty:</label>
-                <input type="date" id="warranty" name="warranty" placeholder="Warranty" required>
+            <!-- Price -->
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" placeholder="Price" required>
 
-                <!-- Add Discount Radio Buttons -->
-                <label>Do you want to add a discount?</label>
-                <div>
-                    <input type="radio" id="add_discount_yes" name="add_discount" value="yes" onclick="toggleDiscountFields(true)" required>
-                    <label for="add_discount_yes">Yes</label>
-                    <input type="radio" id="add_discount_no" name="add_discount" value="no" onclick="toggleDiscountFields(false)" required>
-                    <label for="add_discount_no">No</label>
-                </div>
+            <!-- Description -->
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" placeholder="Description" required>
 
-                <!-- Discount Fields (Initially Hidden) -->
-                <div id="discount_fields" style="display: none;" class="discount_field_css">
-                    <label for="discount">Discount (%):</label>
-                    <input type="number" id="discount" name="discount" placeholder="Discount">
-                    <label for="discount_date">Discount End Date:</label>
-                    <input type="date" id="discount_date" name="discount_date" placeholder="Discount End Date">
-                </div>
+            <!-- Warranty -->
+            <label for="warranty">Warranty:</label>
+            <input type="date" id="warranty" name="warranty" placeholder="Warranty" required>
 
-                <!-- Availability -->
-                <label for="availability">Availability:</label>
-                <select id="availability" name="availability" required>
-                    <option value="" disabled selected>Select availability</option>
-                    <option value="IN STOCK">IN STOCK</option>
-                    <option value="OUT OF STOCK">OUT OF STOCK</option>
-                </select>
+            <!-- Add Discount Radio Buttons -->
+            <label>Do you want to add a discount?</label>
+            <div>
+                <input type="radio" id="add_discount_yes" name="add_discount" value="yes" onclick="toggleDiscountFields(true)" required>
+                <label for="add_discount_yes">Yes</label>
+                <input type="radio" id="add_discount_no" name="add_discount" value="no" onclick="toggleDiscountFields(false)" required>
+                <label for="add_discount_no">No</label>
+            </div>
 
-                <!-- Vendor ID -->
-                <label for="VID">Vendor ID:</label>
-                <input type="number" id="VID" name="VID" placeholder="Enter your Vendor ID" required>
+            <!-- Discount Fields (Initially Hidden) -->
+            <div id="discount_fields" style="display: none;" class="discount_field_css">
+                <label for="discount">Discount (%):</label>
+                <input type="number" id="discount" name="discount" placeholder="Discount">
+                <label for="discount_date">Discount End Date:</label>
+                <input type="date" id="discount_date" name="discount_date" placeholder="Discount End Date">
+            </div>
 
-                <input type="submit" value="Add Product to Acadia">
-            </form>
+            <!-- Availability -->
+            <label for="availability">Availability:</label>
+            <select id="availability" name="availability" required>
+                <option value="" disabled selected>Select availability</option>
+                <option value="IN STOCK">IN STOCK</option>
+                <option value="OUT OF STOCK">OUT OF STOCK</option>
+            </select>
 
-            <!-- Form for adding a inventory for Product -->
-            <form class="form-css form2" method="POST">
+            <!-- Vendor ID -->
+            <label for="VID">Vendor ID:</label>
+            <input type="number" id="VID" name="VID" placeholder="Enter your Vendor ID" required>
+
+            <input type="submit" value="Add Product to Acadia">
+        </form>
+
+        <!-- Form for adding a inventory for Product -->
+        <!-- <form class="form-css form2" method="POST">
                 <label for="PID">PID:</label>
                 <input type="text" name="PID" placeholder="PID">
 
@@ -153,9 +203,23 @@
                 <label for="amount">Amount:</label>
                 <input type="number" name="amount" placeholder="amount">
                 <input type="submit" value="Add Inventory for Product">
-            </form>
-        </div>
+            </form> -->
     </section>
+   
+    <section class="vendor-Products"> 
+        <h1>Your Products</h1>
+            <div class="grid-products">
+                {% for Product in AllProducts %}
+                    <div class="product-card">
+                        <img class="img-holder" src="{{ Product[10] }}" alt="Product Image">
+                        <div class="title"><p>{{ Product[1] }}</p></div>
+                        <div class="price"><p>${{ Product[2] }}</p></div>
+                        <button class="inventory-button">Add Inventory Item</button>
+                    </div> 
+                {% endfor %}
+            </div>
+    </section>
+   
 </section>
 
 <script>

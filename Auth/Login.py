@@ -10,7 +10,6 @@ login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='tem
 login_bp.register_blueprint(admin)
 login_bp.register_blueprint(customer_bp)
 login_bp.register_blueprint(vendor_bp)
-
 conn = Connecttodb()
 
 @login_bp.route('/Login',methods=["GET"])
@@ -54,7 +53,7 @@ def Signin():
         elif role=='vendor': # * Looks through all Vendors and see if any match with the email
             
             print('INTO VENDOR')
-            return redirect(url_for('login_bp.vendor_bp.VendorHomePage')) # * Takes you to vendor page
+            return redirect(url_for('login_bp.vendor_bp.VendorAddProduct')) # * Takes you to vendor page
         else:
             print('Not a User')
             return"Not A USER"
