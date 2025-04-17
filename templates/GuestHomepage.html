@@ -25,7 +25,7 @@
              
               {%elif g.User['Role']=='vendor'%}
                 <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
-                <li><button id="ViewAccounts" onclick="window.location.href = ''">SEE YOUR PRODUCTS</button></li>
+                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts') }}'">SEE YOUR PRODUCTS</button></li>
                 <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
               {% elif g.User['Role']=='customer' %}
                 <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('customer_bp.chat_bp.chat_view') }}'">CHAT</button></li>
