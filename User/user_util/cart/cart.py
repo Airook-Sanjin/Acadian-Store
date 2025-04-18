@@ -50,34 +50,36 @@ def RemoveFromCart(username):
     except Exception as e:
         print(f'ERROR: {e}')
         return render_template('Cart.html',username=username,CartList = CartList)
-@cart_bp.route('/Add/ <int:PID>',methods=['POST'])
-def addToCart(PID):
+    
+@cart_bp.route('/add',methods=['POST'])
+def addToCart():
     try:
         EMAIL = g.User['Email']
-        ID = g.user['ID']
+        ID = g.User['ID']
+        PID = request.form.get('PID')
         conn.execute(text(
             """
             INSERT INTO cart 
             (title,size,color,email,PID,CID)
             VALUES
-            (:title,:size,:color,:email,:PID,:CID,)"""),
+            (:title,:size,:color,:email,:PID,:CID)"""),
             {'title':request.form.get('Title'),'size':request.form.get('Size'),'color':request.form.get('Color'),'email':EMAIL,'PID':PID,'CID':ID})
         print("item ADDED")
         conn.commit()
         if g.User['Role']=='customer': #* checks role
             
             print('INTO Customer')
-            return redirect(url_for('customer_bp.CustomerHomePage',PID = PID)) # * Takes you to Customer page
+            return redirect(url_for('customer_bp.CustomerHomePage', username=g.User['Name'])) # * Takes you to Customer page
         
         elif g.User['Role']=='admin': #* checks role
             print('INTO Admin')
 
-            return redirect(url_for('admin.AdminHomePage',PID = PID)) # * Takes you to admin page
+            return redirect(url_for('admin.AdminHomePage', username=g.User['Name'])) # * Takes you to admin page
 
         elif g.User['Role']=='vendor': #* checks role
 
             print('INTO VENDOR')
-            return redirect(url_for('vendor_bp.VendorHomePage',PID = PID)) # * Takes you to vendor page
+            return redirect(url_for('vendor_bp.VendorHomePage', username=g.User['Name'])) # * Takes you to vendor page
 
     except Exception as e:
         print(f'ERROR: {e}')

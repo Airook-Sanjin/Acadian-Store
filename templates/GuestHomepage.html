@@ -81,8 +81,8 @@
                 <option value=""></option>
               </select>
               <p class="inventory">{{product['amount']}}</p>
-              <form class="AddtoCart-Form" action= "{{url_for('addToCart',PID= product['PID'])}}" method="POST">
-                <input type="hidden" name="PID" value="{{product['PID']}}">
+              <form class="AddtoCart-Form" action= "{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                <input type="hidden" name="PID" value="{{product['PID']|int }}">
                 <input type="hidden" name="Title" value="{{product['title']}}">
                 <input type="hidden" name="Size" value="{{product['size']}}">
                 <input type="hidden" name="Color" value="{{product['color']}}">

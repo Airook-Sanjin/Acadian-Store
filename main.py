@@ -44,7 +44,7 @@ app.register_blueprint(vendor_bp)
 def start():
     try:
         Allproducts = conn.execute(text(
-        """SELECT * FROM product as p
+        """SELECT p.PID as PID,p.title as title, p.price as price,p.description as description,inv.amount as amount,p.warranty as warranty,p.discount as discount,p.availability as availability,p.image_url as image FROM product as p
            LEFT JOIN product_images as pi on p.PID = pi.PID
            LEFT JOIN product_inventory as inv on pi.PID = inv.PID""")).mappings().fetchall()
         # print(Allproducts)
@@ -52,7 +52,7 @@ def start():
         return render_template('GuestHomepage.html',Allproducts = Allproducts)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html',Allproducts = Allproducts)
+        return render_template('GuestHomepage.html',Allproducts = [])
     
 
 if __name__ == '__main__':
