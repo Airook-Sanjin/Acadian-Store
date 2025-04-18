@@ -37,8 +37,12 @@
 <p>{{item['description']}}</p>
 </section>
 <section class="item-remove">
-    <input type="submit" value="Remove-item">
-</section>
+    <form action = "{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}" method="POST">
+        <input type="hidden" name="RemovedItem" value="{{item['itemid']}}">
+        <input type="submit" name='RemoveBTN'value="Remove Item">
+    </form>
+    
+</section>      
 </section>
 {% endfor %}
 </section>

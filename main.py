@@ -1,4 +1,4 @@
-from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text
+from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request
 import secrets
 from Auth.Login import login_bp
 from Auth.Register import register_bp
@@ -39,7 +39,8 @@ app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
 
 
-@app.route('/')
+ 
+@app.route('/', methods=["GET"])
 def start():
     try:
         Allproducts = conn.execute(text(
@@ -52,5 +53,7 @@ def start():
     except Exception as e:
         print(f"Error adding product: {e}")
         return render_template('GuestHomepage.html',Allproducts = Allproducts)
+    
+
 if __name__ == '__main__':
         app.run(debug=True)  
