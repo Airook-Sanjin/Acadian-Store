@@ -1,7 +1,6 @@
 
-from globals import Blueprint, render_template, request,g,session
-from dbconnect import Connecttodb  # Import the updated Connecttodb function
-from sqlalchemy import text
+from globals import Blueprint, render_template, request,g,session,Connecttodb,text
+
 from User.chat import chat_bp
 from globals import redirect, url_for
 
@@ -22,9 +21,13 @@ def load_user():
     else:
         g.User = None
         
-# @vendor_bp.route('/Home', methods=["GET"])
-# def VendorHomePage():
-#     return render_template('VendorHomepage.html')
+@vendor_bp.route('/Home', methods=["GET"])
+def VendorHomePage():
+    Allproducts = conn.execute(text(
+    """SELECT * FROM product as p
+       LEFT JOIN product_images as pi on p.PID = pi.PID
+       LEFT JOIN product_inventory as inv on pi.PID = inv.PID""")).mappings().fetchall()
+    return render_template('VendorHomepage.html',Allproducts=Allproducts)
 
 ###########################################################
 # IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
