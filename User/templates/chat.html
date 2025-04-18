@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('chat_bp.static', filename='style/chat.css') }}">
-    <title>Chat</title>
-</head>
 <style>
     .outer-container{
         display: flex;
@@ -15,18 +7,44 @@
     h1, h2{
         text-align: center;
     }
+    p{
+        margin: 0;
+    }
     form{
         text-align: center;
     }
+    .chat-messages{
+        display: flex;
+        flex-direction: column;
+        height: 300px;
+        overflow-y: scroll;
+    }
     .incoming-message{
+        margin: 30px 0;
         text-align: left;
     }
+    .incoming-message .message{
+        padding: 10px;
+        background-color: lightblue;
+        border-radius: 10px 10px 10px 0;
+    }
     .outgoing-message{
+        margin: 30px 0;
         text-align: right;
     }
+    .outgoing-message .message{
+        padding: 10px;
+        background-color: lightgreen;
+        border-radius: 10px 10px 0 10px;
+    }
+    .chat-container{
+        display: flex;
+        flex-direction: column;
+        width: 40%;
+    }
 </style>
+{% extends 'GuestHomepage.html' %}
 <body>
-    {% extends 'GuestHomepage.html' %}
     {% block body %}
     <div class="outer-container">
 
@@ -58,17 +76,26 @@
 
         <div class="chat-container">
             <h1>Chat with vendor/admin name</h1>
+            <p>Chat ID: 1</p>
             <div class="chat-messages">
                 <div class="incoming-message">
-                    <p>username at 00/00/00 00:00:00</p>
-                    <p>Text text text text message from incoming user</p>
+                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
+                    <div class="message"><p>Text text text text message from incoming user</p></div>
                 </div>
 
-                <br>
+                <div class="outgoing-message">
+                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
+                    <div class="message"><p>Text text text text message from incoming user</p></div>
+                </div>
+
+                <div class="incoming-message">
+                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
+                    <div class="message"><p>Text text text text message from incoming user</p></div>
+                </div>
 
                 <div class="outgoing-message">
-                    <p>username at 00/00/00 00:00:00</p>
-                    <p>Text text text text message from outgoing user</p>
+                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
+                    <div class="message"><p>Text text text text message from incoming user</p></div>
                 </div>
             </div>
         </div>
@@ -80,6 +107,10 @@
             </form>
         </div>
 
+        {% for text in result %}
+            <p>{{text[5]}}</p>
+            <p>{{text[6]}}</p>
+        {% endfor %}
     </div>
     {% endblock %}
 </body>

@@ -16,4 +16,5 @@ def load_user():
 @chat_bp.route('/chat', methods=["GET", "POST"])
 def chat_view():
     message = None
-    return render_template('chat.html', message=message)
+    result = conn.execute(text("SELECT VID, CID, CHAT_ID, PID, images, message, timestamp FROM chatroom_vendor"))
+    return render_template('chat.html', message=message, result=result)
