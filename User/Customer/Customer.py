@@ -20,11 +20,14 @@ def load_user():
     else:
         g.User = None
         
-@customer_bp.route('/Home') # Customer homepage
+@customer_bp.route('/Home', methods=["GET"]) # Customer homepage
 def CustomerHomePage():
     Allproducts = conn.execute(text(
         """SELECT * FROM product as p
            LEFT JOIN product_images as pi on p.PID = pi.PID
            LEFT JOIN product_inventory as inv on pi.PID = inv.PID""")).mappings().fetchall()
     return render_template('CustomerHomepage.html',Allproducts=Allproducts)
+
+# def AddToCart():
+    
 
