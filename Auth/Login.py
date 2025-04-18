@@ -22,19 +22,19 @@ def Signin():
     # Creates dictionary view of all users,customer, vendor and admin
     try:
         result = conn.execute(text(
-        """ SELECT u.username,c.email, 'customer' AS role, CID as ID FROM customer as c Natural JOIN users as u
+        """ SELECT u.username,c.email as email, 'customer' AS role, CID as ID FROM customer as c Natural JOIN users as u
             WHERE c.email = :email and u.password = :password
             UNION
-            SELECT u.username, a.email, 'admin' AS role, AID as ID FROM admin as a Natural JOIN users as u
+            SELECT u.username, a.email as email, 'admin' AS role, AID as ID FROM admin as a Natural JOIN users as u
             WHERE a.email = :email and u.password = :password
             UNION
-            SELECT u.username, v.email,'vendor' AS role, VID as ID FROM vendor as v Natural JOIN users as u
+            SELECT u.username, v.email as email,'vendor' AS role, VID as ID FROM vendor as v Natural JOIN users as u
             WHERE v.email = :email and u.password = :password """
         ),{'email':request.form.get('Email'),'password':request.form.get('Pass')}).mappings().fetchone()
 
         role = result['role']
         ID= result['ID']
-        session['User'] = {'Name':result['username'],'Role':role,'ID':ID}
+        session['User'] = {'Name':result['username'],'Role':role,'ID': ID,'Email':result['email']}
         g.User = session['User']
         if role=='customer': # * Looks through all customers and see if any match with the email
             

@@ -1,4 +1,4 @@
-from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text
+from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request
 import secrets
 from Auth.Login import login_bp
 from Auth.Register import register_bp
@@ -7,6 +7,7 @@ from User.Customer.Customer import customer_bp
 from User.Vendor.Vendor import vendor_bp
 from User.user import user_bp
 from User.chat import chat_bp
+from User.user_util.cart.cart import cart_bp
 
 
 
@@ -25,16 +26,21 @@ def load_user():
 
 conn = Connecttodb() # Get database connection
 
-# Register blueprints
+# Register blueprints  #! ORDER MATTERS
 app.register_blueprint(login_bp)
 app.register_blueprint(register_bp)
-app.register_blueprint(chat_bp)
-app.register_blueprint(admin)
+
 app.register_blueprint(user_bp)
+app.register_blueprint(cart_bp) 
+app.register_blueprint(chat_bp)
+
+app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
 
-@app.route('/')
+
+ 
+@app.route('/', methods=["GET"])
 def start():
     try:
         Allproducts = conn.execute(text(
@@ -47,5 +53,7 @@ def start():
     except Exception as e:
         print(f"Error adding product: {e}")
         return render_template('GuestHomepage.html',Allproducts = Allproducts)
+    
+
 if __name__ == '__main__':
         app.run(debug=True)  
