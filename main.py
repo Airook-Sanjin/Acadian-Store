@@ -7,6 +7,7 @@ from User.Customer.Customer import customer_bp
 from User.Vendor.Vendor import vendor_bp
 from User.user import user_bp
 from User.chat import chat_bp
+from User.user_util.cart.cart import cart_bp
 
 
 
@@ -25,14 +26,18 @@ def load_user():
 
 conn = Connecttodb() # Get database connection
 
-# Register blueprints
+# Register blueprints  #! ORDER MATTERS
 app.register_blueprint(login_bp)
 app.register_blueprint(register_bp)
-app.register_blueprint(chat_bp)
-app.register_blueprint(admin)
+
 app.register_blueprint(user_bp)
+app.register_blueprint(cart_bp) 
+app.register_blueprint(chat_bp)
+
+app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
+
 
 @app.route('/')
 def start():

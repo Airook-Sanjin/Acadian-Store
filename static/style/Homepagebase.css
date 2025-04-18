@@ -34,7 +34,11 @@ a,a:active,a:visited{
   width:8em;
   height:8em;
   color: var(--Secondary);
+  
 }
+
+
+
 
 .Logo-Container{
   padding:1rem;
@@ -162,7 +166,7 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   gap:2rem;
-  height:100%;
+  /* height:100%; */
 }
 .product_card{
   min-width: 20%;
