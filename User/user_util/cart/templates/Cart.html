@@ -1,49 +1,101 @@
 <style>
-    .Cart-Container{
-        display: flex;
-        flex-direction: column;
-        background-color: var(--Primary);
-        padding: 2em;
-        gap:3em;
-    }
-    .item-Card{
-        display: flex;
-        flex-direction: row;
-        background-color: white;
-        padding:2em;
-        border-radius: 20px;
-        justify-content: space-between;
-        }
-    .item-info{
-        display: flex;
-        flex-direction: row;
-        gap:2em;
-        width:50%;
-    }
-    .product_container{
-        display: none;
-    }
-</style>
-{% extends 'GuestHomepage.html' %}
-{% block body %}
-
-<h1>{{username.title()}}'s' Cart</h1>
-<section class="Cart-Container">
-{% for item in CartList %}
-<section class="item-Card">
-    <section class="item-info">
-<h3>{{item['title']}}</h3>
-<h4>{{item['size']}}</h4>
-<p>{{item['description']}}</p>
-</section>
-<section class="item-remove">
-    <form action = "{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}" method="POST">
-        <input type="hidden" name="RemovedItem" value="{{item['itemid']}}">
-        <input type="submit" name='RemoveBTN'value="Remove Item">
-    </form>
+  .Cart-Container {
+    display: flex;
+    height:70vh;
+    flex-direction: column;
+    /* background-color: var(--Primary); */
+    padding: 2em;
+    gap: 3em;
+   
+    overflow: scroll;
+    overflow-x: hidden;
     
-</section>      
-</section>
-{% endfor %}
+  }
+  .Cart-Container::-webkit-scrollbar {
+   width:.2em;
+   /* height: 2em; */
+    
+  }
+  .Cart-Container::-webkit-scrollbar-track{
+    background: hsl(0, 0%, 95%);
+    /* height:80%; */
+    
+  }
+  .Cart-Container::-webkit-scrollbar-thumb{
+    background:linear-gradient(0deg, hsl(0, 0%, 95%) 0 10%  ,black 50% 55%, hsl(0, 0%, 95%) 90% 100% );
+    border-radius: 32px;
+  }
+  .item-Card {
+    display: flex;
+    flex-direction: row;
+    width:100%;
+    background-color: white;
+    padding: 2em;
+    border-radius: 20px;
+    justify-content: space-between;
+    box-shadow: var(--BoxShadow);
+  }
+  .item-info {
+    display: flex;
+    flex-direction: row;
+    gap: 2em;
+    width: 50%;
+  }
+  .product_container {
+    display: none;
+  }
+  #Title {
+    text-align: left;
+    padding: 1em;
+  }
+  #RemoveBTN{
+    margin-top: 1em;
+    
+  }
+  .item-fun{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap:1em;
+    align-items: center;
+  }
+  .Cart-Total-Section {
+    display: flex;
+    
+  }
+  .totals-Container{
+    padding:2em;
+  }
+</style>
+{% extends 'GuestHomepage.html' %} {% block body %}
+<h1 id="Title">{{username.title()}}'s Cart</h1>
+<section class="Cart-Total-Section">
+  <section class="Cart-Container">
+    {% for item in CartList %}
+    <section class="item-Card">
+      <section class="item-info">
+        <h3>{{item['title']}}</h3>
+        <h4>{{item['size']}}</h4>
+        <p>{{item['price']}}</p>
+        <p>{{item['description']}}</p>
+      </section>
+      <section class="item-fun">
+        <h3>${{item['price']}}</h3>
+        <form id="RemoveBTN"
+          action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
+          method="POST"
+        >
+          <input type="hidden" name="RemovedItem" value="{{item['itemid']}}" />
+          <input type="submit" name="RemoveBTN" value="Remove Item" />
+        </form>
+      </section>
+    </section>
+    {% endfor %}
+  </section>
+
+  <section class="totals-Container">
+    <h2>Cart Totals</h2>
+    <h3 id="Total">Total: {{total}} </h3>
+  </section>
 </section>
 {% endblock %}
