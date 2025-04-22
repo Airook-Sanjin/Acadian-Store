@@ -1,5 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
+<style>
+  .product-img{
+    width: 100%;
+    height: auto;
+  }
+</style>
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='/style/Homepagebase.css') }}" />
@@ -12,7 +19,7 @@
         <div class="topBar">
           <div class="Left-side">
             <div class = "Logo-Container">
-            <img class = "logo"src="{{url_for('static',filename='/images/Logo_fill.svg')}}"></img>
+            <img class = "logo"src="{{url_for('static',filename='/images/Logo_fill.svg')}}">
           </div>
             <ul class="barItem">
               <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li> <!-- Takes to appropraite homepage-->
@@ -71,7 +78,7 @@
           {% for product in Allproducts %}
             <section class="product_card">
             <section class = product_img>
-              <img src="{{product['image']}}" alt="{{product['title']}}">
+              <img src="{{product['image']}}" alt="{{product['title']}}" class="product-img">
             </section>
             <section class="product">
               <h3 class='title'>{{product['title']}}</h3>
