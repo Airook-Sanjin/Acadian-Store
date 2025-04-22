@@ -151,10 +151,10 @@ body {
 .Main {
   flex: 1; /* Allow the main section to grow and fill available space */
   width: 100%;
-  max-width: 1200px; /* Optional: Limit the width for better layout */
-  margin: 0 auto; /* Center the main content horizontally */
-  padding: 20px; /* Add padding for spacing */
-  box-sizing: border-box; /* Include padding in width/height calculations */
+  max-width: 1200px; 
+  margin: 0 auto; 
+  padding: 20px; 
+  box-sizing: border-box; 
 
 }
 
@@ -167,6 +167,7 @@ body {
   justify-content: center;
   gap:2rem;
   /* height:100%; */
+  margin-bottom: 2%;
 }
 .product_card{
   min-width: 20%;
@@ -176,6 +177,12 @@ body {
   background-color: white;
   border-radius: 10px;
   box-shadow: var(--BoxShadow);
+  cursor: pointer;
+  transition: 0.3s ease-in-out
+}
+.product_card:hover{
+transform: scale(1.025);
+transition: 0.3s ease-in-out;
 }
 /* -------------------------- footer ------------------------------------------- */
 
