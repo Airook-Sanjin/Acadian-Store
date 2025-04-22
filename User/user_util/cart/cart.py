@@ -104,3 +104,9 @@ def addToCart():
         print(f'ERROR: {e}')
         return redirect(url_for('start'))
     
+@cart_bp.route('/checkout')
+def GotoCheckout():
+    try:
+        
+    except:
+        return redirect(url_for(''))
