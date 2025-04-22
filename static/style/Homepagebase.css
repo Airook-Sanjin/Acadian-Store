@@ -102,7 +102,7 @@ h1 {
   text-align: center;
 }
 
-header button {
+button,.BTN{
   height: 35px;
   border: none;
   border-radius: 5px;
@@ -110,12 +110,12 @@ header button {
   background-color: var(--Secondary);
   box-shadow: var(--BoxShadow)
 }
-header button:hover{
+button:hover,.BTN:hover{
   background-color: var(--Tertiary);
   color:white ;
   transition: .2s ease-in-out;
 }
-header button:active{
+button:active,.BTN:active{
   background-color: hsl(0, 0%, 80%);
   
 }
@@ -173,7 +173,8 @@ body {
   width:20%;
   padding:2rem;
   
-  background-color: var(--Secondary);
+  background-color: white;
+  border-radius: 10px;
   box-shadow: var(--BoxShadow);
 }
 /* -------------------------- footer ------------------------------------------- */
