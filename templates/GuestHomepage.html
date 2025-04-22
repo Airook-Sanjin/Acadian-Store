@@ -6,6 +6,11 @@
     width: 100%;
     height: auto;
   }
+  .product-button{
+    width: auto;
+    height: auto;
+    cursor: pointer;
+  }
 </style>
 <head>
     <meta charset="UTF-8">
@@ -66,47 +71,29 @@
   
         </div>
       </header>
-      <section class="Main">
+      
         {% block body %}
-    
-        <h1>GUEST</h1>
-        
+        <section class="Main">
+          <h1>GUEST</h1>
+        </section>
       
         {% endblock body %}
-      </section>
-        <section class = product_container>
+      
+        <section class="product_container">
           {% for product in Allproducts %}
-            <section class="product_card">
-            <section class = product_img>
-              <img src="{{product['image']}}" alt="{{product['title']}}" class="product-img">
-            </section>
-            <section class="product">
-              <h3 class='title'>{{product['title']}}</h3>
-              <h4 class="price">${{product['price']}}</h4>
-              <p class="desc">{{product['description']}}</p>
-              <select name="Colors" id="Colors">
-                <option value=""></option>
-              </select>
-              <p class="inventory">{{product['amount']}}</p>
-              <form class="AddtoCart-Form" action= "{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
-                <input type="hidden" name="PID" value="{{product['PID']|int }}">
-                <input type="hidden" name="Title" value="{{product['title']}}">
-                <input type="hidden" name="Size" value="{{product['size']}}">
-                <input type="hidden" name="Color" value="{{product['color']}}">
-                <input type="hidden" name="Price" value="{{product['price']}}">
-                <input type="hidden" name="Desc" value="{{product['description']}}">
-                <input type="hidden" name="Amount" value="{{product['amount']}}">
-                <input class="BTN" type="submit" value="Add to Cart">
-              </form>
-            </section>
-            </section> 
+            <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product['PID'] }}'">
+                  <section class="product_img">
+                      <img src="{{ product['image'] }}" alt="{{ product['title'] }}" class="product-img">
+                  </section>
+                  <section class="product">
+                      <h3 class="title">{{ product['title'] }}</h3>
+                      <h4 class="price">${{ product['price'] }}</h4>
+                      <h4 class="desc">{{ product['description'] }}</h4>
+                  </section>
+              </section>
           {% endfor %}
-        </section>
-       
-        
-        
-        
-  
+      </section>
+      
     <footer class="footer">
       <div class="footer__container">
         <div class="footer__section">

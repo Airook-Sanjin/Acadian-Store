@@ -64,6 +64,33 @@ def start():
         print(f"Error adding product: {e}")
         return render_template('GuestHomepage.html',Allproducts = [])
     
+@app.route('/Product-View')
+def ProductView():
+    try:
+        pid = request.args.get('pid')
+        specific_product = conn.execute(text(
+        """SELECT 
+            p.PID as PID,
+            p.title as title, 
+            p.price as price,
+            p.description as description,
+            inv.amount as amount,
+            p.warranty as warranty,
+            p.discount as discount,
+            p.availability as availability,
+            p.image_url as image
+            FROM product as p
+            LEFT JOIN product_images as pi ON p.PID = pi.PID
+            LEFT JOIN product_inventory as inv ON pi.PID = inv.PID
+            WHERE p.PID = :pid"""), {"pid": pid}).mappings().fetchall()
+        print("Specific Product:", specific_product)  # Debugging output
+        return render_template('Product.html', specific_product=specific_product)
+    except Exception as e:
+        print("Error:", e)  # Print the actual error
+        return render_template('Product.html', specific_product=[])
+
+    
+
 
 if __name__ == '__main__':
         app.run(debug=True)  
