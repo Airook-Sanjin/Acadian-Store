@@ -52,7 +52,7 @@
 
         <div class="start-new-chat-container">
             <h2>Start New Chat</h2>
-            <form>
+            <form method="POST">
                 <input type="text" name="user-id" placeholder="User ID">
                 <input type="text" name="product-id" placeholder="Product ID">
                 <input type="submit" name="start-chat" value="Start Chat">
@@ -61,7 +61,7 @@
 
         <div class="open-previous-chat-container">
             <h2>Open Previous Chat</h2>
-            <form>
+            <form method="POST">
                 <select>
                     <option value="no-chats">No chats to select.</option>
                     <option value="chat1">ID 1 - vendor/admin name</option>
@@ -101,7 +101,7 @@
         </div>
 
         <div class="send-message-container">
-            <form>
+            <form method="POST">
                 <input type="text" name="message" placeholder="Type your message here...">
                 <input type="submit" name="send-message" value="Send">
             </form>
