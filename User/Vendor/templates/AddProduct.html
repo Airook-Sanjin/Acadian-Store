@@ -336,7 +336,7 @@
             </div>
             <div class="modal-body">
                 <!-- Form for adding product images -->
-                <form class="Inventory-form method="POST"   action="{{ url_for('vendor_bp.AddImages') }}" enctype="multipart/form-data">
+                <form class="Inventory-form" method="POST"   action="{{ url_for('vendor_bp.AddImages') }}" enctype="multipart/form-data">
                     <label for="image_PID">Product ID:</label>
                     <input type="text" id="image_PID" name="PID" placeholder="Enter Product ID" readonly required>
 
