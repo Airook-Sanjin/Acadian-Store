@@ -14,6 +14,9 @@
     form{
         text-align: center;
     }
+    .chat-options-container{
+        display: flex;
+    }
     .chat-messages{
         display: flex;
         flex-direction: column;
@@ -64,7 +67,6 @@
 {% extends 'GuestHomepage.html' %}
 <body>
     {% block body %}
-    <h1>Chat</h1>
     <div class="outer-container">
 
         <div class="chat-options-container">
@@ -74,7 +76,7 @@
                         {% if previous_chats %}
                             <select name="chat_id">
                             {% for chat in previous_chats %}
-                                <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
+                                <option value="{{ chat['CHAT_ID'] }}">Chat ID: {{ chat['CHAT_ID'] }}</option>
                             {% endfor %}
                             </select>
                             <input type="submit" value="Open Chat">
@@ -104,8 +106,6 @@
         </div>
 
         <div class="chat-container">
-            <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
-
             {% if message %}
                 <p style="color: red;">{{ message }}</p>
             {% endif %}
@@ -142,6 +142,7 @@
                 <form>
                     <input type="text" placeholder="Type your message here...">
                     <input type="submit" value="Send">
+                    <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
                 </form>
             </div>
         </div>
