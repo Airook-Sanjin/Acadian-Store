@@ -65,12 +65,12 @@
             <h2>Open Previous Chat</h2>
             <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
                     {% if previous_chats %}
-                        {% for chat in previous_chats %}
                         <select name="chat_id">
+                        {% for chat in previous_chats %}
                             <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
+                        {% endfor %}
                         </select>
                         <input type="submit" value="Open Chat">
-                        {% endfor %}
                     {% else %}
                     <select name="chat_id">
                         <option>No chats found</option>
