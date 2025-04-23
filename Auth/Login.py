@@ -13,7 +13,7 @@ conn = Connecttodb()
 
 @login_bp.route('/Login',methods = ["GET"])
 def Login():
-    print('in LOgin')
+    print('in Login')
     return render_template('login.html')
 
 @login_bp.route('/Login', methods=["POST"])

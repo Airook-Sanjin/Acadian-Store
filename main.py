@@ -53,7 +53,7 @@ def start():
     try:
         products = conn.execute(text("""
            SELECT 
-                PID, title, price,
+                PID, title, CAST(price AS DECIMAL(10,2)) AS price,
                 (price * discount) as saving_discount,
                 price - (price * discount) AS discounted_price,
                 description,
@@ -85,7 +85,7 @@ def ProductView():
         
         product = conn.execute(text("""
              SELECT 
-                PID, title, price,
+                PID, title, CAST(price AS DECIMAL(10,2)) AS price,
                 (price * discount) as saving_discount,
                 price - (price * discount) AS discounted_price,
                 description,

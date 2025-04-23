@@ -29,8 +29,7 @@ def VendorHomePage():
                     PID, title, price, description,
                     warranty, discount, availability, image_url
                 FROM product
-            """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
-
+            """)).mappings().fetchall() 
         inventory = conn.execute(text("""
             SELECT size, color, amount            FROM product_inventory
             """)).mappings().fetchall()
@@ -52,7 +51,7 @@ def VendorViewProducts():
         AllProducts = conn.execute(text("""SELECT 
                                 PID,
                                 title,
-                                price,
+                                CAST(price AS DECIMAL(10,2)) AS price,
                                 (price * discount) as saving_discount,
                                 price - (price * discount) AS discounted_price,
                                 description,
