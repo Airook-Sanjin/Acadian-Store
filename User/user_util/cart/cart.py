@@ -104,3 +104,14 @@ def addToCart():
         print(f'ERROR: {e}')
         return redirect(url_for('start'))
     
+@cart_bp.route('/checkout')
+def GotoCheckout(username):
+    try:
+        CartList = conn.execute(text(
+            """
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.price as price
+                FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
+                WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
+        return render_template('Cart.html',username=username,CartList = CartList,total=total)
+    except:
+        return render_template('Cart.html',username=username)

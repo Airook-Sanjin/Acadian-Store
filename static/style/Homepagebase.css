@@ -1,17 +1,20 @@
 :root{
-  --FONT: hsl(27, 16%, 24%);
-  --Primary:hsl(77, 40%, 60%);
-  --Secondary:hsl(38, 99%, 70%);
-  --Tertiary:hsl(25, 97%, 70%);
-  --Shadow:28px 28px 47px hsla(217, 72%, 18%,16%),
+    --FONT: #bfdf9f;
+    --Btn: #c6c295;
+    --HovBtn:#bdb884;
+    --Primary:#5C8966;
+    --Secondary:#2D4B48;
+    --Tertiary:#788497;
+    --Quad:#669294;
+    --Shadow:28px 28px 47px hsla(217, 72%, 18%,16%),
     -23px -23px 45px hsla(0, 0%, 100%,100%);
-  --BoxShadow:0px 4px 4px hsla(0, 0%, 0%, 0.188),
-  0px 12px 12px hsla(0, 0%, 0%, 0.082);
+    --BoxShadow:0px 4px 4px hsla(0, 0%, 0%, 0.188),
+    0px 12px 12px hsla(0, 0%, 0%, 0.082);
 
 }
 
 a,a:active,a:visited{
-  color:var(--FONT);
+  color:#F8F2F4;
   text-decoration: none;
 }
 
@@ -33,7 +36,7 @@ a,a:active,a:visited{
 .logo {
   width:8em;
   height:8em;
-  color: var(--Secondary);
+  color: #F8F2F4;
   
 }
 
@@ -64,6 +67,7 @@ header li {
   align-items: center;
   padding: 10px;
   height: 120px;
+  color:var(--FONT)
 }
 
 .formSection {
@@ -86,10 +90,10 @@ header li {
   padding:.5rem;
   width:50px;
   height:50px;
-  color: var(--Secondary);
+  color:var(--Btn);
 }
 .Profile:hover{
-  color:black;
+  color:  var(--HovBtn);
   transition:.5s ease-in-out;
 }
 
@@ -107,12 +111,13 @@ button,.BTN{
   border: none;
   border-radius: 5px;
   margin-left: 10px;
-  background-color: var(--Secondary);
+  color:var(--Secondary) ;
+  background-color: var(--Btn);
   box-shadow: var(--BoxShadow)
 }
 button:hover,.BTN:hover{
-  background-color: var(--Tertiary);
-  color:white ;
+  background-color:  var(--HovBtn);
+  
   transition: .2s ease-in-out;
 }
 button:active,.BTN:active{
@@ -142,7 +147,7 @@ body {
   flex-direction: column;
   min-height: 100vh; /* Ensure the body spans the full viewport height */
   font-size: 14px;
-  background-color: hsl(0, 0%, 95%);
+  background-color: #F8F2F4;
 }
   
 /* ---------------------------UNI BODY-------------------------- */
@@ -193,7 +198,7 @@ transition: 0.3s ease-in-out;
   justify-content: space-between;
   padding: 10px 15px; /* Reduced padding */
   background-color: var(--Primary);
-  color: var(--FONT);
+  color:var(--FONT);
   border-top: 1px solid #e5e5e5;
   width: 100%;
 }
@@ -229,7 +234,7 @@ transition: 0.3s ease-in-out;
 }
 
 .footer__link {
-  color: var(--FONT);
+  color:var(--FONT);
   text-decoration: none;
   font-size: 0.9rem; /* Reduced font size */
 }
