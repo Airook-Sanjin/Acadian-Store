@@ -1,9 +1,12 @@
 
 :root{
-    --FONT: #473C33;
-    --Primary:#ABC270;
-    --Secondary:#FEC868;
-    --Tertiary:#FDA769;
+    --FONT: #bfdf9f;
+    --Btn: #c6c295;
+    --HovBtn:#bdb884;
+    --Primary:#5C8966;
+    --Secondary:#2D4B48;
+    --Tertiary:#788497;
+    --Quad:#669294;
     --DropShadow:6px 6px 10px hsl(217, 72%, 18%,16%),
     -4px -4px 10px hsla(0, 0%, 99%,50%);
   
@@ -84,17 +87,17 @@ font-size: 2em;
     outline: none;
 
     &::placeholder{
-        color: white;
+        color: #F8F2F4;
         /* color:var(--FONT) ; */
     } /* Changes color of placeholder*/
-    color:white;
+    color:#F8F2F4;
     /* border:none; */
 }
 
 .form-sub{
 padding:.6em;
-/* background-color: var(--Primary); */
-background-color: var(--Tertiary);
+background-color: var(--Btn); 
+color: var(--Secondary);
 outline: none;
 border-radius: 10px;
 border: none;
