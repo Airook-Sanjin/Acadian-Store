@@ -64,16 +64,19 @@
         <div class="open-previous-chat-container">
             <h2>Open Previous Chat</h2>
             <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
-                <select name="chat_id">
                     {% if previous_chats %}
                         {% for chat in previous_chats %}
+                        <select name="chat_id">
                             <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
+                        </select>
+                        <input type="submit" value="Open Chat">
                         {% endfor %}
                     {% else %}
+                    <select name="chat_id">
                         <option>No chats found</option>
+                    </select>
+                    <input type="submit" value="Open Chat" disabled>
                     {% endif %}
-                </select>
-                <input type="submit" value="Open Chat">
             </form>
         </div>
 
