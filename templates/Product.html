@@ -1,54 +1,127 @@
 <style>
- 
-    .Main-Product{
-        margin: auto;
-       
-        width: 90%;
-        background-color: brown;
-    }
-    .Product{
-        display: flex;
+ .Main-Product {
+    margin: auto;
+    width: 90%;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.Product {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.product-container {
+    display: flex;
+    width: 100%;
+}
+
+.left-side-product,
+.right-side-product {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.left-side-product {
+    width: 55%;
+    padding: 10px;
+}
+
+.right-side-product {
+    width: 40%;
+    padding: 10px;
+}
+
+.left-img {
+    width: auto;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.img-css {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.AddtoCart-Form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-title {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.product-id {
+    font-size: 1rem;
+    color: #555;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+select,
+input[type="submit"] {
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+select {
+    width: 100%;
+    background-color: #fff;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.product-description {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+.product-amount {
+    font-size: 1rem;
+    color: #555;
+}
+
+@media (max-width: 768px) {
+    .Product {
         flex-direction: column;
-        justify-content: space-around;
-        height: 1100px;
+    }
+    
+    .left-side-product,
+    .right-side-product {
         width: 100%;
-        background-color: aqua;
     }
-
-    .left-side-product, .right-side-product{
-        height: 600px;
-        background-color: bisque;
-    }
-    .left-side-product{
-        width: 65%;
-    }
-    .right-side-product{
-      width: 30%;
-    }
-    .product-container{
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-    }
+}
 
 
-    /* Left side */
-    .left-side-product{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-    }
-    .left-side-bar{
-        background-color: red;
-        width: 15%;
-        height: 100%;
-    }
-    .left-img{
-        width: 85%;
-        height: 100%;
-        background-color: aquamarine;
-    }
 
 </style>
 {% extends 'GuestHomepage.html'%}
@@ -58,32 +131,44 @@
         <section class="Product">
             <section class="product-container">
                 <section class="left-side-product">
-                    <div class="left-side-bar"></div>
-                    <div class="left-img"><img src="{{product['image']}}" alt=""></div>
+                    <div class="left-img">
+                        <img src="{{product['image']}}" alt="" class="img-css">
+                    </div>
                 </section>
                 <section class="right-side-product">
-                    <select name="Colors" id="Colors">
-                        <option value=""></option>
-                    </select>
-                    <p class="inventory">{{product['amount']}}</p>
-    
                     <form class="AddtoCart-Form">
-                    <input type="hidden" name="PID" value="{{product['PID']|int }}">
-                    <input type="hidden" name="Title" value="{{product['title']}}">
-                    <input type="hidden" name="Size" value="{{product['size']}}">
-                    <input type="hidden" name="Color" value="{{product['color']}}">
-                    <input type="hidden" name="Price" value="{{product['price']}}">
-                    <input type="hidden" name="Desc" value="{{product['description']}}">
-                    <input type="hidden" name="Amount" value="{{product['amount']}}">
-                    <input class="BTN" type="submit" value="Add to Cart">
-                    </form> 
+                        <h2 class="product-title">{{ product['title'] }}</h2>
+                        <p class="product-id"><strong>Product ID:</strong> {{ product['PID']|int }}</p>
+                        
+                        <label for="sizes">Size:</label>
+                        <select name="Sizes" id="sizes">
+                            <option value="">Select Size</option>
+                        </select>
+                        
+                        <label for="Colors">Colors:</label>
+                        <select name="Colors" id="Colors">
+                            <option value="">Select Color</option>
+                        </select>
+
+                        <div class="product-price">
+                            <p><strong>Price:</strong> ${{ product['price'] }}</p>
+                        </div>
+
+                        <div class="product-description">
+                            <label for="description">Description:</label>
+                            <p id="description">{{ product['description'] }}</p>
+                        </div>
+
+                        <div class="product-amount">
+                            <p><strong>Amount Available:</strong> {{ product['amount'] }}</p>
+                        </div>
+
+                        <input class="BTN" type="submit" value="Add to Cart">
+                    </form>
                 </section>
             </section>
         </section>
     {% endfor %}
 </section>
+
 {% endblock body%}
-<!-- 
-
-
-              -->
