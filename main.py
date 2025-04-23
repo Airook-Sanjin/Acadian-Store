@@ -97,7 +97,7 @@ def ProductView():
                 image_url
             FROM product
             WHERE PID = :pid
-        """), {"pid": pid}).mappings().fetchall()
+        """), {"pid": pid}).mappings().first()
         
         inventory = conn.execute(text("""
             SELECT size, color, amount

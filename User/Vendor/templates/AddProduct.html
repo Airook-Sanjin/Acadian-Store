@@ -246,17 +246,26 @@
          <h1>Your Products</h1>
              <div class="grid-products">
                  {% for Product in AllProducts %}
-                    
+                   
                         <div class="product-card">
                             <img class="img-holder" src="{{ Product['image_url'] }}" alt="Product Image">
                             <div class="title"><h3>{{ Product['title'] }}</h3></div>
+                            {% if Product.discounted_price  == None%}
+                                <div>
+                                    <div class="price"><p>Original Price: ${{ Product['price'] }}</p></div>
+                                    <div class="price"><p>No discount added</p></div>
+                                </div>
+                            {% else %}
                             <div>
                                 <div class="price"><p>Original Price: ${{ Product['price'] }}</p></div>
                                 <div class="price"><p style="color: rgb(255, 0, 0);">dropped Price: -${{ Product['saving_discount'] }}</p></div>
                                 <div class="price"><p style="color: green;">discounted Price: ${{ Product['discounted_price'] }}</p></div>
                             </div>
+                            {% endif%}
                             <button onclick="OpenModal('{{Product['PID']}}')" class="inventory-button">Add Inventory Item</button>
-                        </div> 
+                        </div>
+                    
+                    
                     
                  {% endfor %}
              </div>

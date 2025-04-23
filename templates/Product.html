@@ -1,5 +1,5 @@
 <style>
-    .Main-Product {
+   .Main-Product {
        margin: auto;
        width: 90%;
        padding: 20px;
@@ -232,14 +232,21 @@
                                <option value="{{ item.color }}">{{ item.color }}</option>
                            {% endfor %}
                        </select>
-   
+                       
+                       {% if product.discounted_price  == None%}
                        <div class="product-price">
                         <div class="price-summary">
-                           <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
-                           <p style="font-size: 12px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
-                           <p style="color: rgb(97, 97, 97); font-size: 10px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
+                           <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
                        </div>
-   
+                       {% else %}
+                            <div class="product-price">
+                                <div class="price-summary">
+                                    <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
+                                    <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
+                                    <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
+                                </div>
+                            </div>
+                       {%endif%}
                        <div class="product-description">
                            <label for="description">Description:</label>
                            <p id="description">{{ product.description }}</p>
