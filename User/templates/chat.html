@@ -18,21 +18,28 @@
         flex-direction: column;
         height: 300px;
         overflow-y: scroll;
+        width: 100%;
+        border: 1px solid lightgray;
+        padding: 10px;
+        background-color: white;
+    }
+    .incoming-message, .outgoing-message{
+        margin: 10px 0;
     }
     .incoming-message{
-        margin: 30px 0;
         text-align: left;
     }
     .incoming-message .message{
+        display: inline-block;
         padding: 10px;
         background-color: lightblue;
         border-radius: 10px 10px 10px 0;
     }
     .outgoing-message{
-        margin: 30px 0;
         text-align: right;
     }
     .outgoing-message .message{
+        display: inline-block;
         padding: 10px;
         background-color: lightgreen;
         border-radius: 10px 10px 0 10px;
@@ -40,7 +47,11 @@
     .chat-container{
         display: flex;
         flex-direction: column;
-        width: 40%;
+        width: 50%;
+    }
+    .send-message-container{
+        width: 100%;
+        background-color: white;
     }
 </style>
 {% extends 'GuestHomepage.html' %}
@@ -50,67 +61,65 @@
 
         <h1>Chat</h1>
 
-        <div class="start-new-chat-container">
-            <h2>Start New Chat</h2>
-            <form>
-                <input type="text" name="user-id" placeholder="User ID">
-                <input type="text" name="product-id" placeholder="Product ID">
-                <input type="submit" name="start-chat" value="Start Chat">
-            </form>
-        </div>
-
         <div class="open-previous-chat-container">
             <h2>Open Previous Chat</h2>
-            <form>
-                <select>
-                    <option value="no-chats">No chats to select.</option>
-                    <option value="chat1">ID 1 - vendor/admin name</option>
-                    <option value="chat2">ID 2 - vendor/admin name</option>
-                    <option value="chat3">ID 3 - vendor/admin name</option>
+            <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
+                <select name="chat_id">
+                    {% if previous_chats %}
+                        {% for chat in previous_chats %}
+                            <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option>No chats found</option>
+                    {% endif %}
                 </select>
-                <input type="submit" name="open-chat" value="Open Chat">
+                <input type="submit" value="Open Chat">
             </form>
         </div>
-
-        <br>
 
         <div class="chat-container">
-            <h1>Chat with vendor/admin name</h1>
-            <p>Chat ID: 1</p>
+            <h2>Chat with {{ selected_chat.vendor_name if selected_chat else "Vendor" }}</h2>
+            <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
+
+            {% if message %}
+                <p style="color: red;">{{ message }}</p>
+            {% endif %}
+
             <div class="chat-messages">
-                <div class="incoming-message">
-                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
-                    <div class="message"><p>Text text text text message from incoming user</p></div>
-                </div>
+                {% for message in messages %}
+                    {% if message['CID'] %}
+                        <div class="outgoing-message">
+                            <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
+                            <div class="message">
+                                <p>{{ message['message'] }}</p>
+                                {% if message['images'] %}
+                                    <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
 
-                <div class="outgoing-message">
-                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
-                    <div class="message"><p>Text text text text message from incoming user</p></div>
-                </div>
+                    {% if message['VID'] %}
+                        <div class="incoming-message">
+                            <div class="info"><p>Vendor at {{ message['timestamp'] }}</p></div>
+                            <div class="message">
+                                <p>{{ message['message'] }}</p>
+                                {% if message['images'] %}
+                                    <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
 
-                <div class="incoming-message">
-                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
-                    <div class="message"><p>Text text text text message from incoming user</p></div>
-                </div>
-
-                <div class="outgoing-message">
-                    <div class="info"><p>username at 00/00/00 00:00:00</p></div>
-                    <div class="message"><p>Text text text text message from incoming user</p></div>
-                </div>
+            <div class="send-message-container">
+                <form>
+                    <input type="text" placeholder="Type your message here...">
+                    <input type="submit" value="Send">
+                </form>
             </div>
         </div>
-
-        <div class="send-message-container">
-            <form>
-                <input type="text" name="message" placeholder="Type your message here...">
-                <input type="submit" name="send-message" value="Send">
-            </form>
-        </div>
-
-        {% for text in result %}
-            <p>{{text[5]}}</p>
-            <p>{{text[6]}}</p>
-        {% endfor %}
     </div>
     {% endblock %}
 </body>

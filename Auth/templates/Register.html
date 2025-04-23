@@ -1,9 +1,14 @@
 <link rel="stylesheet" href="{{ url_for('register_bp.static', filename='style/Auth.css') }}" />
 <title>Register</title>
+<style>
+
+</style>
 {% extends 'Login.html' %}
-<body>
+
     {% block body %}
+    
     <section class="sign-up-page">
+        <h1 id="Login">Signup</h1>
         <!-- Display success or error message -->
         {% if success == True %}
             <h2 style="color: green; margin: 0%;">{{ message }}</h2>
@@ -14,44 +19,43 @@
         <!-- Conditional Forms -->
         {% if reg_type == 'customer' %}
         <form class="form-css" method="POST" action="{{ url_for('register_bp.register_view_customer') }}">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="text" name="full_name" placeholder="Full Name" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="submit" value="Sign-up as Customer">
+            <input class="form-input"type="text" name="username" placeholder="Username" required>
+            <input class="form-input"type="email" name="email" placeholder="Email" required>
+            <input class="form-input"type="text" name="full_name" placeholder="Full Name" required>
+            <input class="form-input"type="password" name="password" placeholder="Password" required>
+            <input class="form-sub" type="submit" value="Sign-up as Customer">
         </form>
         {% elif reg_type == 'vendor' %}
         <form class="form-css" method="POST" action="{{ url_for('register_bp.register_view_vendor') }}">
-            <input type="text" name="username" placeholder="Vendor Username" required>
-            <input type="email" name="email" placeholder="Vendor Email" required>
-            <input type="text" name="full_name" placeholder="Vendor Full Name" required>
-            <input type="password" name="password" placeholder="Vendor Password" required>
-            <input type="submit" value="Sign-up as Vendor">
+            <input class="form-input"type="text" name="username" placeholder="Vendor Username" required>
+            <input class="form-input"type="email" name="email" placeholder="Vendor Email" required>
+            <input class="form-input"type="text" name="full_name" placeholder="Vendor Full Name" required>
+            <input class="form-input"type="password" name="password" placeholder="Vendor Password" required>
+            <input class="form-sub" type="submit" value="Sign-up as Vendor">
         </form>
         {% elif reg_type == 'admin' %}
         <form class="form-css" method="POST" action="{{ url_for('register_bp.register_view_admin') }}">
-            <input type="text" name="username" placeholder="Admin Username" required>
-            <input type="email" name="email" placeholder="Admin Email" required>
-            <input type="text" name="full_name" placeholder="Admin Full Name" required>
-            <input type="password" name="password" placeholder="Admin Password" required>
-            <input type="submit" value="Sign-up as Admin">
+            <input class="form-input"type="text" name="username" placeholder="Admin Username" required>
+            <input class="form-input"type="email" name="email" placeholder="Admin Email" required>
+            <input class="form-input"type="text" name="full_name" placeholder="Admin Full Name" required>
+            <input class="form-input"type="password" name="password" placeholder="Admin Password" required>
+            <input class="form-sub" type="submit" value="Sign-up as Admin">
         </form>
         {% endif %}
     
         <div class="other-options">
             <!-- Link to Customer registration -->
-            <a href="{{ url_for('register_bp.register_who', type='customer') }}">
+            <button class="form-sub" onclick="window.location.href='{{ url_for('register_bp.register_who', type='customer') }}'">
                 <h3>Customer</h3>
-            </a>
+            </button>
             <!-- Link to Vendor registration -->
-            <a href="{{ url_for('register_bp.register_who', type='vendor') }}">
+            <button class="form-sub" onclick="window.location.href='{{ url_for('register_bp.register_who', type='vendor') }}'">
                 <h3>Vendor</h3>
-            </a>
+            </button>
             <!-- Link to Admin registration -->
-            <a href="{{ url_for('register_bp.register_who', type='admin') }}">
+            <button class="form-sub" onclick="window.location.href='{{ url_for('register_bp.register_who', type='admin') }}'">
                 <h3>Admin</h3>
-            </a>
+            </button>
         </div>
     </section>
     {% endblock %}
-</body>

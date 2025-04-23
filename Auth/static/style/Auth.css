@@ -1,56 +1,113 @@
 
 :root{
-    --FONT: #473C33;
-    --Primary:#ABC270;
-    --Secondary:#FEC868;
-    --Tertiary:#FDA769;
+    --FONT: #bfdf9f;
+    --Btn: #c6c295;
+    --HovBtn:#bdb884;
+    --Primary:#5C8966;
+    --Secondary:#2D4B48;
+    --Tertiary:#788497;
+    --Quad:#669294;
     --DropShadow:6px 6px 10px hsl(217, 72%, 18%,16%),
-    -6px -6px 10px hsla(0, 0%, 99%,100%);
+    -4px -4px 10px hsla(0, 0%, 99%,50%);
   
     --InnerShadow:-2px -2px 2px #00000026,
     2px 2px 2px hsla(0, 0%, 99%,100%);
   }
 body{
     display: flex;
-    justify-content: center; 
+    justify-content: flex-end; 
     align-items: center; 
     height: 100vh; 
     margin: 0;
+    background-image: url("../images/Background-image-acadian.jpg");
+    background-repeat: none;
+    background-size: cover;
+}
+.body-Signup{
+    
+    justify-content: flex-start !important; 
 }
 .sign-up-page{
     display: flex;
     flex-direction:column;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 1em;
     align-items: center;
-    width: 80%;
-    height: 70%;
-    border-radius: 30px;
-    background-color: antiquewhite;
+    width: 50vw;
+    height: 100%;
+    border-top-right-radius: 3em;
+    border-bottom-right-radius: 3em;
+    background-color: hsla(0, 0%, 99%,0.1);
+    /* background-color: var(--Primary); */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 .log-in-page{
     display: flex;
     flex-direction:column;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 1em;
     align-items: center;
-    width: 80%;
-    height: 70%;
-    border-radius: 30px;
-    background-color: antiquewhite;
+    width: 50vw;
+    height: 100%;
+    border-top-left-radius: 3em;
+    border-bottom-left-radius: 3em;
+    background-color: hsla(0, 0%, 99%,0.1);
+    /* background-color: var(--Primary); */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
+#Login{
+/* margin:0 */
+color:white;
+align-self: flex-start;
+padding-left: 3em;
+font-size: 2em;
+}
+
 .form-css{
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    margin: 0;
-    width: 200px;
-    height: 200px;
-    background-color: aqua;
+    align-items: center;
+    gap: 2em;
+    width: 80%;
+    padding:2em;
+    
+    /* box-shadow: var(--DropShadow); */
 }
+
+.form-input{
+    padding: .5em;
+    width:100%;
+    /* border-radius: 20px; */
+    border: none;
+    border-bottom: 1px solid hsla(0, 0%, 99%,0.5);
+    background-color: transparent;
+    /* background-color: hsla(0, 0%, 99%,0.5); */
+    outline: none;
+
+    &::placeholder{
+        color: #F8F2F4;
+        /* color:var(--FONT) ; */
+    } /* Changes color of placeholder*/
+    color:#F8F2F4;
+    /* border:none; */
+}
+
+.form-sub{
+padding:.6em;
+background-color: var(--Btn); 
+color: var(--Secondary);
+outline: none;
+border-radius: 10px;
+border: none;
+cursor: pointer;
+width:50%;
+}
+
 .other-options{
-    display:flex;
-    flex-direction: row;
-    justify-content: space-around;
+    display: flex;
     width: 200px;
-    min-height: 50px;
-    background-color: aquamarine;
+    gap:.4em;
+    justify-content: center;
 }

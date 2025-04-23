@@ -196,9 +196,29 @@ select {
                     <div class="thumbnail placeholder-thumb">
                         <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
                     </div>
+
                     {% for img in images %}
                         <div class="thumbnail placeholder-thumb">
                             <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+
+                </section>
+                <section class="right-side-product">
+                    
+                        <h2 class="product-title">{{ product['title'] }}</h2>
+                        <p class="product-id"><strong>Product ID:</strong> {{ product['PID']|int }}</p>
+                        
+                        <label for="sizes">Size:</label>
+                        <select name="Sizes" id="sizes">
+                            <option value="">Select Size</option>
+                        </select>
+                        
+                        <label for="Colors">Colors:</label>
+                        <select name="Colors" id="Colors">
+                            <option value="">Select Color</option>
+                        </select>
+
+                        <div class="product-price">
+                            <p><strong>Price:</strong> ${{ product['price'] }}</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -234,6 +254,7 @@ select {
                         <p><strong>Price:</strong> ${{ product.price }}</p>
                     </div>
 
+
                     <div class="product-description">
                         <label for="description">Description:</label>
                         <p id="description">{{ product.description }}</p>
@@ -245,8 +266,18 @@ select {
                         </p>
                     </div>
 
-                    <input class="BTN" type="submit" value="Add to Cart">
-                </form>
+                        <form class="AddtoCart-Form" action= "{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                            <input type="hidden" name="PID" value="{{product['PID']|int }}">
+                            <input type="hidden" name="Title" value="{{product['title']}}">
+                            <input type="hidden" name="Size" value="{{product['size']}}">
+                            <input type="hidden" name="Color" value="{{product['color']}}">
+                            <input type="hidden" name="Price" value="{{product['price']}}">
+                            <input type="hidden" name="Desc" value="{{product['description']}}">
+                            <input type="hidden" name="Amount" value="{{product['amount']}}">
+                            <input class="BTN" type="submit" value="Add to Cart">
+                          </form>
+                        
+                </section>
             </section>
         </section>
     </section>
