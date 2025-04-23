@@ -3,6 +3,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
     }
     h1, h2{
         text-align: center;
@@ -32,8 +33,11 @@
     .incoming-message .message{
         display: inline-block;
         padding: 10px;
-        background-color: lightblue;
+        background: #ADD8E6;
+        background: linear-gradient(180deg, rgba(173, 216, 230, 1) 0%, rgba(128, 187, 207, 1) 100%);
+        border: 1px solid lightgray;
         border-radius: 10px 10px 10px 0;
+        max-width: 47%;
     }
     .outgoing-message{
         text-align: right;
@@ -41,13 +45,16 @@
     .outgoing-message .message{
         display: inline-block;
         padding: 10px;
-        background-color: lightgreen;
+        background: #90EE90;
+        background: linear-gradient(180deg, rgba(144, 238, 144, 1) 0%, rgba(112, 207, 112, 1) 100%);
+        border: 1px solid lightgray;
         border-radius: 10px 10px 0 10px;
+        max-width: 47%;
     }
     .chat-container{
         display: flex;
         flex-direction: column;
-        width: 50%;
+        width: 45%;
     }
     .send-message-container{
         width: 100%;
@@ -57,31 +64,46 @@
 {% extends 'GuestHomepage.html' %}
 <body>
     {% block body %}
+    <h1>Chat</h1>
     <div class="outer-container">
 
-        <h1>Chat</h1>
-
-        <div class="open-previous-chat-container">
-            <h2>Open Previous Chat</h2>
-            <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
-                    {% if previous_chats %}
+        <div class="chat-options-container">
+            <div class="open-previous-chat-container">
+                <h2>Open Previous Chat</h2>
+                <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
+                        {% if previous_chats %}
+                            <select name="chat_id">
+                            {% for chat in previous_chats %}
+                                <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
+                            {% endfor %}
+                            </select>
+                            <input type="submit" value="Open Chat">
+                        {% else %}
                         <select name="chat_id">
-                        {% for chat in previous_chats %}
-                            <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
-                        {% endfor %}
+                            <option>No chats found</option>
                         </select>
-                        <input type="submit" value="Open Chat">
-                    {% else %}
-                    <select name="chat_id">
-                        <option>No chats found</option>
+                        <input type="submit" value="Open Chat" disabled>
+                        {% endif %}
+                </form>
+            </div>
+    
+            <div class="start-new-chat-container">
+                <h2>Start New Chat</h2>
+                <form>
+                    <select>
+                        <option>Vendor</option>
+                        <option>Admin</option>
                     </select>
-                    <input type="submit" value="Open Chat" disabled>
-                    {% endif %}
-            </form>
+                    <div style="display: inline-block;">
+                        <input type="text" placeholder="Vendor ID">
+                    </div>
+                    <input type="text" placeholder="Product ID">
+                    <input type="submit" value="Start Chat">
+                </form>
+            </div>
         </div>
 
         <div class="chat-container">
-            <h2>Chat with {{ selected_chat.vendor_name if selected_chat else "Vendor" }}</h2>
             <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
 
             {% if message %}
@@ -123,6 +145,7 @@
                 </form>
             </div>
         </div>
+
     </div>
     {% endblock %}
 </body>
