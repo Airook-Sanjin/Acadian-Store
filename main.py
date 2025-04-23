@@ -78,7 +78,9 @@ def ProductView():
             p.warranty as warranty,
             p.discount as discount,
             p.availability as availability,
-            p.image_url as image
+            p.image_url as image,
+            inv.size as size,                
+            inv.color as color
             FROM product as p
             LEFT JOIN product_images as pi ON p.PID = pi.PID
             LEFT JOIN product_inventory as inv ON pi.PID = inv.PID
