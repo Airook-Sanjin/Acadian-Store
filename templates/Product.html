@@ -48,13 +48,60 @@
     align-items: center;
 }
 
-.img-css {
+/* .img-css {
     width: auto;
     height: 100%;
     max-width: 100%;
     object-fit: contain;
     border-radius: 8px;
+} */
+.thumbnail-bar {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
+
+.thumbnail {
+    width: 100%;
+    height: auto;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border 0.3s, transform 0.3s;
+}
+
+.thumbnail:hover {
+    border: 2px solid #007BFF;
+    transform: scale(1.05);
+}
+
+.left-side-product {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.left-img {
+    flex: 1;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.img-css {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
 
 .AddtoCart-Form {
     display: flex;
@@ -110,7 +157,7 @@ select {
     color: #555;
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .Product {
         flex-direction: column;
     }
@@ -119,24 +166,44 @@ select {
     .right-side-product {
         width: 100%;
     }
+} */
+
+.placeholder-thumb {
+    align-content: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #ccc;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border 0.3s, transform 0.3s;
 }
 
+.placeholder-thumb:hover {
+    border: 2px solid #007BFF;
+    transform: scale(1.05);
+}
 
 
 </style>
 {% extends 'GuestHomepage.html'%}
 {% block body %}
 <section class="Main-Product">
-    {% for product in specific_product %}
-        <section class="Product">
-            <section class="product-container">
-                <section class="left-side-product">
-                    <div class="left-img">
-                        <img src="{{product['image']}}" alt="" class="img-css">
+    <section class="Product">
+        <section class="product-container">
+            <section class="left-side-product">
+                <div class="thumbnail-bar">
+                    <div class="thumbnail placeholder-thumb">
+                        <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
                     </div>
+
+                    {% for img in images %}
+                        <div class="thumbnail placeholder-thumb">
+                            <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+
                 </section>
                 <section class="right-side-product">
-                    <form class="AddtoCart-Form">
+                    
                         <h2 class="product-title">{{ product['title'] }}</h2>
                         <p class="product-id"><strong>Product ID:</strong> {{ product['PID']|int }}</p>
                         
@@ -153,22 +220,73 @@ select {
                         <div class="product-price">
                             <p><strong>Price:</strong> ${{ product['price'] }}</p>
                         </div>
+                    {% endfor %}
+                </div>
+                <div class="left-img">
+                    <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
+                </div>
+            </section>
+            
+            <section class="right-side-product">
+                <form class="AddtoCart-Form">
+                    <h2 class="product-title">{{ product.title }}</h2>
+                    <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+                    
+                    <!-- Size Dropdown -->
+                    <label for="sizes">Size:</label>
+                    <select name="Sizes" id="sizes">
+                        <option value="">Select Size</option>
+                        {% for item in inventory %}
+                            <option value="{{ item.size }}">{{ item.size }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <!-- Color Dropdown -->
+                    <label for="Colors">Colors:</label>
+                    <select name="Colors" id="Colors">
+                        <option value="">Select Color</option>
+                        {% for item in inventory %}
+                            <option value="{{ item.color }}">{{ item.color }}</option>
+                        {% endfor %}
+                    </select>
 
-                        <div class="product-description">
-                            <label for="description">Description:</label>
-                            <p id="description">{{ product['description'] }}</p>
-                        </div>
+                    <div class="product-price">
+                        <p><strong>Price:</strong> ${{ product.price }}</p>
+                    </div>
 
-                        <div class="product-amount">
-                            <p><strong>Amount Available:</strong> {{ product['amount'] }}</p>
-                        </div>
 
-                        <input class="BTN" type="submit" value="Add to Cart">
-                    </form>
+                    <div class="product-description">
+                        <label for="description">Description:</label>
+                        <p id="description">{{ product.description }}</p>
+                    </div>
+
+                    <div class="product-amount">
+                        <p><strong>Amount Available:</strong> 
+                            {{ inventory[0].amount if inventory else 'N/A' }}
+                        </p>
+                    </div>
+
+                        <form class="AddtoCart-Form" action= "{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                            <input type="hidden" name="PID" value="{{product['PID']|int }}">
+                            <input type="hidden" name="Title" value="{{product['title']}}">
+                            <input type="hidden" name="Size" value="{{product['size']}}">
+                            <input type="hidden" name="Color" value="{{product['color']}}">
+                            <input type="hidden" name="Price" value="{{product['price']}}">
+                            <input type="hidden" name="Desc" value="{{product['description']}}">
+                            <input type="hidden" name="Amount" value="{{product['amount']}}">
+                            <input class="BTN" type="submit" value="Add to Cart">
+                          </form>
+                        
                 </section>
             </section>
         </section>
-    {% endfor %}
+    </section>
 </section>
 
+<script>
+    function changeImage(thumbnail) {
+        const mainImage = document.getElementById('main-image');
+        mainImage.src = thumbnail.src;
+    }
+</script>
 {% endblock body%}

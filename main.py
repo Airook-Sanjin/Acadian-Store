@@ -51,45 +51,55 @@ app.register_blueprint(vendor_bp)
 @app.route('/', methods=["GET"])
 def start():
     try:
-        Allproducts = conn.execute(text(
-        """SELECT p.PID as PID,p.title as title, p.price as price,p.description as description,inv.amount as amount,p.warranty as warranty,p.discount as discount,p.availability as availability,p.image_url as image FROM product as p
-           LEFT JOIN product_images as pi on p.PID = pi.PID
-           LEFT JOIN product_inventory as inv on pi.PID = inv.PID""")).mappings().fetchall() #* Gets all products
-        # print(Allproducts)
+        products = conn.execute(text("""
+            SELECT 
+                PID, title, price, description,
+                warranty, discount, availability, image_url
+            FROM product
+        """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
 
-        # resets connection  to db for the next request
+        inventory = conn.execute(text("""
+            SELECT size, color, amount
+            FROM product_inventory
+        """)).mappings().fetchall()
+
         conn.commit()
-        return render_template('GuestHomepage.html',Allproducts = Allproducts)
+        return render_template('GuestHomepage.html', products=products, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html',Allproducts = [])
+        return render_template('GuestHomepage.html', products=[], inventory=[])
+
     
 @app.route('/Product-View')
 def ProductView():
     try:
         pid = request.args.get('pid')
-        specific_product = conn.execute(text(
-        """SELECT 
-            p.PID as PID,
-            p.title as title, 
-            p.price as price,
-            p.description as description,
-            inv.amount as amount,
-            p.warranty as warranty,
-            p.discount as discount,
-            p.availability as availability,
-            p.image_url as image,
-            inv.size as size,                
-            inv.color as color
-            FROM product as p
-            LEFT JOIN product_images as pi ON p.PID = pi.PID
-            LEFT JOIN product_inventory as inv ON pi.PID = inv.PID
-            WHERE p.PID = :pid"""), {"pid": pid}).mappings().fetchall()
-        print("Specific Product:", specific_product)  # Debugging output
-        return render_template('Product.html', specific_product=specific_product)
+        
+        product = conn.execute(text("""
+            SELECT 
+            PID, title, price, description,
+            warranty, discount, availability, image_url
+            FROM product
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().first()
+        
+        inventory = conn.execute(text("""
+            SELECT size, color, amount
+            FROM product_inventory
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().fetchall()
+
+        images = conn.execute(text("""
+            SELECT image
+            FROM product_images
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().fetchall()
+        
+        # print("Specific Product:", specific_product)  # Debugging output
+        return render_template('Product.html', product=product, inventory=inventory, images=images)
     except Exception as e:
         print("Error:", e)  # Print the actual error
-        return render_template('Product.html', specific_product=[])
+        return render_template('Product.html', product=None, inventory=[], images=[])
 
     
 
