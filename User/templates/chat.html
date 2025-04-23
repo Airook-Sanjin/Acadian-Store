@@ -3,6 +3,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
     }
     h1, h2{
         text-align: center;
@@ -12,6 +13,9 @@
     }
     form{
         text-align: center;
+    }
+    .chat-options-container{
+        display: flex;
     }
     .chat-messages{
         display: flex;
@@ -23,6 +27,16 @@
         padding: 10px;
         background-color: white;
     }
+    .chat-messages::-webkit-scrollbar{
+        width:.2em;
+    }
+  .chat-messages::-webkit-scrollbar-track{
+        background: hsl(0, 0%, 95%);
+    }
+  .chat-messages::-webkit-scrollbar-thumb{
+        background:linear-gradient(0deg, hsl(0, 0%, 95%) 0 10%  ,black 50% 55%, hsl(0, 0%, 95%) 90% 100% );
+        border-radius: 32px;
+    }
     .incoming-message, .outgoing-message{
         margin: 10px 0;
     }
@@ -32,8 +46,11 @@
     .incoming-message .message{
         display: inline-block;
         padding: 10px;
-        background-color: lightblue;
+        background: #ADD8E6;
+        background: linear-gradient(180deg, rgba(173, 216, 230, 1) 0%, rgba(128, 187, 207, 1) 100%);
+        border: 1px solid lightgray;
         border-radius: 10px 10px 10px 0;
+        max-width: 47%;
     }
     .outgoing-message{
         text-align: right;
@@ -41,13 +58,16 @@
     .outgoing-message .message{
         display: inline-block;
         padding: 10px;
-        background-color: lightgreen;
+        background: #90EE90;
+        background: linear-gradient(180deg, rgba(144, 238, 144, 1) 0%, rgba(112, 207, 112, 1) 100%);
+        border: 1px solid lightgray;
         border-radius: 10px 10px 0 10px;
+        max-width: 47%;
     }
     .chat-container{
         display: flex;
         flex-direction: column;
-        width: 50%;
+        width: 45%;
     }
     .send-message-container{
         width: 100%;
@@ -59,28 +79,43 @@
     {% block body %}
     <div class="outer-container">
 
-        <h1>Chat</h1>
-
-        <div class="open-previous-chat-container">
-            <h2>Open Previous Chat</h2>
-            <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
-                <select name="chat_id">
-                    {% if previous_chats %}
-                        {% for chat in previous_chats %}
-                            <option value="{{ chat['CHAT_ID'] }}">{{ chat['CHAT_ID'] }}</option>
-                        {% endfor %}
-                    {% else %}
-                        <option>No chats found</option>
-                    {% endif %}
-                </select>
-                <input type="submit" value="Open Chat">
-            </form>
+        <div class="chat-options-container">
+            <div class="open-previous-chat-container">
+                <h2>Open Previous Chat</h2>
+                <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
+                        {% if previous_chats %}
+                            <select name="chat_id">
+                            {% for chat in previous_chats %}
+                                <option value="{{ chat['CHAT_ID'] }}">Chat ID: {{ chat['CHAT_ID'] }}</option>
+                            {% endfor %}
+                            </select>
+                            <input type="submit" value="Open Chat">
+                        {% else %}
+                        <select name="chat_id">
+                            <option>No chats found</option>
+                        </select>
+                        <input type="submit" value="Open Chat" disabled>
+                        {% endif %}
+                </form>
+            </div>
+    
+            <div class="start-new-chat-container">
+                <h2>Start New Chat</h2>
+                <form>
+                    <select>
+                        <option>Vendor</option>
+                        <option>Admin</option>
+                    </select>
+                    <div style="display: inline-block;">
+                        <input type="text" placeholder="Vendor ID">
+                    </div>
+                    <input type="text" placeholder="Product ID">
+                    <input type="submit" value="Start Chat">
+                </form>
+            </div>
         </div>
 
         <div class="chat-container">
-            <h2>Chat with {{ selected_chat.vendor_name if selected_chat else "Vendor" }}</h2>
-            <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
-
             {% if message %}
                 <p style="color: red;">{{ message }}</p>
             {% endif %}
@@ -117,9 +152,11 @@
                 <form>
                     <input type="text" placeholder="Type your message here...">
                     <input type="submit" value="Send">
+                    <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
                 </form>
             </div>
         </div>
+
     </div>
     {% endblock %}
 </body>
