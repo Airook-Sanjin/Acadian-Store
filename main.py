@@ -81,7 +81,7 @@ def ProductView():
             warranty, discount, availability, image_url
             FROM product
             WHERE PID = :pid
-        """), {"pid": pid}).mappings().first()
+        """), {"pid": pid}).mappings().fetchall()
         
         inventory = conn.execute(text("""
             SELECT size, color, amount
