@@ -6,21 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
   </head>
-  <body>
+  <body class="{% if reg_type %} body-Signup {% endif %}">
     {% block body %}
+    
     <section class="log-in-page">
+      <h1 id="Login">Log In</h1>
       <form class="form-css" method="POST" action="{{ url_for('login_bp.Signin') }}">
         {% if message %}
           <p style="color: red;">{{ message }}</p>
         {% endif %}
-        <input type="email" name="Email" id="Email" placeholder="Email" />
-        <input type="password" name="Pass" id="Pass" placeholder="Password" />
-        <input type="submit" value="LOG IN">
+        <input class="form-input" type="email" name="Email" id="Email" placeholder="Email" />
+        <input class="form-input" type="password" name="Pass" id="Pass" placeholder="Password" />
+        <input class="form-sub" type="submit" value="Log In">
       </form>
       <div class="other-options">
-        <a href="{{ url_for('register_bp.register_who') }}">
-          <h3>Sign Up</h3>
-        </a>
+        <button class="form-sub" onclick="window.location.href='{{ url_for('register_bp.register_who') }}'"> Sign Up</button>
       </div>
     </section>
     {% endblock %}
