@@ -16,8 +16,17 @@ def load_user():
 
 @admin.route('/Home')
 def AdminHomePage():
-    Allproducts = conn.execute(text(
-         """SELECT p.PID as PID,p.title as title, p.price as price,p.description as description,inv.amount as amount,p.warranty as warranty,p.discount as discount,p.availability as availability,p.image_url as image FROM product as p
-           LEFT JOIN product_images as pi on p.PID = pi.PID
-           LEFT JOIN product_inventory as inv on pi.PID = inv.PID""")).mappings().fetchall()
-    return render_template('AdminHomepage.html',Allproducts=Allproducts)
+    try:
+        products = conn.execute(text("""
+                SELECT 
+                    PID, title, price, description,
+                    warranty, discount, availability, image_url
+                FROM product
+            """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
+
+        inventory = conn.execute(text("""
+            SELECT size, color, amount            FROM product_inventory
+            """)).mappings().fetchall()
+        return render_template('AdminHomepage.html',products=products, inventory=inventory)
+    except Exception as e:
+        return render_template('AdminHomepage.html',products=[], inventory=[])
