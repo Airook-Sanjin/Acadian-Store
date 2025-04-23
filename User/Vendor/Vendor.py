@@ -40,7 +40,22 @@ def VendorViewProducts():
         conn = Connecttodb()
 
         # Fetch all products to display
-        AllProducts = conn.execute(text("SELECT * FROM product")).fetchall()
+        AllProducts = conn.execute(text("""SELECT 
+                                PID,
+                                title,
+                                price,
+                                (price * discount) as saving_discount,
+                                price - (price * discount) AS discounted_price,
+                                description,
+                                warranty,
+                                discount,
+                                discount_date,
+                                availability,
+                                VID,
+                                AID,
+                                image_url
+                            FROM product 
+                            """)).fetchall()
         # print(AllProducts)  # Debugging: Print the fetched products
 
         return render_template('AddProduct.html', AllProducts=AllProducts, message="Successfully added", success=True)
@@ -69,7 +84,7 @@ def VendorAddProduct():
         DISCOUNT = DISCOUNT if DISCOUNT else None
         DISCOUNT_DATE = DISCOUNT_DATE if DISCOUNT_DATE else None
 
-        DISCOUNT = DISCOUNT/100
+        DISCOUNT = float(DISCOUNT)/100
         # Insert product into the database
         conn.execute(text("""
             INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url)

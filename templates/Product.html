@@ -145,6 +145,9 @@
        font-weight: bold;
        color: #e74c3c;
    }
+   .price-summary p{
+    margin: 0;
+   }
    
    .product-description {
        font-size: 1rem;
@@ -231,7 +234,10 @@
                        </select>
    
                        <div class="product-price">
-                           <p><strong>Price:</strong> ${{ product.price }}</p>
+                        <div class="price-summary">
+                           <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
+                           <p style="font-size: 12px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
+                           <p style="color: rgb(97, 97, 97); font-size: 10px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
                        </div>
    
                        <div class="product-description">

@@ -52,11 +52,19 @@ app.register_blueprint(vendor_bp)
 def start():
     try:
         products = conn.execute(text("""
-            SELECT 
-                PID, title, price, description,
-                warranty, discount, availability, image_url
-            FROM product
-        """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
+           SELECT 
+                PID, title, price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
+                FROM product 
+        """)).mappings().fetchall()  # changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
             SELECT size, color, amount
@@ -76,9 +84,17 @@ def ProductView():
         pid = request.args.get('pid')
         
         product = conn.execute(text("""
-            SELECT 
-            PID, title, price, description,
-            warranty, discount, availability, image_url
+             SELECT 
+                PID, title, price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
             FROM product
             WHERE PID = :pid
         """), {"pid": pid}).mappings().first()
