@@ -69,6 +69,7 @@ def VendorAddProduct():
         DISCOUNT = DISCOUNT if DISCOUNT else None
         DISCOUNT_DATE = DISCOUNT_DATE if DISCOUNT_DATE else None
 
+        DISCOUNT = DISCOUNT/100
         # Insert product into the database
         conn.execute(text("""
             INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url)
@@ -86,10 +87,10 @@ def VendorAddProduct():
         })
 
         # Commit the changes to the database
-        # conn.commit()
+        conn.commit()
         return render_template('AddProduct.html', message="Added product successfully.", success=True)
     except Exception as e:
-        print(f"Error adding product: {e}")
+        print(f"ERROR ADDING PRODUCT: {e}")
         return render_template('AddProduct.html', message="Product failed to add.", success=False)
 
 ###########################################################
@@ -115,9 +116,9 @@ def AddInventory():
             'size': Size,
             'amount': Amount
         })
-        # conn.commit()
+        conn.commit()
 
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Inventory added successfully", success=True))
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"ERROR: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add inventory", success=False))
