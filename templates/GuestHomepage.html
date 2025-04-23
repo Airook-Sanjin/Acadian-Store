@@ -80,19 +80,20 @@
         {% endblock body %}
       
         <section class="product_container">
-          {% for product in Allproducts %}
-            <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product['PID'] }}'">
+          {% for product in products %}
+              <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
                   <section class="product_img">
-                      <img src="{{ product['image'] }}" alt="{{ product['title'] }}" class="product-img">
+                      <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
                   </section>
                   <section class="product">
-                      <h3 class="title">{{ product['title'] }}</h3>
-                      <h4 class="price">${{ product['price'] }}</h4>
-                      <h4 class="desc">{{ product['description'] }}</h4>
+                      <h3 class="title">{{ product.title }}</h3>
+                      <h4 class="price">${{ product.price }}</h4>
+                      <h4 class="desc">{{ product.description }}</h4>
                   </section>
               </section>
           {% endfor %}
       </section>
+      
       
     <footer class="footer">
       <div class="footer__container">
