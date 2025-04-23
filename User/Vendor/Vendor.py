@@ -146,3 +146,24 @@ def AddInventory():
     except Exception as e:
         print(f"ERROR: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add inventory", success=False))
+    
+@vendor_bp.route('/AddImages', methods=["POST"])
+def AddImages():
+    try:
+        PID = request.form.get("PID")
+        image_url = request.form.get("image_url")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            INSERT INTO product_images (PID, image)
+            VALUES (:product_id, :image)
+        """), {
+            'product_id': PID,
+            'image': image_url
+        })
+        conn.commit()
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Image added successfully", success=True))
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add image", success=False))

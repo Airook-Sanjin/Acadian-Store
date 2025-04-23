@@ -120,8 +120,28 @@
         background-color: #e2d1b8;
     }
 
+    .button-holder{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        min-height: 100px;
+    }
+
     /* Modal */
     #InventoryModal {
+        flex-direction: row;
+        justify-content: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: none;
+    }
+    #ImageModal {
         flex-direction: row;
         justify-content: center;
         position: fixed;
@@ -258,11 +278,14 @@
                             {% else %}
                             <div>
                                 <div class="price"><p>Original Price: ${{ Product['price'] }}</p></div>
-                                <div class="price"><p style="color: rgb(255, 0, 0);">dropped Price: -${{ Product['saving_discount'] }}</p></div>
+                                <div class="price"><p style="color: rgb(255, 0, 0);">Amount dropped: -${{ Product['saving_discount'] }}</p></div>
                                 <div class="price"><p style="color: green;">discounted Price: ${{ Product['discounted_price'] }}</p></div>
                             </div>
                             {% endif%}
-                            <button onclick="OpenModal('{{Product['PID']}}')" class="inventory-button">Add Inventory Item</button>
+                            <div class="button-holder">
+                                <button onclick="OpenImageModal('{{Product['PID']}}')" class="inventory-button">Add Images</button>
+                                <button onclick="OpenModal('{{Product['PID']}}')" class="inventory-button">Add Inventory Item</button>
+                            </div>
                         </div>
                     
                     
@@ -302,10 +325,37 @@
         </div>
     </div>
 </div>
+
+<!-- Second Modal Structure -->
+<div id="ImageModal" class="modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Add Product Images</h1>
+                <p style="margin: 0; color: rgb(136, 136, 136);">Upload additional images</p>
+            </div>
+            <div class="modal-body">
+                <!-- Form for adding product images -->
+                <form class="Inventory-form method="POST"   action="{{ url_for('vendor_bp.AddImages') }}" enctype="multipart/form-data">
+                    <label for="image_PID">Product ID:</label>
+                    <input type="text" id="image_PID" name="PID" placeholder="Enter Product ID" readonly required>
+
+
+                    <label for="image_url">Enter Image URL:</label>
+                    <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
+                    <button type="submit" class="btn btn-primary">Upload Image</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CloseImageModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
  </section>
  
  <script>
- // JavaScript to toggle the visibility of discount fields
  function toggleDiscountFields(show) {
      const discountFields = document.getElementById('discount_fields');
      if (show) {
@@ -329,6 +379,22 @@
         let modal = document.querySelector("#InventoryModal");
         modal.style.display = "none"; // Hide the modal
     };
+
+
+    window.OpenImageModal = function(PID) {
+    let modal = document.querySelector("#ImageModal");
+    let productIdInput = document.querySelector("#image_PID");
+        if (productIdInput) {
+            productIdInput.value = PID;
+        }
+        modal.style.display = "flex";
+    };
+
+    window.CloseImageModal = function() {
+        let modal = document.querySelector("#ImageModal");
+        modal.style.display = "none";
+    };
+
  
  </script> 
  {% endblock body%}
