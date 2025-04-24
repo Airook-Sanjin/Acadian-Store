@@ -49,7 +49,22 @@ def VendorViewProducts():
         conn = Connecttodb()
 
         # Fetch all products to display
-        AllProducts = conn.execute(text("SELECT * FROM product")).fetchall()
+        AllProducts = conn.execute(text("""SELECT 
+                                PID,
+                                title,
+                                price,
+                                (price * discount) as saving_discount,
+                                price - (price * discount) AS discounted_price,
+                                description,
+                                warranty,
+                                discount,
+                                discount_date,
+                                availability,
+                                VID,
+                                AID,
+                                image_url
+                            FROM product 
+                            """)).fetchall()
         # print(AllProducts)  # Debugging: Print the fetched products
 
         return render_template('AddProduct.html', AllProducts=AllProducts, message="Successfully added", success=True)
@@ -78,7 +93,7 @@ def VendorAddProduct():
         DISCOUNT = DISCOUNT if DISCOUNT else None
         DISCOUNT_DATE = DISCOUNT_DATE if DISCOUNT_DATE else None
 
-        DISCOUNT = DISCOUNT/100
+        DISCOUNT = float(DISCOUNT)/100
         # Insert product into the database
         conn.execute(text("""
             INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url)
@@ -131,3 +146,24 @@ def AddInventory():
     except Exception as e:
         print(f"ERROR: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add inventory", success=False))
+    
+@vendor_bp.route('/AddImages', methods=["POST"])
+def AddImages():
+    try:
+        PID = request.form.get("PID")
+        image_url = request.form.get("image_url")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            INSERT INTO product_images (PID, image)
+            VALUES (:product_id, :image)
+        """), {
+            'product_id': PID,
+            'image': image_url
+        })
+        conn.commit()
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Image added successfully", success=True))
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add image", success=False))
