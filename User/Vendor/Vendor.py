@@ -25,17 +25,30 @@ def load_user():
 def VendorHomePage():
     try:
         products = conn.execute(text("""
-                SELECT 
-                    PID, title, price, description,
-                    warranty, discount, availability, image_url
-                FROM product
-            """)).mappings().fetchall() 
+           SELECT 
+                PID, title, CAST(price AS DECIMAL(10,2)) AS price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
+                FROM product 
+        """)).mappings().fetchall()  # changed from .first() to .fetchall()
+
         inventory = conn.execute(text("""
-            SELECT size, color, amount            FROM product_inventory
-            """)).mappings().fetchall()
-        return render_template('VendorHomepage.html',products=products, inventory=inventory)
+            SELECT size, color, amount
+            FROM product_inventory
+        """)).mappings().fetchall()
+
+        conn.commit()
+        return render_template('GuestHomepage.html', products=products, inventory=inventory)
     except Exception as e:
-        return render_template('VendorHomepage.html',products=[], inventory=[])
+        print(f"Error adding product: {e}")
+        return render_template('GuestHomepage.html', products=[], inventory=[])
 
 ###########################################################
 # IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
