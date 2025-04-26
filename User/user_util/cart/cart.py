@@ -22,13 +22,17 @@ def UserCart(username):
     try:
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color, p.description as description,p.price as price
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date < curdate() then p.price	
+                    WHEN p.discount IS NOT NULL OR p.discount_date > curdate() then p.price - (p.price * p.discount) 
+                END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall()
         print (CartList)
         total = 0
         for item in CartList:
-            total+=float(item['price'])
+            total+=float(item['Price'])
             
         print(total)
         if not g.User: #* Handles if signed in or not
@@ -52,13 +56,17 @@ def RemoveFromCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.price as price
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date < curdate() then p.price	
+                    WHEN p.discount IS NOT NULL OR p.discount_date > curdate() then p.price - (p.price * p.discount) 
+                END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
         
         total = 0
         for item in CartList:
-            total+=float(item['price'])
+            total+=float(item['Price'])
             
         return render_template('Cart.html',username=username,CartList = CartList,total=total)
     except Exception as e:
@@ -70,13 +78,21 @@ def addToCart():
     try:
         products = conn.execute(text("""
                 SELECT 
-                    PID, title, price, description,
-                    warranty, discount, availability, image_url
+                    PID, title, CAST(price AS DECIMAL(10,2)) AS price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
                 FROM product
             """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount            FROM product_inventory
+            SELECT size, color, amount FROM product_inventory
             """)).mappings().fetchall()#! Needed to then get the PID
         
         EMAIL = g.User['Email']
@@ -91,21 +107,37 @@ def addToCart():
             {'title':request.form.get('Title'),'size':request.form.get('Size'),'color':request.form.get('Color'),'email':EMAIL,'PID':PID,'CID':ID})
         print("item ADDED")
         conn.commit()
-        if g.User['Role']=='customer': #* checks role
-            
-            print('INTO Customer')
-            return redirect(url_for('customer_bp.CustomerHomePage',products=products, inventory=inventory, username=g.User['Name'])) # * Takes you to Customer page
+        product = conn.execute(text("""
+             SELECT 
+                PID, title, CAST(price AS DECIMAL(10,2)) AS Price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
+            FROM product
+            WHERE PID = :pid
+        """), {"pid": PID}).mappings().first()
         
-        elif g.User['Role']=='admin': #* checks role
-            print('INTO Admin')
+        inventory = conn.execute(text("""
+            SELECT size, color, amount
+            FROM product_inventory
+            WHERE PID = :pid
+        """), {"pid": PID}).mappings().fetchall()
 
-            return redirect(url_for('admin.AdminHomePage',products=products, inventory=inventory, username=g.User['Name'])) # * Takes you to admin page
-
-        elif g.User['Role']=='vendor': #* checks role
-
-            print('INTO VENDOR')
-            return redirect(url_for('vendor_bp.VendorHomePage',products=products, inventory=inventory, username=g.User['Name'])) # * Takes you to vendor page
-
+        images = conn.execute(text("""
+            SELECT image
+            FROM product_images
+            WHERE PID = :pid
+        """), {"pid": PID}).mappings().fetchall()
+            
+        print('INTO Customer')
+        return redirect(url_for('ProductView',products=product, inventory=inventory,images=images, username=g.User['Name'])) # * Takes you to Product page
+        
     except Exception as e:
         print(f'ERROR: {e}')
         return redirect(url_for('start'))
@@ -115,7 +147,11 @@ def GotoCheckout(username):
     try:
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.price as price
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date < curdate() then p.price	
+                    WHEN p.discount IS NOT NULL OR p.discount_date > curdate() then p.price - (p.price * p.discount) 
+                END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
         return render_template('Cart.html',username=username,CartList = CartList,total=total)

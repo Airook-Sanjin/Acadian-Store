@@ -24,15 +24,25 @@ def load_user():
 def CustomerHomePage():
     try:
         products = conn.execute(text("""
-                SELECT 
-                    PID, title, price, description,
-                    warranty, discount, availability, image_url
-                FROM product
-            """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
+           SELECT 
+                PID, title, CAST(price AS DECIMAL(10,2)) AS price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
+                FROM product 
+        """)).mappings().fetchall()  # changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount            FROM product_inventory
-            """)).mappings().fetchall()
+            SELECT size, color, amount
+            FROM product_inventory
+        """)).mappings().fetchall()
+        
         return render_template('CustomerHomepage.html',products=products, inventory=inventory)
     except Exception as e:
         return render_template('CustomerHomepage.html',products=[], inventory=[])

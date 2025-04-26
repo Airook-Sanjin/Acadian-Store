@@ -245,11 +245,11 @@
       <section class="item-info">
         <h3>{{item['title']}}</h3>
         <h4>{{item['size']}}</h4>
-        <p>{{item['price']}}</p>
+        <p>{{item['Price']}}</p>
         <p>{{item['description']}}</p>
       </section>
       <section class="item-fun">
-        <h3>${{item['price']}}</h3>
+        <h3>${{item['Price']}}</h3>
         <form id="Remove section"
           action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
           method="POST"
