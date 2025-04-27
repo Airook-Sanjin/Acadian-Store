@@ -67,7 +67,10 @@
   
              
             </ul>
+            <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="post">
             <input type="search" name="Search" id="Search" placeholder="Search">
+            <input class="BTN" type="submit" value="Search">
+          </form>
           </div>
   
           <div class="Right-side">

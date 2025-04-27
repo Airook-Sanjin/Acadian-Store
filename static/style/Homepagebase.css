@@ -163,8 +163,11 @@ body {
 
 }
 
-
-
+/* ----------------------------SearchForm-------------------- */
+  .SearchForm{
+    display:flex;
+    flex-direction: row;
+  }
 /* ---------------------------PRODUCT CARDS-------------------- */
 .product_container{
   display: flex;

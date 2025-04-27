@@ -9,6 +9,7 @@ from User.Vendor.Vendor import vendor_bp
 from User.user import user_bp
 from User.chat import chat_bp
 from User.user_util.cart.cart import cart_bp
+from User.user_util.search.search import search_bp
 
 
 
@@ -42,6 +43,7 @@ app.register_blueprint(register_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(cart_bp) 
 app.register_blueprint(chat_bp)
+app.register_blueprint(search_bp)
 
 app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
@@ -73,10 +75,6 @@ def start():
             FROM product_inventory
         """)).mappings().fetchall()
 
-        # Debug each product's discount date instead of trying to access the list directly
-        for product in products:
-            print(f"Product {product['PID']} discount date type: {type(product['discount_date'])}")
-        print(f'Curdate : {type(CurDate)}')
         conn.commit()
         return render_template('GuestHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
