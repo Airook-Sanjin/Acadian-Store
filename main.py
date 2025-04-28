@@ -111,8 +111,47 @@ def ProductView():
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
         
+        Reviews = conn.execute(text("""
+            SELECT *
+            FROM reviews
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().fetchall()
+        
         # print("Specific Product:", specific_product)  # Debugging output
-        return render_template('Product.html', product=product, inventory=inventory, images=images)
+        return render_template('Product.html', product=product, inventory=inventory, images=images, Reviews=Reviews)
+    except Exception as e:
+        print("Error:", e)  # Print the actual error
+        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[])
+    
+# @app.route('/View-Reviews')
+# def ProductReviews():
+#     try:
+#         pid = request.args.get('pid')
+#         conn.commit()
+#         return render_template('Product.html', product=None, inventory=[], images=[])
+#     except Exception as e:
+#         print("Error:", e)  # Print the actual error
+#         return render_template('Product.html', product=None, inventory=[], images=[])
+
+app.route('/Review', methods=["POST"])
+def Review():
+    try:
+        pid = request.args.get('pid') # take from page
+        rating = request.args.get('rating')
+        title = request.args.get('title')
+        review = request.args.get('description')
+        cid = g.User['ID']
+        
+        conn.execute(text("""Insert into reviews (CID, PID, rating, title, description) 
+                          values (:CID, :PID, :rating, :title, :description)"""), 
+                        {"CID": cid, 
+                        "PID": pid,
+                        "rating": rating,
+                        "title": title,
+                        "description": review})
+        
+        # conn.commit()
+        return render_template('Product.html', product=None, inventory=[], images=[])
     except Exception as e:
         print("Error:", e)  # Print the actual error
         return render_template('Product.html', product=None, inventory=[], images=[])

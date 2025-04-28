@@ -66,6 +66,7 @@
         align-items: center;
         border-radius: 8px;
         overflow: hidden;
+        height: 100%;
     }
     
     .img-css {
@@ -274,6 +275,16 @@
     }
     
     /* Review Form */
+
+    .review-title-text {
+        margin-bottom: 25px;
+        font-size: 17px;
+        width: 100%;
+        border: #d5d5d5 solid 1px;
+        /* height: ; */
+        border-radius: 8px;
+        padding: 8px;
+    }
     .write-review {
         margin-top: 30px;
         padding: 20px;
@@ -457,9 +468,10 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Review Form -->
-            <div class="write-review">
+            <!-- ############### -->
+            <!-- # Review Form # -->
+            <!-- ############### -->
+            <form class="write-review">
                 <h3 class="review-form-title">Write a Review</h3>
                 <div class="rating-input">
                     <span class="star" data-rating="1">★</span>
@@ -468,107 +480,45 @@
                     <span class="star" data-rating="4">★</span>
                     <span class="star" data-rating="5">★</span>
                 </div>
-                <textarea placeholder="Share your honest thoughts about this product..."></textarea>
-                <button class="submit-review">Submit Review</button>
-            </div>
+                <input class="review-title-text" type="text" name="title" placeholder="Title">
+                <textarea placeholder="Share your honest thoughts about this product..." name="description"></textarea>
+                <button type="submit" class="submit-review">Submit Review</button>
+            </form>
         </div>
         
         <!-- Right Side - Review List -->
-        <div class="review-list-container">
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-stars">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
+            
+           
+            <div class="review-list-container">
+                <!-- review card section -->
+                {% for review in Reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <div class="review-stars">
+                                {% set rating = review['rating']|length %}
+                                {% for i in range(5) %}
+                                    {% if i < rating %}
+                                        <span class="star">★</span>
+                                    {% else %}
+                                        <span class="empty-star">★</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>                            
+                        </div>
+                        <div class="review-meta">
+                            <span class="review-author">{{ review['CID']}}</span>
+                            <span class="review-verified">✓ Verified Purchaser</span>
+                            <span>• Owned for 2 months</span>
+                        </div>
                     </div>
-                    <div class="review-meta">
-                        <span class="review-author">Kevinthethecguy</span>
-                        <span class="review-verified">✓ Verified Purchaser</span>
-                        <span>• Owned for < 1 week</span>
-                    </div>
+                    <h3>{{review['title']}}</h3>
+                    <p class="review-text">{{review['description']}}</p>
+                    <p class="review-date">Posted {{review['date']}}</p>
+                    <!-- <p class="review-date">Posted 1 month ago</p> -->
                 </div>
-                <h3>The QD-OLED to buy in 2025</h3>
-                <p class="review-text">
-                    Let me start by saying, I have owned all of top TVs in 2024 and this TV is the best.
-                    If you are looking for the best glossy QD-OLED, this is it. The price is less than the top tier G5, S95F and Bravia 8 II and will perform similarly or better. 
-                    The picture is beautiful, the build is nice and motion is highly improved over previous models. 
-                    The only knock is that every new TV has a high starting price. If you can wait until the price drops, 
-                    I find it a hard TV to beat in 2025.
-                </p>
-                <p class="review-date">Posted 1 week ago</p>
-            </div>
+                {% endfor %}
 
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-stars">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="empty-star">★</span>
-                    </div>
-                    <div class="review-meta">
-                        <span class="review-author">TechEnthusiast42</span>
-                        <span class="review-verified">✓ Verified Purchaser</span>
-                        <span>• Owned for 1 month</span>
-                    </div>
-                </div>
-                <h3>Excellent with minor quirks</h3>
-                <p class="review-text">
-                    The picture quality is absolutely stunning with perfect blacks and vibrant colors. The only reason I'm giving 4 stars instead of 5 is because of the occasional software glitches with the smart features. 
-                    If you're mainly using this with an external streaming device, it's practically perfect. The build quality is premium and it looks fantastic when turned off too.
-                </p>
-                <p class="review-date">Posted 3 weeks ago</p>
-            </div>
-            
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-stars">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="empty-star">★</span>
-                        <span class="empty-star">★</span>
-                    </div>
-                    <div class="review-meta">
-                        <span class="review-author">MovieBuff2025</span>
-                        <span class="review-verified">✓ Verified Purchaser</span>
-                        <span>• Owned for 2 months</span>
-                    </div>
-                </div>
-                <h3>Great for movies, okay for gaming</h3>
-                <p class="review-text">
-                    The picture quality for movies is absolutely breathtaking - the colors pop and the blacks are truly black. Where it falls short is gaming performance, with noticeable input lag even in game mode. 
-                    If you're primarily a movie watcher, this is a fantastic choice. For serious gamers, you might want to look elsewhere.
-                </p>
-                <p class="review-date">Posted 1 month ago</p>
-            </div>
-            
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-stars">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                    </div>
-                    <div class="review-meta">
-                        <span class="review-author">HomeTheaterPro</span>
-                        <span class="review-verified">✓ Verified Purchaser</span>
-                        <span>• Owned for 3 months</span>
-                    </div>
-                </div>
-                <h3>Best TV I've ever owned</h3>
-                <p class="review-text">
-                    After extensive research and comparing all 2025 models, this was clearly the winner. The color accuracy is reference-level, the HDR performance is stunning, and the build quality exceeds expectations. 
-                    The smart features work flawlessly and the remote is well-designed. Worth every penny for home theater enthusiasts.
-                </p>
-                <p class="review-date">Posted 2 months ago</p>
-            </div>
         </div>
     </section>
 </section>
@@ -622,5 +572,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
 {% endblock body %}
