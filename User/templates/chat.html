@@ -15,6 +15,18 @@
     form{
         text-align: center;
     }
+    form input[type="text"], form select{
+        border-style: solid;
+        border-color: lightgray;
+        border-radius: 5px;
+        border-width: 1px;
+    }
+    form input[type="submit"]{
+        background-color: #c6c295;
+        border-radius: 5px;
+        color: #2D4B48;
+        border: none;
+    }
     .chat-options-container{
         display: flex;
         justify-content: space-between;
@@ -113,7 +125,6 @@
         <div class="chat-container">
             <div class="chat-options-container">
                 <div class="open-previous-chat-container">
-                    <!-- <h2>Open Previous Chat</h2> -->
                     <form method="GET" action="{{ url_for('chat_bp.chat_view') }}" id="previous_chat_form">
                             {% if previous_chats %}
                                 <select name="chat_id" id="chat_id_select">
@@ -132,7 +143,6 @@
                 </div>
         
                 <div class="start-new-chat-container">
-                    <!-- <h2>Start New Chat</h2> -->
                     <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="new_chat_form">
                         <select id="user_type" name="user_type">
                             <option id="vendor">Vendor</option>
