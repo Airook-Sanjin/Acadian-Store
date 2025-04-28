@@ -37,10 +37,6 @@ def UserCart(username):
         print(CartList)
         for item in CartList:
             total+=float(item['Price'])
-            
-            print (f'PIDs:{item['PID'],item['size'],item['color']}')
-            
-        print(total)
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
         return render_template('Cart.html',username=username,CartList = CartList,total =total)
