@@ -75,7 +75,7 @@
   
           <div class="Right-side">
             {%if g.User %}
-            <h4>Hello {{g.User["Name"]}}</h4>
+            <h4>Hello {{g.User["Name"].title()}}</h4>
             {%else%}
             {% endif %}
             

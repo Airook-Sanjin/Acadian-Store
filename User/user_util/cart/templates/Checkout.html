@@ -76,6 +76,13 @@
       gap:1em;
       align-items: center;
     }
+    #quantity{
+        padding:.2em;
+        outline:none;
+        border:.5px solid var(--Secondary);
+        border-radius: 10px;
+        width:3.1em;
+    }
     .Removebtn{
       padding:.5em;
       border: none;
@@ -100,15 +107,16 @@
     }
     .totals-Container{
     width:40vw;
-    /* padding:.5em; */
+    padding:1em;
     }
     /*  ---Payment Process  FROM OLD FINAL ---*/
     
   .Payment-Info-Container{
       display: flex;
+      justify-content: center;
       flex-direction: row;
       width: 60vw;
-      padding:2em;
+      padding:1em;
       gap: 25px;
   }
   
@@ -203,7 +211,7 @@
       
                 <div class="infoContainer name">
                   <div class="nameEmailcard">
-                    <h6>Name <span class="star">*</span></h6>
+                    <h5>Name <span class="star">*</span></h5>
                     <input
                       id="FirstName"
                       class="Payinput Name"
@@ -212,7 +220,7 @@
                       required />
                   </div>
                   <div class="nameEmailcard">
-                    <h6>Last Name <span class="star">*</span></h6>
+                    <h5>Last Name <span class="star">*</span></h5>
                     <input
                       id="LastName"
                       class="Payinput Name Last"
@@ -223,7 +231,7 @@
       
                 <div class="infoContainer Email">
                   <div class="Email">
-                    <h6>Email <span class="star">*</span></h6>
+                    <h5>Email <span class="star">*</span></h5>
                     <input
                     class="Payinput Email"
                       id="Email"
@@ -233,7 +241,7 @@
                   </div>
       
                   <div class="Phone">
-                    <h6>Phone Number <span class="star">*</span></h6>
+                    <h5>Phone Number <span class="star">*</span></h5>
                     <input
                         class="Payinput phone"
                       id="Phone"
@@ -244,7 +252,7 @@
       
                 <div class="infoContainer -Address">
                   <div class="Address">
-                    <h6>Street Address <span class="star">*</span></h6>
+                    <h5>Street Address <span class="star">*</span></h5>
                     <input
                     class="Payinput street"
                       type="text"
@@ -253,7 +261,7 @@
                       required />
                   </div>
                   <div class="AddressLine2">
-                    <h6>Address Line 2</h6>
+                    <h5>Address Line 2</h5>
                     <input
                      class="Payinput street2"
                       type="text"
@@ -263,7 +271,7 @@
                 </div>
                 <div class="infoContainer City-State">
                   <div class="City">
-                    <h6>City <span class="star">*</span></h6>
+                    <h5>City <span class="star">*</span></h5>
                     <input
                     class="Payinput city"
                       type="text"
@@ -273,7 +281,7 @@
                   </div>
       
                   <div class="State">
-                    <h6>State/Province/Region <span class="star">*</span></h6>
+                    <h5>State/Province/Region <span class="star">*</span></h5>
                     <select
                         class ="Payinput state"
                       id="State"
@@ -340,7 +348,7 @@
                 </div>
       
                 <div class="infoContainer Zip">
-                  <h6>ZIP/Postal Code <span class="star">*</span></h6>
+                  <h5>ZIP/Postal Code <span class="star">*</span></h5>
                   <input
                   class = "Payinput zip"
                     type="text"
@@ -442,7 +450,7 @@
               <h5>Credit Card Details</h5>
               <div class="infoContainer Card">
                 <div class="CardName">
-                  <h6>Name on Card <span class="star">*</span></h6>
+                  <h5>Name on Card <span class="star">*</span></h5>
                   <input
                     class="Payinput cardname"
                     type="text"
@@ -453,7 +461,7 @@
                     required />
                 </div>
                 <div class="CardNumber">
-                  <h6>Card Number <span class="star">*</span></h6>
+                  <h5>Card Number <span class="star">*</span></h5>
                   <input
                     class="Payinput cardnum"
                     type="text"
@@ -471,7 +479,7 @@
       
               <div class="infoContainer Exp-Cvv">
                 <div class="Exp">
-                  <h6>Expiration Date <span class="star">*</span></h6>
+                  <h5>Expiration Date <span class="star">*</span></h5>
                   <input
                     class="Payinput exp"
                     type="text"
@@ -483,7 +491,7 @@
                     required />
                 </div>
                 <div class="Cvv">
-                  <h6>CVV <span class="star">*</span></h6>
+                  <h5>CVV <span class="star">*</span></h5>
                   <input
                     class="Payinput cvv"
                     type="text"
@@ -532,7 +540,7 @@
           <h2>Cart Totals</h2>
           
           <h3 id="Total">Total: {{total}} </h3>
-          <button id="CheckoutBTN" onclick="window.location.href='{{url_for('cart_bp.GotoCheckout',username=g.User['Name'])}}'"> Proceed to checkout</button>
+          <button id="CheckoutBTN" onclick="window.location.href='{{url_for('cart_bp.GotoCheckout',username=g.User['Name'])}}'">Place Order!</button>
         </section>
       </section>
 </section>
