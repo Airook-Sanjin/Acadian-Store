@@ -67,7 +67,10 @@
   
              
             </ul>
+            <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="post">
             <input type="search" name="Search" id="Search" placeholder="Search">
+            <input class="BTN" type="submit" value="Search">
+          </form>
           </div>
   
           <div class="Right-side">
@@ -101,7 +104,8 @@
       
         <section class="product_container">
           {% for product in products %}
-            {% if product.discounted_price  == None%}
+            {% if product.discount_date and product.discount_date > CurDate %}
+            <!-- Regular Price -->
               <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
                   <section class="product_img">
                       <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
@@ -113,9 +117,12 @@
                 </section>
               </section>
             {% else %}
+            <!-- Discounted Price Display -->
                 <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
                   <section class="product_img">
-                    <div class="discount-badge">{{ (product.discount * 100)|int }}% OFF</div>
+                    {% if product.discount %}
+                      <div class="discount-badge">{{ (product.discount * 100)|int }}% OFF</div>
+                    {%endif%}
                       <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
                   </section>
                   <section class="product">
@@ -123,7 +130,9 @@
                       <h4 class="desc">{{ product.description }}</h4>
                       <div class="price-holder">
                         <h4 class="price" style="">${{ product.discounted_price }}</h4>
-                        <strike><h4 class="price" style="color: gray;">${{ product.price }}</h4></strike>
+                        {% if product.discount %}
+                          <strike><h4 class="price" style="color: gray;">${{ product.price }}</h4></strike>
+                        {%endif%}
                       </div>
                   </section>
                 </section>

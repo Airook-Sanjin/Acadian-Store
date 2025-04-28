@@ -1,5 +1,6 @@
 from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request
 import secrets
+from datetime import datetime
 from Auth.Login import login_bp
 from Auth.Register import register_bp
 from User.Admin.Admin import admin
@@ -8,6 +9,7 @@ from User.Vendor.Vendor import vendor_bp
 from User.user import user_bp
 from User.chat import chat_bp
 from User.user_util.cart.cart import cart_bp
+from User.user_util.search.search import search_bp
 
 
 
@@ -41,6 +43,7 @@ app.register_blueprint(register_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(cart_bp) 
 app.register_blueprint(chat_bp)
+app.register_blueprint(search_bp)
 
 app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
@@ -51,6 +54,7 @@ app.register_blueprint(vendor_bp)
 @app.route('/', methods=["GET"])
 def start():
     try:
+        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -72,17 +76,17 @@ def start():
         """)).mappings().fetchall()
 
         conn.commit()
-        return render_template('GuestHomepage.html', products=products, inventory=inventory)
+        return render_template('GuestHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html', products=[], inventory=[])
+        return render_template('GuestHomepage.html', products=[],CurDate=CurDate,inventory=[])
 
     
 @app.route('/Product-View')
 def ProductView():
     try:
         pid = request.args.get('pid')
-        
+        CurDate = datetime.now().date()
         product = conn.execute(text("""
              SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -112,10 +116,10 @@ def ProductView():
         """), {"pid": pid}).mappings().fetchall()
         
         # print("Specific Product:", specific_product)  # Debugging output
-        return render_template('Product.html', product=product, inventory=inventory, images=images)
+        return render_template('Product.html', product=product, inventory=inventory,CurDate=CurDate, images=images)
     except Exception as e:
         print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[], images=[])
+        return render_template('Product.html', product=None, inventory=[],CurDate=CurDate, images=[])
 
     
 

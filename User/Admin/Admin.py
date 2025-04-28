@@ -1,5 +1,6 @@
 
 from globals import Blueprint,render_template,g,session,Connecttodb,text
+from datetime import datetime
 from User.chat import chat_bp
 
 admin=Blueprint('admin',__name__, url_prefix='/admin',template_folder='templates',static_folder='static',static_url_path='/static') # * init blueprint
@@ -17,6 +18,7 @@ def load_user():
 @admin.route('/Home')
 def AdminHomePage():
     try:
+        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -38,7 +40,7 @@ def AdminHomePage():
         """)).mappings().fetchall()
 
         conn.commit()
-        return render_template('GuestHomepage.html', products=products, inventory=inventory)
+        return render_template('GuestHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html', products=[], inventory=[])
+        return render_template('GuestHomepage.html', products=[],CurDate=CurDate, inventory=[])
