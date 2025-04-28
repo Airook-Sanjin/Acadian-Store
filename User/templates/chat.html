@@ -27,6 +27,10 @@
         color: #2D4B48;
         border: none;
     }
+    form input[type="submit"]:hover{
+        background-color: #bdb884;
+        transition: .5s ease-in-out;
+    }
     .chat-options-container{
         display: flex;
         justify-content: space-between;
@@ -35,6 +39,10 @@
         border-color: lightgray;
         border-width: 1px 1px 0px 1px;
         padding: 5px 0px 5px 0px;
+    }
+    #previous_chat_form, #new_chat_form{
+        display: flex;
+        flex-direction: row;
     }
     #chat_id_select, #vendor_id, #product_id, #user_type,
     #start_new_chat, #open_previous_chat{
@@ -157,10 +165,6 @@
                 </div>
             </div>
 
-            {% if message %}
-                <p style="color: red;">{{ message }}</p>
-            {% endif %}
-
             <div class="chat-messages">
                 {% for message in messages %}
                     {% if message['CID'] %}
@@ -190,11 +194,14 @@
             </div>
 
             <div class="send-message-container">
-                <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="send_message_form">
-                    <input type="text" placeholder="Type your message here..." id="message" name="message">
+                <form method="POST" action="{{ url_for('chat_bp.chat_view', chat_id=selected_chat['CHAT_ID']) }}" id="send_message_form">
+                    <input type="text" placeholder="Type your message here..." id="message" name="message" required>
                     <input type="submit" value="Send" id="send_message">
                 </form>
                 <p style="text-align: center;">Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
+                {% if message %}
+                    <p style="color: red; text-align: center;">{{ message }}</p>
+                {% endif %}
             </div>
         </div>
 
