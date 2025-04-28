@@ -1,5 +1,5 @@
 <style>
-    .Main-Product {
+   .Main-Product {
        margin: auto;
        width: 90%;
        padding: 20px;
@@ -75,7 +75,7 @@
    }
    
    .thumbnail:hover {
-       border: 2px solid #007BFF;
+       /* border: 2px solid #007BFF; */
        transform: scale(1.05);
    }
    
@@ -145,6 +145,9 @@
        font-weight: bold;
        color: #e74c3c;
    }
+   .price-summary p{
+    margin: 0;
+   }
    
    .product-description {
        font-size: 1rem;
@@ -208,32 +211,46 @@
                </section>
                
                <section class="right-side-product">
-                   <form class="AddtoCart-Form">
+                   <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
                        <h2 class="product-title">{{ product.title }}</h2>
                        <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
                        
                        <!-- Size Dropdown -->
                        <label for="sizes">Size:</label>
-                       <select name="Sizes" id="sizes">
+                       <select name="Size" id="sizes">
                            <option value="">Select Size</option>
                            {% for item in inventory %}
                                <option value="{{ item.size }}">{{ item.size }}</option>
+                               
                            {% endfor %}
                        </select>
                        
                        <!-- Color Dropdown -->
                        <label for="Colors">Colors:</label>
-                       <select name="Colors" id="Colors">
+                       <select name="Color" id="Colors">
                            <option value="">Select Color</option>
                            {% for item in inventory %}
                                <option value="{{ item.color }}">{{ item.color }}</option>
+                               
                            {% endfor %}
                        </select>
-   
+                       
+                       {% if product.discount_date > CurDate %}
                        <div class="product-price">
-                           <p><strong>Price:</strong> ${{ product.price }}</p>
+                        <div class="price-summary">
+                           <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
+                           <input type="hidden" name="Price" value="{{product['price']}}">
                        </div>
-   
+                       {% else %}
+                            <div class="product-price">
+                                <div class="price-summary">
+                                    <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
+                                    <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
+                                    <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
+                                    <input type="hidden" name="Price" value="{{product['discounted_price']}}">
+                                </div>
+                            </div>
+                       {%endif%}
                        <div class="product-description">
                            <label for="description">Description:</label>
                            <p id="description">{{ product.description }}</p>
@@ -244,7 +261,13 @@
                                {{ inventory[0].amount if inventory else 'N/A' }}
                            </p>
                        </div>
-   
+                       <input type="hidden" name="PID" value="{{product['PID'] }}">
+                       <input type="hidden" name="Title" value="{{product['title']}}">
+                       
+                       
+                       
+                       <input type="hidden" name="Desc" value="{{product['description']}}">
+                       <input type="hidden" name="Amount" value="{{product['amount']}}">
                        <input class="BTN" type="submit" value="Add to Cart">
                    </form>
                </section>
