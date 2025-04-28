@@ -48,13 +48,10 @@ app.register_blueprint(search_bp)
 app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
-
-
  
 @app.route('/', methods=["GET"])
 def start():
     try:
-        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -76,17 +73,17 @@ def start():
         """)).mappings().fetchall()
 
         conn.commit()
-        return render_template('GuestHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
+        return render_template('GuestHomepage.html', products=products, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html', products=[],CurDate=CurDate,inventory=[])
+        return render_template('GuestHomepage.html', products=[], inventory=[])
 
     
 @app.route('/Product-View')
 def ProductView():
     try:
         pid = request.args.get('pid')
-        CurDate = datetime.now().date()
+        
         product = conn.execute(text("""
              SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -158,10 +155,10 @@ def Review():
         return render_template('Product.html', product=None, inventory=[], images=[])
     except Exception as e:
         print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[],CurDate=CurDate, images=[])
+        return render_template('Product.html', product=None, inventory=[], images=[])
 
     
 
 
 if __name__ == '__main__':
-        app.run(debug=True)  
+        app.run(debug=True) 
