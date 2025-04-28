@@ -1,284 +1,626 @@
 <style>
-   .Main-Product {
-       margin: auto;
-       width: 90%;
-       padding: 20px;
-       background-color: #f4f4f4;
-   }
-   
-   .Product {
-       display: flex;
-       flex-direction: row;
-       justify-content: space-between;
-       background-color: #fff;
-       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-       border-radius: 8px;
-       padding: 20px;
-       margin-bottom: 20px;
-   }
-   
-   .product-container {
-       display: flex;
-       width: 100%;
-   }
-   
-   .left-side-product,
-   .right-side-product {
-       display: flex;
-       flex-direction: column;
-       justify-content: space-between;
-   }
-   
-   .left-side-product {
-       width: 55%;
-       padding: 10px;
-   }
-   
-   .right-side-product {
-       width: 40%;
-       padding: 10px;
-   }
-   
-   .left-img {
-       width: auto;
-       height: 100%;
-       background-color: #f4f4f4;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-   }
-   
-   /* .img-css {
-       width: auto;
-       height: 100%;
-       max-width: 100%;
-       object-fit: contain;
-       border-radius: 8px;
-   } */
-   .thumbnail-bar {
-       width: 15%;
-       height: 100%;
-       display: flex;
-       flex-direction: column;
-       gap: 10px;
-       overflow-y: auto;
-       padding-right: 10px;
-   }
-   
-   .thumbnail {
-       width: 100%;
-       height: auto;
-       border: 2px solid transparent;
-       border-radius: 5px;
-       cursor: pointer;
-       transition: border 0.3s, transform 0.3s;
-   }
-   
-   .thumbnail:hover {
-       /* border: 2px solid #007BFF; */
-       transform: scale(1.05);
-   }
-   
-   .left-side-product {
-       display: flex;
-       flex-direction: row;
-       gap: 15px;
-       align-items: flex-start;
-   }
-   
-   .left-img {
-       flex: 1;
-       background-color: #f4f4f4;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       border-radius: 8px;
-       overflow: hidden;
-   }
-   
-   .img-css {
-       max-width: 100%;
-       max-height: 100%;
-       object-fit: contain;
-   }
-   
-   
-   .AddtoCart-Form {
-       display: flex;
-       flex-direction: column;
-       gap: 15px;
-   }
-   
-   .product-title {
-       font-size: 1.8rem;
-       color: #333;
-       margin-bottom: 10px;
-   }
-   
-   .product-id {
-       font-size: 1rem;
-       color: #555;
-   }
-   
-   label {
-       font-weight: bold;
-       margin-bottom: 5px;
-       color: #333;
-   }
-   
-   select,
-   input[type="submit"] {
-       padding: 10px;
-       font-size: 1rem;
-       margin-bottom: 15px;
-       border-radius: 5px;
-       border: 1px solid #ccc;
-   }
-   
-   select {
-       width: 100%;
-       background-color: #fff;
-   }
-   
-   .product-price {
-       font-size: 1.2rem;
-       font-weight: bold;
-       color: #e74c3c;
-   }
-   .price-summary p{
-    margin: 0;
-   }
-   
-   .product-description {
-       font-size: 1rem;
-       color: #555;
-       line-height: 1.5;
-   }
-   
-   .product-amount {
-       font-size: 1rem;
-       color: #555;
-   }
-   
-   /* @media (max-width: 768px) {
-       .Product {
-           flex-direction: column;
-       }
-       
-       .left-side-product,
-       .right-side-product {
-           width: 100%;
-       }
-   } */
-   
-   .placeholder-thumb {
-       align-content: center;
-       width: 100%;
-       aspect-ratio: 1 / 1;
-       background-color: #ccc;
-       border-radius: 5px;
-       border: 2px solid transparent;
-       cursor: pointer;
-       transition: border 0.3s, transform 0.3s;
-   }
-   
-   .placeholder-thumb:hover {
-       border: 2px solid #007BFF;
-       transform: scale(1.05);
-   }
-   
-   
-   </style>
-   {% extends 'GuestHomepage.html'%}
-   {% block body %}
-   <section class="Main-Product">
-       <section class="Product">
-           <section class="product-container">
-               <section class="left-side-product">
-                   <div class="thumbnail-bar">
-                       <div class="thumbnail placeholder-thumb">
-                           <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
-                       </div>
-                       {% for img in images %}
-                           <div class="thumbnail placeholder-thumb">
-                               <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
-                           </div>
-                       {% endfor %}
-                   </div>
-                   <div class="left-img">
-                       <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
-                   </div>
-               </section>
-               
-               <section class="right-side-product">
-                   <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
-                       <h2 class="product-title">{{ product.title }}</h2>
-                       <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
-                       
-                       <!-- Size Dropdown -->
-                       <label for="sizes">Size:</label>
-                       <select name="Size" id="sizes">
-                           <option value="">Select Size</option>
-                           {% for item in inventory %}
-                               <option value="{{ item.size }}">{{ item.size }}</option>
-                               
-                           {% endfor %}
-                       </select>
-                       
-                       <!-- Color Dropdown -->
-                       <label for="Colors">Colors:</label>
-                       <select name="Color" id="Colors">
-                           <option value="">Select Color</option>
-                           {% for item in inventory %}
-                               <option value="{{ item.color }}">{{ item.color }}</option>
-                               
-                           {% endfor %}
-                       </select>
-                       
-                       {% if product.discount_date > CurDate %}
-                       <div class="product-price">
-                        <div class="price-summary">
-                           <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
-                           <input type="hidden" name="Price" value="{{product['price']}}">
-                       </div>
-                       {% else %}
-                            <div class="product-price">
-                                <div class="price-summary">
-                                    <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
-                                    <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
-                                    <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
-                                    <input type="hidden" name="Price" value="{{product['discounted_price']}}">
-                                </div>
+    /* Main Product Container */
+    .Main-Product {
+        margin: auto;
+        width: 90%;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    
+    /* Product Display Section */
+    .Product {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .product-container {
+        display: flex;
+        width: 100%;
+    }
+    
+    /* Product Image Gallery */
+    .left-side-product {
+        width: 55%;
+        padding: 10px;
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .thumbnail-bar {
+        width: 15%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    .thumbnail, .placeholder-thumb {
+        width: 100%;
+        height: auto;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .thumbnail:hover, .placeholder-thumb:hover {
+        transform: scale(1.05);
+        border-color: #007BFF;
+    }
+    
+    .left-img {
+        flex: 1;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .img-css {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    /* Product Info Section */
+    .right-side-product {
+        width: 40%;
+        padding: 10px;
+    }
+    
+    .AddtoCart-Form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .product-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .product-id {
+        font-size: 1rem;
+        color: #555;
+    }
+    
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    select, input[type="submit"] {
+        padding: 10px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    
+    select {
+        width: 100%;
+        background-color: #fff;
+    }
+    
+    .product-price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #e74c3c;
+    }
+    
+    .price-summary p {
+        margin: 0;
+    }
+    
+    .product-description {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.5;
+    }
+    
+    .product-amount {
+        font-size: 1rem;
+        color: #555;
+    }
+    
+    /* Reviews Section - Split Layout */
+    .Review-Section {
+        margin-top: 40px;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 30px;
+    }
+    
+    .review-summary-container {
+        width: 35%;
+    }
+    
+    .review-list-container {
+        width: 65%;
+    }
+    
+    .review-title {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    
+    /* Rating Summary */
+    .rating-summary {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .average-rating {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .total-reviews {
+        font-size: 0.9rem;
+        color: #777;
+        margin-bottom: 20px;
+    }
+    
+    .rating-distribution {
+        margin-top: 20px;
+    }
+    
+    .rating-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .rating-label {
+        width: 80px;
+        font-size: 0.9rem;
+    }
+    
+    .bar-container {
+        flex-grow: 1;
+        height: 10px;
+        background-color: #eee;
+        border-radius: 5px;
+        margin: 0 10px;
+    }
+    
+    .bar {
+        height: 100%;
+        background-color: #ffc107;
+        border-radius: 5px;
+    }
+    
+    /* Review Cards */
+    .review-card {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .review-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .review-stars {
+        display: flex;
+        gap: 3px;
+    }
+    
+    .star {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+    
+    .empty-star {
+        color: #ddd;
+        font-size: 1.2rem;
+    }
+    
+    .review-meta {
+        font-size: 0.85rem;
+        color: #777;
+    }
+    
+    .review-author {
+        font-weight: bold;
+        color: #444;
+    }
+    
+    .review-text {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
+    
+    .review-date {
+        font-size: 0.8rem;
+        color: #999;
+        text-align: right;
+    }
+    
+    .review-verified {
+        color: #28a745;
+        font-size: 0.8rem;
+        margin-left: 5px;
+    }
+    
+    /* Review Form */
+    .write-review {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+    
+    .review-form-title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .rating-input {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .rating-input .star {
+        cursor: pointer;
+        transition: transform 0.2s;
+        color: #ddd;
+        font-size: 1.5rem;
+    }
+    
+    .rating-input .star.active {
+        color: #ffc107;
+    }
+    
+    .rating-input .star:hover {
+        transform: scale(1.2);
+    }
+    
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        min-height: 100px;
+        margin-bottom: 15px;
+        font-family: inherit;
+    }
+    
+    .submit-review {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 1rem;
+    }
+    
+    .submit-review:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% extends 'GuestHomepage.html' %}
+{% block body %}
+<section class="Main-Product">
+    <!-- Product Display Section -->
+    <section class="Product">
+        <section class="product-container">
+            <section class="left-side-product">
+                <div class="thumbnail-bar">
+                    <div class="thumbnail placeholder-thumb">
+                        <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+                    </div>
+                    {% for img in images %}
+                        <div class="thumbnail placeholder-thumb">
+                            <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="left-img">
+                    <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
+                </div>
+            </section>
+            
+            <section class="right-side-product">
+                <form class="AddtoCart-Form">
+                    <h2 class="product-title">{{ product.title }}</h2>
+                    <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+                    
+                    <label for="sizes">Size:</label>
+                    <select name="Sizes" id="sizes">
+                        <option value="">Select Size</option>
+                        {% for item in inventory %}
+                            <option value="{{ item.size }}">{{ item.size }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <label for="Colors">Colors:</label>
+                    <select name="Colors" id="Colors">
+                        <option value="">Select Color</option>
+                        {% for item in inventory %}
+                            <option value="{{ item.color }}">{{ item.color }}</option>
+                        {% endfor %}
+                    </select>
+
+                    {% if product.discounted_price == None %}
+                        <div class="product-price">
+                            <div class="price-summary">
+                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
                             </div>
-                       {%endif%}
-                       <div class="product-description">
-                           <label for="description">Description:</label>
-                           <p id="description">{{ product.description }}</p>
-                       </div>
-   
-                       <div class="product-amount">
-                           <p><strong>Amount Available:</strong> 
-                               {{ inventory[0].amount if inventory else 'N/A' }}
-                           </p>
-                       </div>
-                       <input type="hidden" name="PID" value="{{product['PID'] }}">
-                       <input type="hidden" name="Title" value="{{product['title']}}">
-                       
-                       
-                       
-                       <input type="hidden" name="Desc" value="{{product['description']}}">
-                       <input type="hidden" name="Amount" value="{{product['amount']}}">
-                       <input class="BTN" type="submit" value="Add to Cart">
-                   </form>
-               </section>
-           </section>
-       </section>
-   </section>
-   
-   <script>
-       function changeImage(thumbnail) {
-           const mainImage = document.getElementById('main-image');
-           mainImage.src = thumbnail.src;
-       }
-   </script>
-   {% endblock body%}
+                        </div>
+                    {% else %}
+                        <div class="product-price">
+                            <div class="price-summary">
+                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
+                                <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
+                                <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="product-description">
+                        <label for="description">Description:</label>
+                        <p id="description">{{ product.description }}</p>
+                    </div>
+
+                    <div class="product-amount">
+                        <p><strong>Amount Available:</strong> 
+                            {{ inventory[0].amount if inventory else 'N/A' }}
+                        </p>
+                    </div>
+
+                    <input class="BTN" type="submit" value="Add to Cart">
+                </form>
+            </section>
+        </section>
+    </section>
+
+    <!-- Reviews Section - Split Layout -->
+    <section class="Review-Section">
+        <!-- Left Side - Rating Summary and Form -->
+        <div class="review-summary-container">
+            <h2 class="review-title">Customer Reviews</h2>
+            
+            <div class="rating-summary">
+                <div class="average-rating">4.8<span style="font-size: 1.5rem;">/5</span></div>
+                <div class="total-reviews">Based on 127 reviews</div>
+                
+                <div class="rating-distribution">
+                    <div class="rating-bar">
+                        <span class="rating-label">5 <span class="star">★</span></span>
+                        <div class="bar-container">
+                            <div class="bar" style="width: 85%"></div>
+                        </div>
+                        <span>85%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">4 <span class="star">★</span></span>
+                        <div class="bar-container">
+                            <div class="bar" style="width: 10%"></div>
+                        </div>
+                        <span>10%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">3 <span class="star">★</span></span>
+                        <div class="bar-container">
+                            <div class="bar" style="width: 3%"></div>
+                        </div>
+                        <span>3%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">2 <span class="star">★</span></span>
+                        <div class="bar-container">
+                            <div class="bar" style="width: 1%"></div>
+                        </div>
+                        <span>1%</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span class="rating-label">1 <span class="star">★</span></span>
+                        <div class="bar-container">
+                            <div class="bar" style="width: 1%"></div>
+                        </div>
+                        <span>1%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Review Form -->
+            <div class="write-review">
+                <h3 class="review-form-title">Write a Review</h3>
+                <div class="rating-input">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                <textarea placeholder="Share your honest thoughts about this product..."></textarea>
+                <button class="submit-review">Submit Review</button>
+            </div>
+        </div>
+        
+        <!-- Right Side - Review List -->
+        <div class="review-list-container">
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <div class="review-meta">
+                        <span class="review-author">Kevinthethecguy</span>
+                        <span class="review-verified">✓ Verified Purchaser</span>
+                        <span>• Owned for < 1 week</span>
+                    </div>
+                </div>
+                <h3>The QD-OLED to buy in 2025</h3>
+                <p class="review-text">
+                    Let me start by saying, I have owned all of top TVs in 2024 and this TV is the best.
+                    If you are looking for the best glossy QD-OLED, this is it. The price is less than the top tier G5, S95F and Bravia 8 II and will perform similarly or better. 
+                    The picture is beautiful, the build is nice and motion is highly improved over previous models. 
+                    The only knock is that every new TV has a high starting price. If you can wait until the price drops, 
+                    I find it a hard TV to beat in 2025.
+                </p>
+                <p class="review-date">Posted 1 week ago</p>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="empty-star">★</span>
+                    </div>
+                    <div class="review-meta">
+                        <span class="review-author">TechEnthusiast42</span>
+                        <span class="review-verified">✓ Verified Purchaser</span>
+                        <span>• Owned for 1 month</span>
+                    </div>
+                </div>
+                <h3>Excellent with minor quirks</h3>
+                <p class="review-text">
+                    The picture quality is absolutely stunning with perfect blacks and vibrant colors. The only reason I'm giving 4 stars instead of 5 is because of the occasional software glitches with the smart features. 
+                    If you're mainly using this with an external streaming device, it's practically perfect. The build quality is premium and it looks fantastic when turned off too.
+                </p>
+                <p class="review-date">Posted 3 weeks ago</p>
+            </div>
+            
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="empty-star">★</span>
+                        <span class="empty-star">★</span>
+                    </div>
+                    <div class="review-meta">
+                        <span class="review-author">MovieBuff2025</span>
+                        <span class="review-verified">✓ Verified Purchaser</span>
+                        <span>• Owned for 2 months</span>
+                    </div>
+                </div>
+                <h3>Great for movies, okay for gaming</h3>
+                <p class="review-text">
+                    The picture quality for movies is absolutely breathtaking - the colors pop and the blacks are truly black. Where it falls short is gaming performance, with noticeable input lag even in game mode. 
+                    If you're primarily a movie watcher, this is a fantastic choice. For serious gamers, you might want to look elsewhere.
+                </p>
+                <p class="review-date">Posted 1 month ago</p>
+            </div>
+            
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <div class="review-meta">
+                        <span class="review-author">HomeTheaterPro</span>
+                        <span class="review-verified">✓ Verified Purchaser</span>
+                        <span>• Owned for 3 months</span>
+                    </div>
+                </div>
+                <h3>Best TV I've ever owned</h3>
+                <p class="review-text">
+                    After extensive research and comparing all 2025 models, this was clearly the winner. The color accuracy is reference-level, the HDR performance is stunning, and the build quality exceeds expectations. 
+                    The smart features work flawlessly and the remote is well-designed. Worth every penny for home theater enthusiasts.
+                </p>
+                <p class="review-date">Posted 2 months ago</p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script>
+// Image Thumbnail Switcher
+function changeImage(thumbnail) {
+    const mainImage = document.getElementById('main-image');
+    mainImage.src = thumbnail.src;
+}
+
+// Star Rating System
+document.addEventListener('DOMContentLoaded', function() {
+    let currentRating = 0;
+    const stars = document.querySelectorAll('.rating-input .star');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            currentRating = parseInt(this.getAttribute('data-rating'));
+            updateStars();
+        });
+        
+        star.addEventListener('mouseover', function() {
+            const hoverRating = parseInt(this.getAttribute('data-rating'));
+            highlightStars(hoverRating);
+        });
+        
+        star.addEventListener('mouseout', function() {
+            updateStars();
+        });
+    });
+    
+    function updateStars() {
+        stars.forEach((star, index) => {
+            if (index < currentRating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+    
+    function highlightStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.style.color = '#ffc107';
+            } else {
+                star.style.color = '#ddd';
+            }
+        });
+    }
+});
+</script>
+
+{% endblock body %}
