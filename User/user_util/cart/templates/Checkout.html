@@ -540,7 +540,7 @@
           <h2>Cart Totals</h2>
           
           <h3 id="Total">Total: {{total}} </h3>
-          <button id="CheckoutBTN" onclick="window.location.href='{{url_for('cart_bp.GotoCheckout',username=g.User['Name'])}}'">Place Order!</button>
+          <button id="CheckoutBTN" onclick="window.location.href='{{url_for('OrderPlace_bp.placeOrder',total=total)}}'">Place Order!</button>
         </section>
       </section>
 </section>

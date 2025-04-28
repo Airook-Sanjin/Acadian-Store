@@ -1,29 +1,39 @@
 <style>
-    /* Main Product Container */
-    .Main-Product {
-        margin: auto;
-        width: 90%;
-        padding: 20px;
-        background-color: #f4f4f4;
-    }
-    
-    /* Product Display Section */
-    .Product {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        background-color: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .product-container {
-        display: flex;
-        width: 100%;
-    }
-    
+/*  Darlin change   */
+.Main-Product {
+       margin: auto;
+       width: 90%;
+       padding: 20px;
+       background-color: #f4f4f4;
+   }
+   
+   .Product {
+       display: flex;
+       flex-direction: row;
+       justify-content: space-between;
+       background-color: #fff;
+       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+       border-radius: 8px;
+       padding: 20px;
+       margin-bottom: 20px;
+   }
+   
+   .product-container {
+       display: flex;
+       width: 100%;
+   }
+   .left-side-product,
+   .right-side-product {
+       display: flex;
+       flex-direction: column;
+       justify-content: space-between;
+   }
+   
+   
+   .right-side-product {
+       width: 40%;
+       padding: 10px;
+   }
     /* Product Image Gallery */
     .left-side-product {
         width: 55%;
@@ -104,13 +114,14 @@
         color: #333;
     }
     
-    select, input[type="submit"] {
-        padding: 10px;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-    }
+    select,
+   .AddtoCart-Form .BTN{
+       padding: 10px;
+       font-size: 1rem;
+       margin-bottom: 15px;
+       border-radius: 5px;
+       border: 1px solid #ccc;
+   }
     
     select {
         width: 100%;
@@ -391,14 +402,6 @@
                         <div class="product-price">
                             <div class="price-summary">
                                 <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="product-price">
-                            <div class="price-summary">
-                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
-                                <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
-                                <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p>
                             </div>
                         </div>
                     {% endif %}
