@@ -22,13 +22,23 @@ def UserCart(username):
     try:
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color, p.description as description,p.price as price
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount) * ca.quantity) 
+                END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall()
-        print (CartList)
+        
+        
+        
         total = 0
+        
+        print(CartList)
         for item in CartList:
-            total+=float(item['price'])
+            total+=float(item['Price'])
+            
+            print (f'PIDs:{item['PID'],item['size'],item['color']}')
             
         print(total)
         if not g.User: #* Handles if signed in or not
@@ -52,15 +62,19 @@ def RemoveFromCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.price as price
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount) * ca.quantity) 
+                END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
         
         total = 0
         for item in CartList:
-            total+=float(item['price'])
+            total+=float(item['Price'])
             
-        return render_template('Cart.html',username=username,CartList = CartList,total=total)
+        return redirect(request.referrer or url_for('Cart.html',username=username,CartList = CartList,total=total))
     except Exception as e:
         print(f'ERROR: {e}')
         return render_template('Cart.html',username=username,CartList = CartList)
@@ -68,56 +82,122 @@ def RemoveFromCart(username):
 @cart_bp.route('/add',methods=['POST'])
 def addToCart():
     try:
-        products = conn.execute(text("""
+        product = conn.execute(text("""
                 SELECT 
-                    PID, title, price, description,
-                    warranty, discount, availability, image_url
+                    PID, title, CAST(price AS DECIMAL(10,2)) AS price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
                 FROM product
             """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount            FROM product_inventory
+            SELECT size, color, amount FROM product_inventory
             """)).mappings().fetchall()#! Needed to then get the PID
         
         EMAIL = g.User['Email']
         ID = g.User['ID']
         PID = int(request.form.get('PID'))
-        conn.execute(text(
+        SIZE = request.form.get('Size')
+        COLOR = request.form.get('Color')
+        Matchingitem =conn.execute(text("""
+                SELECT ca.ITEM_ID AS itemid,ca.size AS size, ca.color AS color,ca.quantity as quantity,ca.PID as PID
+                FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
+                WHERE ca.CID = :ID AND ca.size = :size AND ca.color = :color and ca.PID = :PID"""),{'ID': g.User['ID'],'size':SIZE,'color':COLOR,'PID':PID}).mappings().fetchall()
+        print(Matchingitem)
+        if Matchingitem:
+            print('Updating')
+            
+            newQuantity = Matchingitem[0]['quantity'] +1
+            print(newQuantity)
+            conn.execute(text("""
+                      UPDATE cart
+                      SET quantity =:quantity
+                      Where item_ID = :item_id"""),{'quantity':newQuantity,'item_id':Matchingitem[0]['itemid']})
+            conn.commit()
+            
+        else:
+            conn.execute(text(
             """
             INSERT INTO cart 
             (title,size,color,email,PID,CID)
             VALUES
             (:title,:size,:color,:email,:PID,:CID)"""),
-            {'title':request.form.get('Title'),'size':request.form.get('Size'),'color':request.form.get('Color'),'email':EMAIL,'PID':PID,'CID':ID})
-        print("item ADDED")
+            {'title':request.form.get('Title'),'size':SIZE,'color':COLOR,'email':EMAIL,'PID':PID,'CID':ID})
+            print('ITEMADDED')
+    
         conn.commit()
-        if g.User['Role']=='customer': #* checks role
-            
-            print('INTO Customer')
-            return redirect(url_for('customer_bp.CustomerHomePage',products=products, inventory=inventory, username=g.User['Name'])) # * Takes you to Customer page
+        product = conn.execute(text("""
+             SELECT 
+                PID, title, CAST(price AS DECIMAL(10,2)) AS Price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
+            FROM product
+            WHERE PID = :pid
+        """), {"pid": PID}).mappings().first()
         
-        elif g.User['Role']=='admin': #* checks role
-            print('INTO Admin')
+        inventory = conn.execute(text("""
+            SELECT size, color, amount
+            FROM product_inventory
+            WHERE PID = :pid
+        """), {"pid": PID}).mappings().fetchall()
 
-            return redirect(url_for('admin.AdminHomePage',products=products, inventory=inventory, username=g.User['Name'])) # * Takes you to admin page
-
-        elif g.User['Role']=='vendor': #* checks role
-
-            print('INTO VENDOR')
-            return redirect(url_for('vendor_bp.VendorHomePage',products=products, inventory=inventory, username=g.User['Name'])) # * Takes you to vendor page
-
+        images = conn.execute(text("""
+            SELECT image
+            FROM product_images
+            WHERE PID = :pid
+        """), {"pid": PID}).mappings().fetchall()
+            
+        print('INTO Customer')
+        return redirect(request.referrer or url_for('ProductView',products=product, inventory=inventory,images=images, username=g.User['Name'])) # * Takes you to Product page
+        
     except Exception as e:
         print(f'ERROR: {e}')
         return redirect(url_for('start'))
-    
-@cart_bp.route('/checkout')
+@cart_bp.route('/quantity-update/<username>', methods=["POST"])
+def quantityUpdate(username):
+    try:
+        print('Updating')
+        conn.execute(text("""
+                      UPDATE cart
+                      SET quantity =:quantity
+                      Where item_ID = :item_id"""),{'quantity':request.form.get('quantity'),'item_id':request.form.get('UpdatedItem')})
+        conn.commit()
+        
+        return redirect(request.referrer) # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
+    except Exception as e:
+        print(f'Error: {e}')
+@cart_bp.route('/checkout/<username>')
 def GotoCheckout(username):
     try:
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.price as price
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount) * ca.quantity) 
+                END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
-        return render_template('Cart.html',username=username,CartList = CartList,total=total)
+                WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall()
+        print (CartList)
+        total = 0
+        for item in CartList:
+            total+=float(item['Price'])
+            
+        print(total)
+        return render_template('Checkout.html',username=username,CartList = CartList,total=total)
     except:
-        return render_template('Cart.html',username=username)
+        return render_template('Checkout.html',username=username)

@@ -79,19 +79,19 @@ font-size: 2em;
 .form-input{
     padding: .5em;
     width:100%;
-    /* border-radius: 20px; */
+    
     border: none;
     border-bottom: 1px solid hsla(0, 0%, 99%,0.5);
     background-color: transparent;
-    /* background-color: hsla(0, 0%, 99%,0.5); */
+    
     outline: none;
 
     &::placeholder{
         color: #F8F2F4;
-        /* color:var(--FONT) ; */
-    } /* Changes color of placeholder*/
+        
+    } 
     color:#F8F2F4;
-    /* border:none; */
+    
 }
 
 .form-sub{

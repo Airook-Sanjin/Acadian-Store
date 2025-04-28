@@ -30,6 +30,7 @@
     flex-direction: row;
     width:100%;
     max-width: 100%;
+    max-height: 15.112vh;
     background-color: white;
     padding: 2em;
     border-radius: 20px;
@@ -40,7 +41,11 @@
     display: flex;
     flex-direction: row;
     gap: 2em;
-    width: 50%;
+    width: 70%;
+    align-items: center;
+  }
+  .item-info img{
+    height:5em;
   }
   .product_container {
     display: none;
@@ -52,10 +57,16 @@
   #Total{
     border-top: 1px black solid;
   }
-  #RemoveBTN{
-    margin-top: 1em;
-    
-  }
+  #quantity{
+        padding:.2em;
+        outline:none;
+        border:.5px solid var(--Secondary);
+        border-radius: 10px;
+        width:3.1em;
+    }
+  #Removesection{
+        margin:0;
+    }
   .item-fun{
     display: flex;
     flex-direction: row;
@@ -243,14 +254,22 @@
     {% for item in CartList %}
     <section class="item-Card">
       <section class="item-info">
+        <img src="{{item['image_url']}}" alt="{{item['title']}}">
         <h3>{{item['title']}}</h3>
         <h4>{{item['size']}}</h4>
-        <p>{{item['price']}}</p>
+        
+        <p>{{item['color']}}</p>
+        
         <p>{{item['description']}}</p>
       </section>
       <section class="item-fun">
-        <h3>${{item['price']}}</h3>
-        <form id="Remove section"
+        
+        <form action="{{url_for('cart_bp.quantityUpdate',username=g.User['Name'])}}" method="post">
+        <input type="hidden" name="UpdatedItem" value="{{item['itemid']}}" />
+        <input type="number" name="quantity" id="quantity" value="{{item['quantity']}}" min="1" max="99" onchange="this.form.submit();">
+        </form>
+        <h3>${{item['Price']}}</h3>
+        <form id="Removesection"
           action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
           method="POST"
         >
@@ -585,27 +604,9 @@
     <h2>Cart Totals</h2>
     
     <h3 id="Total">Total: {{total}} </h3>
-    <button id="CheckoutBTN" onclick="GottoCheckout()"> Proceed to checkout</button>
+    <button id="CheckoutBTN" onclick="window.location.href='{{url_for('cart_bp.GotoCheckout',username=g.User['Name'])}}'"> Proceed to checkout</button>
   </section>
 </section>
 </section>
-<script>
-  let PaymentCont = document.querySelector(".Payment-Info-Container")
-  let checkbtn = document.getElementById("CheckoutBTN");
-  let totalCont = document.querySelector(".totals-Container");
-  let cartCont = document.querySelector(".Cart-Container");
-  
-  
-  function GottoCheckout(){
-    totalCont.insertAdjacentHTML('afterbegin',cartCont.outerHTML);
-    Array.from(cartCont.children).forEach(child =>{
-      child.style.height='10%'
-      child.style.padding='.5em'
-      
-    })
-    cartCont.style.display='none'
-    cartCont.style.height="40vh"
-    PaymentCont.style.display="flex"
-  };
-</script>
+
 {% endblock %}

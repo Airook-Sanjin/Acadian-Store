@@ -137,7 +137,9 @@ button:active,.BTN:active{
 html {
   font-size: 100%;
 }
-
+form{
+  margin:0;
+}
 
 
 body {
@@ -163,8 +165,25 @@ body {
 
 }
 
-
-
+/* ----------------------------SearchForm-------------------- */
+  .SearchForm{
+    display:flex;
+    flex-direction: row;
+  }
+  #Search{
+    padding: .5em;
+    width:100%;
+    height:3.5vh;
+    border: none;
+    border-radius: 5px;
+    background-color: hsl(0, 0%, 100%);
+    box-shadow: var(--BoxShadow);
+    outline: none;
+    &::placeholder{
+        color: hsl(0, 0%, 31%);
+    } 
+    color:hsl(0, 0%, 31%);
+  }
 /* ---------------------------PRODUCT CARDS-------------------- */
 .product_container{
   display: flex;
