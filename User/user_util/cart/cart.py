@@ -82,6 +82,7 @@ def RemoveFromCart(username):
 @cart_bp.route('/add',methods=['POST'])
 def addToCart():
     try:
+        
         product = conn.execute(text("""
                 SELECT 
                     PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -95,7 +96,7 @@ def addToCart():
                 AID,
                 image_url
                 FROM product
-            """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
+            """)).mappings().first()  # ✅ changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
             SELECT size, color, amount FROM product_inventory
@@ -103,7 +104,7 @@ def addToCart():
         
         EMAIL = g.User['Email']
         ID = g.User['ID']
-        PID = int(request.form.get('PID'))
+        PID = int(request.args.get('PID'))
         SIZE = request.form.get('Size')
         COLOR = request.form.get('Color')
         Matchingitem =conn.execute(text("""

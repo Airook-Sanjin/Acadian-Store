@@ -1,5 +1,5 @@
 <style>
-/*  Darlin change   */
+   /*  Darlin change   */
 .Main-Product {
        margin: auto;
        width: 90%;
@@ -353,77 +353,95 @@
     .submit-review:hover {
         background-color: #0056b3;
     }
-</style>
-
-{% extends 'GuestHomepage.html' %}
-{% block body %}
-<section class="Main-Product">
-    <!-- Product Display Section -->
-    <section class="Product">
-        <section class="product-container">
-            <section class="left-side-product">
-                <div class="thumbnail-bar">
-                    <div class="thumbnail placeholder-thumb">
-                        <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
-                    </div>
-                    {% for img in images %}
+    
+    </style>
+    
+    {% extends 'GuestHomepage.html' %}
+    {% block body %}
+    <section class="Main-Product">
+        <!-- Product Display Section -->
+        <section class="Product">
+            <section class="product-container">
+                <section class="left-side-product">
+                    <div class="thumbnail-bar">
                         <div class="thumbnail placeholder-thumb">
-                            <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+                            <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
                         </div>
-                    {% endfor %}
-                </div>
-                <div class="left-img">
-                    <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
-                </div>
-            </section>
-            
-            <section class="right-side-product">
-                <form class="AddtoCart-Form">
-                    <h2 class="product-title">{{ product.title }}</h2>
-                    <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
-                    
-                    <label for="sizes">Size:</label>
-                    <select name="Sizes" id="sizes">
-                        <option value="">Select Size</option>
-                        {% for item in inventory %}
-                            <option value="{{ item.size }}">{{ item.size }}</option>
-                        {% endfor %}
-                    </select>
-                    
-                    <label for="Colors">Colors:</label>
-                    <select name="Colors" id="Colors">
-                        <option value="">Select Color</option>
-                        {% for item in inventory %}
-                            <option value="{{ item.color }}">{{ item.color }}</option>
-                        {% endfor %}
-                    </select>
-
-                    {% if product.discounted_price == None %}
-                        <div class="product-price">
-                            <div class="price-summary">
-                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
+                        {% for img in images %}
+                            <div class="thumbnail placeholder-thumb">
+                                <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
                             </div>
+                        {% endfor %}
+                    </div>
+                    <div class="left-img">
+                        <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
+                    </div>
+                </section>
+                
+              
+                      <section class="right-side-product">
+                       <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                           <h2 class="product-title">{{ product.title }}</h2>
+                           <input type="hidden" name="Title" value={{product.title}}>
+                           <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+                      
+                        
+                       <!-- Size Dropdown -->
+                           <label for="size">Size:</label>
+                           <select name="Size" id="sizes">
+                               <option value="">Select Size</option>
+                               {% for item in inventory %}
+                                   <option value="{{ item.size }}">{{ item.size }}</option>
+                                   
+                               {% endfor %}
+                           </select>
+                           
+                           <!-- Color Dropdown -->
+                           <label for="Color">Colors:</label>
+                           <select name="Color" id="Colors">
+                               <option value="">Select Color</option>
+                               {% for item in inventory %}
+                                   <option value="{{ item.color }}">{{ item.color }}</option>
+                                   
+                               {% endfor %}
+                           </select>
+    
+                        {% if product.discount_date > CurDate %}
+                           <div class="product-price">
+                            <div class="price-summary">
+                               <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
+                               <input type="hidden" name="Price" value="{{product['price']}}">
+                           </div>
+                           {% else %}
+                                <div class="product-price">
+                                    <div class="price-summary">
+                                        <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
+                                        <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
+                                        <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
+                                        <input type="hidden" name="Price" value="{{product['discounted_price']}}">
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="product-description">
+                            <label for="description">Description:</label>
+                            <p id="description">{{ product.description }}</p>
                         </div>
-                    {% endif %}
-                    
-                    <div class="product-description">
-                        <label for="description">Description:</label>
-                        <p id="description">{{ product.description }}</p>
-                    </div>
-
-                    <div class="product-amount">
-                        <p><strong>Amount Available:</strong> 
-                            {{ inventory[0].amount if inventory else 'N/A' }}
-                        </p>
-                    </div>
-
-                    <input class="BTN" type="submit" value="Add to Cart">
-                </form>
+    
+                        <div class="product-amount">
+                            <p><strong>Amount Available:</strong> 
+                                {{ inventory[0].amount if inventory else 'N/A' }}
+                            </p>
+                        </div>
+    
+                        <input class="BTN" type="submit" value="Add to Cart">
+                    </form>
+                </section>
             </section>
         </section>
-    </section>
-
-    <!-- Reviews Section - Split Layout -->
+    
+        <!-- Reviews Section - Split Layout -->
     <section class="Review-Section">
         <!-- Left Side - Rating Summary and Form -->
         <div class="review-summary-container">
