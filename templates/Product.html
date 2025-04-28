@@ -1,29 +1,17 @@
 <style>
-    /* Main Product Container */
-    .Main-Product {
-        margin: auto;
-        width: 90%;
-        padding: 20px;
-        background-color: #f4f4f4;
-    }
-    
-    /* Product Display Section */
-    .Product {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        background-color: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .product-container {
-        display: flex;
-        width: 100%;
-    }
-    
+/*  Darlin change   */
+   .left-side-product,
+   .right-side-product {
+       display: flex;
+       flex-direction: column;
+       justify-content: space-between;
+   }
+   
+   
+   .right-side-product {
+       width: 40%;
+       padding: 10px;
+   }
     /* Product Image Gallery */
     .left-side-product {
         width: 55%;
@@ -331,6 +319,174 @@
     .submit-review:hover {
         background-color: #0056b3;
     }
+/*   Erick's css */
+/*      .Main-Product {
+       margin: auto;
+       width: 90%;
+       padding: 20px;
+       background-color: #f4f4f4;
+   }
+   
+   .Product {
+       display: flex;
+       flex-direction: row;
+       justify-content: space-between;
+       background-color: #fff;
+       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+       border-radius: 8px;
+       padding: 20px;
+       margin-bottom: 20px;
+   }
+   
+   .product-container {
+       display: flex;
+       width: 100%;
+   }
+   
+   .left-side-product,
+   .right-side-product {
+       display: flex;
+       flex-direction: column;
+       justify-content: space-between;
+   }
+   
+   
+   .right-side-product {
+       width: 40%;
+       padding: 10px;
+   }
+   
+   .left-img {
+       width: auto;
+       height: 100%;
+       background-color: #f4f4f4;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+   }
+   
+
+   .thumbnail-bar {
+       width: 15%;
+       height: 100%;
+       display: flex;
+       flex-direction: column;
+       gap: 10px;
+       overflow-y: auto;
+       padding-right: 10px;
+   }
+   
+   .thumbnail {
+       width: 100%;
+       height: auto;
+       border: 2px solid transparent;
+       border-radius: 5px;
+       cursor: pointer;
+       transition: border 0.3s, transform 0.3s;
+   }
+   
+   .thumbnail:hover {
+       /* border: 2px solid #007BFF; */
+       transform: scale(1.05);
+   }
+   
+   .left-side-product {
+       display: flex;
+       flex-direction: row;
+       gap: 15px;
+       align-items: flex-start;
+   }
+   
+   .left-img {
+       flex: 1;
+       background-color: #f4f4f4;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       border-radius: 8px;
+       overflow: hidden;
+   }
+   
+   .img-css {
+       max-width: 100%;
+       max-height: 100%;
+       object-fit: contain;
+   }
+   
+   
+   .AddtoCart-Form {
+       display: flex;
+       flex-direction: column;
+       gap: 15px;
+   }
+   
+   .product-title {
+       font-size: 1.8rem;
+       color: #333;
+       margin-bottom: 10px;
+   }
+   
+   .product-id {
+       font-size: 1rem;
+       color: #555;
+   }
+   
+   label {
+       font-weight: bold;
+       margin-bottom: 5px;
+       color: #333;
+   }
+   
+   select,
+   .AddtoCart-Form .BTN{
+       padding: 10px;
+       font-size: 1rem;
+       margin-bottom: 15px;
+       border-radius: 5px;
+       border: 1px solid #ccc;
+   }
+   
+   select {
+       width: 100%;
+       background-color: #fff;
+   }
+   
+   .product-price {
+       font-size: 1.2rem;
+       font-weight: bold;
+       color: #e74c3c;
+   }
+   .price-summary p{
+    margin: 0;
+   }
+   
+   .product-description {
+       font-size: 1rem;
+       color: #555;
+       line-height: 1.5;
+   }
+   
+   .product-amount {
+       font-size: 1rem;
+       color: #555;
+   }
+   
+   
+   .placeholder-thumb {
+       align-content: center;
+       width: 100%;
+       aspect-ratio: 1 / 1;
+       background-color: #ccc;
+       border-radius: 5px;
+       border: 2px solid transparent;
+       cursor: pointer;
+       transition: border 0.3s, transform 0.3s;
+   }
+   
+   .placeholder-thumb:hover {
+       border: 2px solid #007BFF;
+       transform: scale(1.05);
+   } */
 </style>
 
 {% extends 'GuestHomepage.html' %}
@@ -355,31 +511,47 @@
                 </div>
             </section>
             
-            <section class="right-side-product">
-                <form class="AddtoCart-Form">
-                    <h2 class="product-title">{{ product.title }}</h2>
-                    <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+          
+                  <section class="right-side-product">
+                   <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                       <h2 class="product-title">{{ product.title }}</h2>
+                       <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+                  
                     
-                    <label for="sizes">Size:</label>
-                    <select name="Sizes" id="sizes">
-                        <option value="">Select Size</option>
-                        {% for item in inventory %}
-                            <option value="{{ item.size }}">{{ item.size }}</option>
-                        {% endfor %}
-                    </select>
-                    
-                    <label for="Colors">Colors:</label>
-                    <select name="Colors" id="Colors">
-                        <option value="">Select Color</option>
-                        {% for item in inventory %}
-                            <option value="{{ item.color }}">{{ item.color }}</option>
-                        {% endfor %}
-                    </select>
+                   <!-- Size Dropdown -->
+                       <label for="sizes">Size:</label>
+                       <select name="Size" id="sizes">
+                           <option value="">Select Size</option>
+                           {% for item in inventory %}
+                               <option value="{{ item.size }}">{{ item.size }}</option>
+                               
+                           {% endfor %}
+                       </select>
+                       
+                       <!-- Color Dropdown -->
+                       <label for="Colors">Colors:</label>
+                       <select name="Color" id="Colors">
+                           <option value="">Select Color</option>
+                           {% for item in inventory %}
+                               <option value="{{ item.color }}">{{ item.color }}</option>
+                               
+                           {% endfor %}
+                       </select>
 
-                    {% if product.discounted_price == None %}
-                        <div class="product-price">
-                            <div class="price-summary">
-                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
+                    {% if product.discount_date > CurDate %}
+                       <div class="product-price">
+                        <div class="price-summary">
+                           <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
+                           <input type="hidden" name="Price" value="{{product['price']}}">
+                       </div>
+                       {% else %}
+                            <div class="product-price">
+                                <div class="price-summary">
+                                    <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
+                                    <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
+                                    <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
+                                    <input type="hidden" name="Price" value="{{product['discounted_price']}}">
+                                </div>
                             </div>
                         </div>
                     {% else %}
