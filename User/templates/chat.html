@@ -24,6 +24,11 @@
         border-width: 1px 1px 0px 1px;
         padding: 5px 0px 5px 0px;
     }
+    #chat_id_select, #vendor_id, #product_id, #user_type,
+    #start_new_chat, #open_previous_chat{
+        outline: none;
+        padding: 5px;
+    }
     .chat-messages{
         display: flex;
         flex-direction: column;
@@ -74,7 +79,7 @@
     .chat-container{
         display: flex;
         flex-direction: column;
-        width: 45%;
+        width: 47%;
     }
     .send-message-container{
         width: 100%;
@@ -83,6 +88,19 @@
         border-color: lightgray;
         border-width: 0px 1px 1px 1px;
         padding: 5px 0px 5px 0px;
+    }
+    #send_message_form{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #message{
+        width: 100%;
+        padding: 5px;
+        outline: none;
+    }
+    #send_message{
+        padding: 5px;
     }
 </style>
 {% extends 'GuestHomepage.html' %}
@@ -96,27 +114,27 @@
             <div class="chat-options-container">
                 <div class="open-previous-chat-container">
                     <!-- <h2>Open Previous Chat</h2> -->
-                    <form method="GET" action="{{ url_for('chat_bp.chat_view') }}">
+                    <form method="GET" action="{{ url_for('chat_bp.chat_view') }}" id="previous_chat_form">
                             {% if previous_chats %}
                                 <select name="chat_id" id="chat_id_select">
                                 {% for chat in previous_chats %}
                                     <option value="{{ chat['CHAT_ID'] }}" id="chat_id">Chat ID: {{ chat['CHAT_ID'] }}</option>
                                 {% endfor %}
                                 </select>
-                                <input type="submit" id="submit" value="Open Chat">
+                                <input type="submit" id="open_previous_chat" value="Open Chat">
                             {% else %}
                             <select name="chat_id" id="chat_id_select">
                                 <option id="chat_id">No chats found</option>
                             </select>
-                            <input type="submit" id="submit" value="Open Chat" disabled>
+                            <input type="submit" id="open_previous_chat" value="Open Chat" disabled>
                             {% endif %}
                     </form>
                 </div>
         
                 <div class="start-new-chat-container">
                     <!-- <h2>Start New Chat</h2> -->
-                    <form method="POST" action="{{ url_for('chat_bp.chat_view') }}">
-                        <select>
+                    <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="new_chat_form">
+                        <select id="user_type" name="user_type">
                             <option id="vendor">Vendor</option>
                             <option id="admin">Admin</option>
                         </select>
@@ -124,7 +142,7 @@
                             <input type="text" placeholder="Vendor ID" id="vendor_id" name="vendor_id">
                         </div>
                         <input type="text" placeholder="Product ID" id="product_id" name="product_id">
-                        <input type="submit" value="Start Chat" id="start_chat">
+                        <input type="submit" value="Start Chat" id="start_new_chat">
                     </form>
                 </div>
             </div>
@@ -162,11 +180,11 @@
             </div>
 
             <div class="send-message-container">
-                <form method="POST" action="{{ url_for('chat_bp.chat_view') }}">
+                <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="send_message_form">
                     <input type="text" placeholder="Type your message here..." id="message" name="message">
                     <input type="submit" value="Send" id="send_message">
-                    <p>Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
                 </form>
+                <p style="text-align: center;">Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
             </div>
         </div>
 
