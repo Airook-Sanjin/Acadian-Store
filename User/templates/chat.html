@@ -167,28 +167,53 @@
 
             <div class="chat-messages">
                 {% for message in messages %}
-                    {% if message['CID'] %}
-                        <div class="outgoing-message">
-                            <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
-                            <div class="message">
-                                <p>{{ message['message'] }}</p>
-                                {% if message['images'] %}
-                                    <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
-                                {% endif %}
+                    {% if g.User['Role'] == 'customer' %}
+                    
+                        {% if message['CID'] %}
+                            <div class="outgoing-message">
+                                <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                    {% endif %}
-
-                    {% if message['VID'] %}
-                        <div class="incoming-message">
-                            <div class="info"><p>Vendor at {{ message['timestamp'] }}</p></div>
-                            <div class="message">
-                                <p>{{ message['message'] }}</p>
-                                {% if message['images'] %}
-                                    <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
-                                {% endif %}
+                        {% elif message['VID'] %}
+                            <div class="incoming-message">
+                                <div class="info"><p>Vendor at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
+                    
+                    {% elif g.User['Role'] == 'vendor' %}
+                        {% if message['VID'] %}
+                            <div class="outgoing-message">
+                                <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% elif message['CID'] %}
+                            <div class="incoming-message">
+                                <div class="info"><p>Customer at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    
                     {% endif %}
                 {% endfor %}
             </div>
