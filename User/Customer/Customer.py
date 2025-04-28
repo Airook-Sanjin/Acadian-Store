@@ -1,6 +1,6 @@
 
 from globals import Blueprint, render_template,redirect,url_for,session,g,text,Connecttodb
-
+from datetime import datetime
 from User.chat import chat_bp
 
 
@@ -23,6 +23,7 @@ def load_user():
 @customer_bp.route('/Home', methods=["GET"]) # Customer homepage
 def CustomerHomePage():
     try:
+        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -43,9 +44,9 @@ def CustomerHomePage():
             FROM product_inventory
         """)).mappings().fetchall()
         
-        return render_template('CustomerHomepage.html',products=products, inventory=inventory)
+        return render_template('CustomerHomepage.html',products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
-        return render_template('CustomerHomepage.html',products=[], inventory=[])
+        return render_template('CustomerHomepage.html',products=[],CurDate=CurDate, inventory=[])
 
 # def AddToCart():
     
