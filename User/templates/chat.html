@@ -122,6 +122,10 @@
     #send_message{
         padding: 5px;
     }
+    .etc_info{
+        display: flex;
+        justify-content: space-around;
+    }
 </style>
 {% extends 'GuestHomepage.html' %}
 <body>
@@ -223,7 +227,13 @@
                     <input type="text" placeholder="Type your message here..." id="message" name="message" required>
                     <input type="submit" value="Send" id="send_message">
                 </form>
-                <p style="text-align: center;">Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
+                <div class="etc_info">
+                    <p style="text-align: center;">Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
+                    <p style="text-align: center;">Vendor ID: {{ selected_chat.VID if selected_chat and selected_chat.VID else "N/A" }}</p>
+                    <p style="text-align: center;">Customer ID: {{ selected_chat.CID if selected_chat and selected_chat.CID else "N/A" }}</p>
+                    <p style="text-align: center;">Product ID: {{ selected_chat.PID if selected_chat and selected_chat.PID else "N/A" }}</p>
+                </div>
+                
                 {% if message %}
                     <p style="color: red; text-align: center;">{{ message }}</p>
                 {% endif %}
