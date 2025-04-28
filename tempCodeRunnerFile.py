@@ -1,2 +1,1 @@
-
-        """)).mappings().fetchall()
+c

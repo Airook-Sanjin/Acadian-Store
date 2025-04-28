@@ -10,6 +10,7 @@ from User.user import user_bp
 from User.chat import chat_bp
 from User.user_util.cart.cart import cart_bp
 from User.user_util.search.search import search_bp
+from User.user_util.PlaceOrder.PlaceOrder import OrderPlace_bp
 
 
 
@@ -44,6 +45,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(cart_bp) 
 app.register_blueprint(chat_bp)
 app.register_blueprint(search_bp)
+app.register_blueprint(OrderPlace_bp)
 
 app.register_blueprint(admin)
 app.register_blueprint(customer_bp)

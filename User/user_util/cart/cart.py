@@ -25,10 +25,10 @@ def UserCart(username):
                 SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
-	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount) * ca.quantity) 
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall()
+                WHERE ca.CID = :ID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID']}).mappings().fetchall()
         
         
         
@@ -65,7 +65,7 @@ def RemoveFromCart(username):
                 SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
-	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount) * ca.quantity) 
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
@@ -109,7 +109,7 @@ def addToCart():
         Matchingitem =conn.execute(text("""
                 SELECT ca.ITEM_ID AS itemid,ca.size AS size, ca.color AS color,ca.quantity as quantity,ca.PID as PID
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID AND ca.size = :size AND ca.color = :color and ca.PID = :PID"""),{'ID': g.User['ID'],'size':SIZE,'color':COLOR,'PID':PID}).mappings().fetchall()
+                WHERE ca.CID = :ID AND ca.size = :size AND ca.color = :color and ca.PID = :PID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID'],'size':SIZE,'color':COLOR,'PID':PID}).mappings().fetchall()
         print(Matchingitem)
         if Matchingitem:
             print('Updating')
@@ -183,15 +183,18 @@ def quantityUpdate(username):
 @cart_bp.route('/checkout/<username>')
 def GotoCheckout(username):
     try:
+        # ?Should I have an autofill for card info?
+        # userinfo = conn.execute(text("""
+        #             Select """))
         CartList = conn.execute(text(
             """
                 SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
-	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount) * ca.quantity) 
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall()
+                WHERE ca.CID = :ID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID']}).mappings().fetchall()
         print (CartList)
         total = 0
         for item in CartList:
