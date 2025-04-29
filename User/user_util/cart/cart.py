@@ -42,7 +42,7 @@ def UserCart(username):
         for item in CartList:
             total+=float(item['Price'])
             print(item)
-            print (f'PIDs:{item['PID'],item['size'],item['color']}')
+            # print (f'PIDs:{item['PID'],item['size'],item['color']}')
             
         print(total)
         return render_template('Cart.html',username=username,CartList = CartList,total =total)
