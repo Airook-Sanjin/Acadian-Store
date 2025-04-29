@@ -71,7 +71,9 @@ def start():
                 image_url
                 FROM product 
         """)).mappings().fetchall()  # changed from .first() to .fetchall()
-
+        
+        print
+        
         inventory = conn.execute(text("""
             SELECT size, color, amount
             FROM product_inventory
@@ -124,35 +126,50 @@ def ProductView():
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
         
-        # print("Specific Product:", specific_product)  # Debugging output
-        return render_template('Product.html', product=product, inventory=inventory,CurDate=CurDate, images=images, Reviews=Reviews)
+        Review_Count = conn.execute(text("""
+        SELECT Pid, COUNT(review_id) AS review_count
+        FROM reviews
+        WHERE PID = :pid
+        GROUP BY PID;"""), {"pid": pid}).mappings().fetchall()
+        
+        return render_template('Product.html', product=product, inventory=inventory,CurDate=CurDate, images=images, Reviews=Reviews,Review_Count=Review_Count)
     except Exception as e:
+        print("##############################################") 
         print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate)
+        print("##############################################") 
+        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate,Review_Count=[])
     
 
-app.route('/Review', methods=["POST"])
+@app.route('/Review', methods=["POST"])
 def Review():
     try:
-        pid = request.args.get('pid') # take from page
-        rating = request.args.get('rating')
-        title = request.args.get('title')
-        review = request.args.get('description')
-        cid = g.User['ID']
-        
-        conn.execute(text("""Insert into reviews (CID, PID, rating, title, description) 
-                          values (:CID, :PID, :rating, :title, :description)"""), 
-                        {"CID": cid, 
-                        "PID": pid,
-                        "rating": rating,
-                        "title": title,
-                        "description": review})
-        
-        # conn.commit()
-        return render_template('Product.html', product=None, inventory=[], images=[])
+        if not g.User:
+            return redirect(url_for('login_bp.Login'))  # Or whatever your login route is
+
+        pid = request.form.get('pid')
+        rating = request.form.get('rating')
+        title = request.form.get('title', '')
+        review = request.form.get('description', '')
+        cid = g.User.get('ID')
+
+        # Ensure rating is an integer and properly handled
+        if rating:
+            rating = int(rating)
+        else:
+            rating = 0  # Default to 0 if no rating is selected
+
+        # Insert review into the database
+        conn.execute(text("""INSERT INTO reviews (CID, PID, rating, title, description) 
+                             VALUES (:CID, :PID, :rating, :title, :description)"""), 
+                     {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
+        conn.commit()
+        print(f"Redirecting to ProductView with PID: {pid}")  # Log the pid
+        return redirect(url_for('ProductView', pid=pid))
     except Exception as e:
-        print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[], images=[])
+        print(f"Error: {e}")
+        return redirect(url_for('ProductView', pid=request.form.get('pid')))
+
+
 
     
 
