@@ -1,5 +1,5 @@
 from globals import Blueprint, render_template, request,g,session,redirect,url_for,Connecttodb,text
-
+from flask import make_response
 cart_bp = Blueprint('cart_bp', __name__, url_prefix='/cart', template_folder='templates')
 
 conn = Connecttodb()
@@ -19,16 +19,20 @@ def load_user():
 
 @cart_bp.route('/<username>',methods=["GET"])
 def UserCart(username):
+    if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
     try:
+        conn.commit() #!Fresh connection
+        
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID']}).mappings().fetchall()
+                WHERE ca.CID = :ID AND (ca.ORDER_ID is Null OR ca.ORDER_ID = 0)"""),{'ID': g.User['ID']}).mappings().fetchall()
         
         
         
@@ -37,12 +41,10 @@ def UserCart(username):
         print(CartList)
         for item in CartList:
             total+=float(item['Price'])
-            
+            print(item)
             print (f'PIDs:{item['PID'],item['size'],item['color']}')
             
         print(total)
-        if not g.User: #* Handles if signed in or not
-            return redirect(url_for('login_bp.Login'))
         return render_template('Cart.html',username=username,CartList = CartList,total =total)
     except Exception as e:
         print(f'ERROR: {e}')
@@ -62,13 +64,13 @@ def RemoveFromCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
+                WHERE ca.CID = :ID AND ca.ORDER_ID is Null """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
         
         total = 0
         for item in CartList:
@@ -82,6 +84,7 @@ def RemoveFromCart(username):
 @cart_bp.route('/add',methods=['POST'])
 def addToCart():
     try:
+        
         product = conn.execute(text("""
                 SELECT 
                     PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -95,7 +98,7 @@ def addToCart():
                 AID,
                 image_url
                 FROM product
-            """)).mappings().fetchall()  # ✅ changed from .first() to .fetchall()
+            """)).mappings().first()  # ✅ changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
             SELECT size, color, amount FROM product_inventory
@@ -103,11 +106,11 @@ def addToCart():
         
         EMAIL = g.User['Email']
         ID = g.User['ID']
-        PID = int(request.form.get('PID'))
+        PID = int(request.args.get('PID'))
         SIZE = request.form.get('Size')
         COLOR = request.form.get('Color')
         Matchingitem =conn.execute(text("""
-                SELECT ca.ITEM_ID AS itemid,ca.size AS size, ca.color AS color,ca.quantity as quantity,ca.PID as PID
+                SELECT ca.ITEM_ID AS itemid,ca.size AS size, ca.color AS color,ca.quantity as quantity,ca.PID as PID,ca.ORDER_ID
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND ca.size = :size AND ca.color = :color and ca.PID = :PID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID'],'size':SIZE,'color':COLOR,'PID':PID}).mappings().fetchall()
         print(Matchingitem)
@@ -188,7 +191,7 @@ def GotoCheckout(username):
         #             Select """))
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 

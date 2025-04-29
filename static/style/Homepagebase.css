@@ -169,6 +169,7 @@ body {
   .SearchForm{
     display:flex;
     flex-direction: row;
+    align-items: center;
   }
   #Search{
     padding: .5em;
