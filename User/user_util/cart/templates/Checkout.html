@@ -38,7 +38,9 @@
       flex-direction: row;
       width:100%;
       max-width: 100%;
-      height:90%;
+      min-height: 9em;
+      height:9em;
+      max-height:9em;
       background-color: white;
       padding: .5em;
       border-radius: 20px;
@@ -49,7 +51,7 @@
       display: flex;
       flex-direction: row;
       gap: 2em;
-      width: 70%;
+      width: 2.5em;
       align-items: center;
     }
     .item-info img{
@@ -525,7 +527,8 @@
                         <input type="hidden" name="UpdatedItem" value="{{item['itemid']}}" />
                         <input type="number" name="quantity" id="quantity" value="{{item['quantity']}}" min="1" max="99" onchange="this.form.submit();">
                         </form>
-                    <h3>${{item['Price']}}</h3>
+                        <!-- Formating  -->
+                    <h3>${{'%0.2f' | format(item['Price']|float)}}</h3>
                     <form id="Removesection"
                       action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
                       method="POST"

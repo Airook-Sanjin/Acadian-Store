@@ -50,10 +50,13 @@ app.register_blueprint(OrderPlace_bp)
 app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
+
+
  
 @app.route('/', methods=["GET"])
 def start():
     try:
+        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -75,17 +78,18 @@ def start():
         """)).mappings().fetchall()
 
         conn.commit()
-        return render_template('GuestHomepage.html', products=products, inventory=inventory)
+        return render_template('GuestHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html', products=[], inventory=[])
+        return render_template('GuestHomepage.html', products=[],CurDate=CurDate,inventory=[])
 
     
 @app.route('/Product-View')
 def ProductView():
     try:
+        CurDate = datetime.now().date()
         pid = request.args.get('pid')
-        
+
         product = conn.execute(text("""
              SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -101,7 +105,7 @@ def ProductView():
             FROM product
             WHERE PID = :pid
         """), {"pid": pid}).mappings().first()
-        
+
         inventory = conn.execute(text("""
             SELECT size, color, amount
             FROM product_inventory
@@ -113,54 +117,20 @@ def ProductView():
             FROM product_images
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
-        
+
         Reviews = conn.execute(text("""
             SELECT *
             FROM reviews
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
-        
-        # print("Specific Product:", specific_product)  # Debugging output
-        return render_template('Product.html', product=product, inventory=inventory, images=images, Reviews=Reviews)
+
+# print("Specific Product:", specific_product)  # Debugging output
+        return render_template('Product.html', product=product, inventory=inventory,CurDate=CurDate, images=images, Reviews=Reviews)
     except Exception as e:
         print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[])
-    
-# @app.route('/View-Reviews')
-# def ProductReviews():
-#     try:
-#         pid = request.args.get('pid')
-#         conn.commit()
-#         return render_template('Product.html', product=None, inventory=[], images=[])
-#     except Exception as e:
-#         print("Error:", e)  # Print the actual error
-#         return render_template('Product.html', product=None, inventory=[], images=[])
-
-app.route('/Review', methods=["POST"])
-def Review():
-    try:
-        pid = request.args.get('pid') # take from page
-        rating = request.args.get('rating')
-        title = request.args.get('title')
-        review = request.args.get('description')
-        cid = g.User['ID']
-        
-        conn.execute(text("""Insert into reviews (CID, PID, rating, title, description) 
-                          values (:CID, :PID, :rating, :title, :description)"""), 
-                        {"CID": cid, 
-                        "PID": pid,
-                        "rating": rating,
-                        "title": title,
-                        "description": review})
-        
-        # conn.commit()
-        return render_template('Product.html', product=None, inventory=[], images=[])
-    except Exception as e:
-        print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[], images=[])
-
+        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate)
     
 
 
 if __name__ == '__main__':
-        app.run(debug=True) 
+        app.run(debug=True)  
