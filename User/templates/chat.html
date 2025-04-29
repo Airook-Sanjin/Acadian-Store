@@ -62,12 +62,14 @@
     .chat-messages::-webkit-scrollbar{
         width:.2em;
     }
-  .chat-messages::-webkit-scrollbar-track{
+    .chat-messages::-webkit-scrollbar-track{
         background: hsl(0, 0%, 95%);
     }
-  .chat-messages::-webkit-scrollbar-thumb{
-        background:linear-gradient(0deg, hsl(0, 0%, 95%) 0 10%  ,#2D4B48 50% 55%, hsl(0, 0%, 95%) 90% 100% );
-        border-radius: 32px;
+    .chat-messages::-webkit-scrollbar-thumb{
+        background: #888;
+    }
+    .chat-messages::-webkit-scrollbar-thumb:hover{
+        background: #555;
     }
     .incoming-message, .outgoing-message{
         margin: 10px 0;
@@ -95,11 +97,6 @@
         border: 1px solid lightgray;
         border-radius: 10px 10px 0 10px;
         max-width: 47%;
-    }
-    .chat-container{
-        display: flex;
-        flex-direction: column;
-        width: 47%;
     }
     .send-message-container{
         width: 100%;
@@ -138,19 +135,19 @@
             <div class="chat-options-container">
                 <div class="open-previous-chat-container">
                     <form method="GET" action="{{ url_for('chat_bp.chat_view') }}" id="previous_chat_form">
-                            {% if previous_chats %}
-                                <select name="chat_id" id="chat_id_select">
+                        {% if previous_chats %}
+                            <select name="chat_id" id="chat_id_select">
                                 {% for chat in previous_chats %}
                                     <option value="{{ chat['CHAT_ID'] }}" id="chat_id">Chat ID: {{ chat['CHAT_ID'] }}</option>
                                 {% endfor %}
-                                </select>
-                                <input type="submit" id="open_previous_chat" value="Open Chat">
-                            {% else %}
+                            </select>
+                            <input type="submit" id="open_previous_chat" value="Open Chat">
+                        {% else %}
                             <select name="chat_id" id="chat_id_select">
                                 <option id="chat_id">No chats found</option>
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat" disabled>
-                            {% endif %}
+                        {% endif %}
                     </form>
                 </div>
         
@@ -158,12 +155,11 @@
                     <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="new_chat_form">
                         <select id="user_type" name="user_type">
                             <option id="vendor">Vendor</option>
-                            <option id="admin">Admin</option>
                         </select>
                         <div style="display: inline-block;">
-                            <input type="text" placeholder="Vendor ID" id="vendor_id" name="vendor_id">
+                            <input type="text" placeholder="Vendor ID" id="vendor_id" name="vendor_id" required>
                         </div>
-                        <input type="text" placeholder="Product ID" id="product_id" name="product_id">
+                        <input type="text" placeholder="Product ID" id="product_id" name="product_id" required>
                         <input type="submit" value="Start Chat" id="start_new_chat">
                     </form>
                 </div>
@@ -171,8 +167,11 @@
 
             <div class="chat-messages">
                 {% for message in messages %}
-                    {% if g.User['Role'] == 'customer' %}
-                    
+                    {% if message['message'] == "* * Start of Chat * *" %}
+                        <div class="system-message">
+                            <p style="text-align: center; font-style: italic;">{{ message['message'] }}</p>
+                        </div>
+                    {% elif g.User['Role'] == 'customer' %}
                         {% if message['CID'] %}
                             <div class="outgoing-message">
                                 <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
@@ -194,7 +193,6 @@
                                 </div>
                             </div>
                         {% endif %}
-                    
                     {% elif g.User['Role'] == 'vendor' %}
                         {% if message['VID'] %}
                             <div class="outgoing-message">
@@ -217,7 +215,6 @@
                                 </div>
                             </div>
                         {% endif %}
-                    
                     {% endif %}
                 {% endfor %}
             </div>
@@ -243,4 +240,3 @@
     </div>
     {% endblock %}
 </body>
-</html>
