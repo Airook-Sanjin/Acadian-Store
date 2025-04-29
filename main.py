@@ -50,6 +50,8 @@ app.register_blueprint(OrderPlace_bp)
 app.register_blueprint(admin)
 app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
+
+
  
 @app.route('/', methods=["GET"])
 def start():
@@ -87,7 +89,7 @@ def ProductView():
     try:
         CurDate = datetime.now().date()
         pid = request.args.get('pid')
-        
+
         product = conn.execute(text("""
              SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -103,7 +105,7 @@ def ProductView():
             FROM product
             WHERE PID = :pid
         """), {"pid": pid}).mappings().first()
-        
+
         inventory = conn.execute(text("""
             SELECT size, color, amount
             FROM product_inventory
@@ -115,7 +117,7 @@ def ProductView():
             FROM product_images
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
-        
+
         Reviews = conn.execute(text("""
             SELECT *
             FROM reviews
@@ -128,15 +130,6 @@ def ProductView():
         print("Error:", e)  # Print the actual error
         return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate)
     
-# @app.route('/View-Reviews')
-# def ProductReviews():
-#     try:
-#         pid = request.args.get('pid')
-#         conn.commit()
-#         return render_template('Product.html', product=None, inventory=[], images=[])
-#     except Exception as e:
-#         print("Error:", e)  # Print the actual error
-#         return render_template('Product.html', product=None, inventory=[], images=[])
 
 app.route('/Review', methods=["POST"])
 def Review():

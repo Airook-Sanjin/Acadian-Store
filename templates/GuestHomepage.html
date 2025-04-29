@@ -84,7 +84,11 @@
             <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
             {% else %}
             <iconify-icon class="Profile" icon="mdi:account-circle">   </iconify-icon>
-            <button id='GotoCart' onclick="window.location.href='{{ url_for('cart_bp.UserCart', username= g.User['Name']) }}'"> <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon></button>
+            <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
+              <button id='GotoCart' type="submit">
+                  <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon>
+              </button>
+          </form>
             <button id="ViewAccounts" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log Out</button>
             {% endif %}
             

@@ -15,20 +15,44 @@ def load_user():
 @chat_bp.route('/chat', methods=["GET", "POST"])
 def chat_view():
     user_email = g.User["Email"]
-    customer_result = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).fetchone()
-    if not customer_result:
-        message = "Customer not found."
+    user_role = g.User["Role"]
+
+    if user_role == "customer":
+        customer_result = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).fetchone()
+        if not customer_result:
+            message = "Customer not found."
+            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
+        user_id = customer_result.CID
+        user_type = "CID"
+        chats = conn.execute(text("SELECT DISTINCT CHAT_ID, VID, PID FROM chatroom_vendor WHERE CID = :cid"), {"cid": user_id}).mappings().all()
+
+    elif user_role == "vendor":
+        vendor_result = conn.execute(text("SELECT VID FROM vendor WHERE email = :email"), {"email": user_email}).fetchone()
+        if not vendor_result:
+            message = "Vendor not found."
+            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
+        user_id = vendor_result.VID
+        user_type = "VID"
+        chats = conn.execute(text("SELECT DISTINCT CHAT_ID, CID, PID FROM chatroom_vendor WHERE VID = :vid"), {"vid": user_id}).mappings().all()
+
+    else:
+        message = "Invalid user role."
         return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-    customer_id = customer_result.CID
-    chats = conn.execute(text("SELECT DISTINCT CHAT_ID FROM chatroom_vendor WHERE CID = :cid"),
-                        {"cid": customer_id}).mappings().all()
     if not chats:
         message = "No chats found."
         return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
+
     chat_id = request.args.get("chat_id")
     if not chat_id:
         chat_id = chats[0]["CHAT_ID"]
-    messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"),
-                            {"chat_id": chat_id}).mappings().all()
-    selected_chat = {"CHAT_ID": chat_id, "vendor_name": "Vendor", "product_name": "Product"}
-    return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=selected_chat, message=None)
+
+    chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+    if request.method == "POST":
+        message_content = request.form.get("message")
+        if message_content:
+            conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, message, timestamp) VALUES (:chat_id, :user_id, :message, CURRENT_TIMESTAMP)"),
+                        {"chat_id": chat_id, "user_id": user_id, "message": message_content})
+            conn.commit()
+
+    messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"),{"chat_id": chat_id}).mappings().all()
+    return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=chat_details, message=None)

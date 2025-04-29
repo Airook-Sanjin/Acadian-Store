@@ -268,7 +268,7 @@
         <input type="hidden" name="UpdatedItem" value="{{item['itemid']}}" />
         <input type="number" name="quantity" id="quantity" value="{{item['quantity']}}" min="1" max="99" onchange="this.form.submit();">
         </form>
-        <h3>${{item['Price']}}</h3>
+        <h3>${{'%0.2f' | format(item['Price']|float)}}</h3>
         <form id="Removesection"
           action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
           method="POST"
