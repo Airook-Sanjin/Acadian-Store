@@ -34,17 +34,18 @@ def UserCart(username):
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND (ca.ORDER_ID is Null OR ca.ORDER_ID = 0)"""),{'ID': g.User['ID']}).mappings().fetchall()
         
-        
+        if CartList== []:
+            return render_template('EmptyCart.html')
         
         total = 0
         
-        print(CartList)
+        print(CartList)#!Debug
         for item in CartList:
             total+=float(item['Price'])
-            print(item)
+            print(item)#!Debug
             print (f'PIDs:{item['PID'],item['size'],item['color']}')
             
-        print(total)
+        print(total) #!Debug
         return render_template('Cart.html',username=username,CartList = CartList,total =total)
     except Exception as e:
         print(f'ERROR: {e}')
@@ -54,7 +55,6 @@ def UserCart(username):
 def RemoveFromCart(username):
     try:
        
-        
         ITEMID = request.form.get('RemovedItem') #* Gets Item ID
         
         conn.execute(text(

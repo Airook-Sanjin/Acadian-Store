@@ -117,7 +117,7 @@
                   <section class="product">
                       <h3 class="title">{{ product.title }}</h3>
                       <h4 class="desc">{{ product.description }}</h4>
-                      <h4 class="price">${{ product.price }}</h4>
+                      <h4 class="price">${{ '%0.2f'| format(product.price|float) }}</h4>
                 </section>
               </section>
             {% else %}
@@ -133,9 +133,9 @@
                       <h3 class="title">{{ product.title }}</h3>
                       <h4 class="desc">{{ product.description }}</h4>
                       <div class="price-holder">
-                        <h4 class="price" style="">${{ product.discounted_price }}</h4>
+                        <h4 class="price" style="">${{'%0.2f'| format(product.discounted_price|float) }}</h4>
                         {% if product.discount %}
-                          <strike><h4 class="price" style="color: gray;">${{ product.price }}</h4></strike>
+                          <strike><h4 class="price" style="color: gray;">${{ '%0.2f'| format(product.price|float) }}</h4></strike>
                         {%endif%}
                       </div>
                   </section>

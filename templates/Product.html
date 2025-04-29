@@ -472,24 +472,26 @@
                                    
                                {% endfor %}
                            </select>
-    
-                        {% if product.discount_date > CurDate %}
-                           <div class="product-price">
+                        
+                        {% if product.discount_date and product.discount_date < CurDate %}
+                        <div class="product-price">
                             <div class="price-summary">
-                               <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.price }}</p>
-                               <input type="hidden" name="Price" value="{{product['price']}}">
-                           </div>
-                           {% else %}
-                                <div class="product-price">
-                                    <div class="price-summary">
-                                        <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ product.discounted_price }}</p>
-                                        <p style="font-size: 14px;"><strong>Save:</strong> ${{ product.saving_discount }}</p>
-                                        <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ product.price }}</p></div>
-                                        <input type="hidden" name="Price" value="{{product['discounted_price']}}">
-                                    </div>
-                                </div>
+                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format(product.discounted_price |float ) }}</p>
+                                <p style="font-size: 14px;"><strong>Save:</strong> ${{'%0.2f' |format(product.saving_discount | float) }}</p>
+                                <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ '%0.2f' |format( product.price | float) }}</p></div>
+                                <input type="hidden" name="Price" value="{{product['discounted_price']}}">
                             </div>
+                        </div>
+                    </div>
+                           {% else %}
+                                
+                            <div class="product-price">
+                                <div class="price-summary">
+                                   <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format( product.price | float) }}</p>
+                                   <input type="hidden" name="Price" value="{{product['price']}}">
+                               </div>
                         {% endif %}
+                        
                         
                         <div class="product-description">
                             <label for="description">Description:</label>
