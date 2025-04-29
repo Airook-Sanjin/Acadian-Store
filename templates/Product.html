@@ -462,54 +462,27 @@
         <div class="review-summary-container">
             <h2 class="review-title">Customer Reviews</h2>
             
-                <div class="rating-summary">
-                   
-                    <div class="average-rating">4.8<span style="font-size: 1.5rem;">/5</span></div> 
-                    {% if Review_Count %}
-                        {% for review in Review_Count %}
-                            <div class="total-reviews">Based on {{ review['review_count']}} reviews</div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="total-reviews">Based on 0 reviews</div>
-                    {% endif %}
-                    <div class="rating-distribution">
+            <div class="rating-summary">
+                <div class="average-rating">{{ Avg_Rating }}<span style="font-size: 1.5rem;">/5</span></div> 
+            
+                {% if Review_Count > 0 %}
+                    <div class="total-reviews">Based on {{ Review_Count }} reviews</div>
+                {% else %}
+                    <div class="total-reviews">Based on 0 reviews</div>
+                {% endif %}
+            
+                <div class="rating-distribution">
+                    {% for star in range(5, 0, -1) %}
                         <div class="rating-bar">
-                            <span class="rating-label">5 <span class="star">★</span></span>
+                            <span class="rating-label">{{ star }} <span class="star">★</span></span>
                             <div class="bar-container">
-                                <div class="bar" style="width: 85%"></div>
+                                <div class="bar" style="width: {{ Rating_Percentages.get(star, 0) }}%"></div>
                             </div>
-                            <span>85%</span>
+                            <span>{{ "%0.1f"|format(Rating_Percentages.get(star, 0)) }}%</span>
                         </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">4 <span class="star">★</span></span>
-                            <div class="bar-container">
-                                <div class="bar" style="width: 10%"></div>
-                            </div>
-                            <span>10%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">3 <span class="star">★</span></span>
-                            <div class="bar-container">
-                                <div class="bar" style="width: 3%"></div>
-                            </div>
-                            <span>3%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">2 <span class="star">★</span></span>
-                            <div class="bar-container">
-                                <div class="bar" style="width: 1%"></div>
-                            </div>
-                            <span>1%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <span class="rating-label">1 <span class="star">★</span></span>
-                            <div class="bar-container">
-                                <div class="bar" style="width: 1%"></div>
-                            </div>
-                            <span>1%</span>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
+            </div>
             <!-- ############### -->
             <!-- # Review Form # -->
             <!-- ############### -->
@@ -524,8 +497,8 @@
                     <span class="star" data-rating="4">★</span>
                     <span class="star" data-rating="5">★</span>
                 </div>
-                <input class="review-title-text" type="text" name="title" placeholder="Title">
-                <textarea placeholder="Share your honest thoughts about this product..." name="description"></textarea>
+                <input class="review-title-text" type="text" name="title" placeholder="Title" required>
+                <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
                 <button type="submit" class="submit-review">Submit Review</button>
             </form>
 
