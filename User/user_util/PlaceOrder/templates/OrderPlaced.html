@@ -1,4 +1,9 @@
 {% extends 'GuestHomepage.html' %}
 {% block body %}
+{% for item in OrderHistory %}
+<p>{{item['ItemTitle' or 'Title']}}</p>
+<p>{{item['ItemPrice'or'$100.00']}}</p>
+<p>{{item['ItemQuantity' or '3']}}</p>
+{% endfor %}
 
 {% endblock body %}
