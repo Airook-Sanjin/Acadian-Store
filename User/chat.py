@@ -50,9 +50,8 @@ def chat_view():
     if request.method == "POST":
         message_content = request.form.get("message")
         if message_content:
-            conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, message, timestamp) VALUES (:chat_id, :user_id, :message, CURRENT_TIMESTAMP)"),
-                        {"chat_id": chat_id, "user_id": user_id, "message": message_content})
+            conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, PID, message, timestamp) VALUES (:chat_id, :user_id, :pid, :message, CURRENT_TIMESTAMP)"),
+                        {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content})
             conn.commit()
-
-    messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"),{"chat_id": chat_id}).mappings().all()
+    messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
     return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=chat_details, message=None)
