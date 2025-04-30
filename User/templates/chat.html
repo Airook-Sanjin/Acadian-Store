@@ -123,6 +123,12 @@
         display: flex;
         justify-content: space-around;
     }
+    .system-message{
+        color: #757575;
+    }
+    hr{
+        background-color: #757575;
+    }
 </style>
 {% extends 'GuestHomepage.html' %}
 <body>
@@ -170,6 +176,7 @@
                     {% if message['message'] == "* * Start of Chat * *" %}
                         <div class="system-message">
                             <p style="text-align: center; font-style: italic;">{{ message['message'] }}</p>
+                            <hr>
                         </div>
                     {% elif g.User['Role'] == 'customer' %}
                         {% if message['CID'] %}
