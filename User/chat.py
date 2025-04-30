@@ -26,7 +26,7 @@ def chat_view():
         user_type = "CID"
         vendor_chats = conn.execute(text("SELECT CHAT_ID, VID, PID, 'vendor' AS chat_type FROM chatroom_vendor WHERE CID = :cid"), {"cid": user_id}).mappings().all()
         admin_chats = conn.execute(text("SELECT CHAT_ID, AID AS VID, PID, 'admin' AS chat_type FROM chatroom_admin WHERE CID = :cid"), {"cid": user_id}).mappings().all()
-        chats = vendor_chats + admin_chats
+        chats = {chat["CHAT_ID"]: chat for chat in (vendor_chats + admin_chats)}.values()
 
     elif user_role == "vendor":
         vendor_result = conn.execute(text("SELECT VID FROM vendor WHERE email = :email"), {"email": user_email}).fetchone()
@@ -48,7 +48,7 @@ def chat_view():
 
     chat_id = request.args.get("chat_id")
     if not chat_id and chats:
-        chat_id = chats[0]["CHAT_ID"]
+        chat_id = list(chats)[0]["CHAT_ID"]
     if request.method == "POST":
         print(f"Form data: {request.form}")
         user_type_selected = request.form.get("user_type")

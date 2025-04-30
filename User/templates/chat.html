@@ -144,7 +144,9 @@
                         {% if previous_chats %}
                             <select name="chat_id" id="chat_id_select">
                                 {% for chat in previous_chats %}
-                                    <option value="{{ chat['CHAT_ID'] }}" id="chat_id">Chat ID: {{ chat['CHAT_ID'] }}</option>
+                                    <option value="{{ chat['CHAT_ID'] }}">
+                                        Chat ID: {{ chat['CHAT_ID'] }}
+                                    </option>
                                 {% endfor %}
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat">
