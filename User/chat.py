@@ -65,7 +65,7 @@ def chat_view():
 
             conn.execute(text("INSERT INTO chat (CHAT_ID) VALUES (:chat_id)"), {"chat_id": new_chat_id})
             conn.execute(text("INSERT INTO chatroom_admin (CHAT_ID, CID, AID, PID, message, timestamp) VALUES (:chat_id, :cid, :aid, :pid, :message, CURRENT_TIMESTAMP)"),
-                {"chat_id": new_chat_id, "cid": user_id, "aid": admin_id, "pid": product_id, "message": "* * Start of Chat * *"})
+                        {"chat_id": new_chat_id, "cid": user_id, "aid": admin_id, "pid": product_id, "message": "* * Start of Chat * *"})
             conn.commit()
             return redirect(url_for("chat_bp.chat_view", chat_id=new_chat_id))
 
@@ -100,7 +100,7 @@ def chat_view():
             conn.commit()
             return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
 
-    chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+    chat_details = conn.execute( text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
     chat_type = "vendor"
     if not chat_details:
         chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
@@ -110,6 +110,13 @@ def chat_view():
         message = "Chat not found."
         return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
 
+    selected_chat = dict(chat_details)
+    selected_chat['chat_type'] = chat_type
+    if chat_type == "admin":
+        selected_chat['AID'] = chat_details.get('AID')
+    else:
+        selected_chat['VID'] = chat_details.get('VID')
+
     if chat_type == "vendor":
         messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
     elif chat_type == "admin":
@@ -117,4 +124,4 @@ def chat_view():
     else:
         messages = []
 
-    return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=chat_details, message=None)
+    return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=selected_chat, message=None)
