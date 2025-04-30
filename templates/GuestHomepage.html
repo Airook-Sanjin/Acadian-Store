@@ -1,188 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
-  .product-img{
+  .product-img {
     width: 100%;
     height: auto;
   }
-  .product-button{
+  .product-button {
     width: auto;
     height: auto;
     cursor: pointer;
   }
-
-.discount-badge {
-  position: absolute;
-  background-color: red;
-  color: white;
-  font-weight: bold;
-  padding: 5px 8px;
-  font-size: 12px;
-  top: 10px;
-  left: 10px;
-  border-radius: 5px;
-  z-index: 1;
-}
-.product_img {
-  position: relative; 
-}
-
-.price-holder h4{
-  margin: 0;
-}
+  .discount-badge {
+    position: absolute;
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    padding: 5px 8px;
+    font-size: 12px;
+    top: 10px;
+    left: 10px;
+    border-radius: 5px;
+    z-index: 1;
+  }
+  .product_img {
+    position: relative;
+  }
+  .price-holder h4 {
+    margin: 0;
+  }
 </style>
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='/style/Homepagebase.css') }}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/style/Homepagebase.css') }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store</title>
 </head>
 
 <body>
-    <header>
-        <div class="topBar">
-          <div class="Left-side">
-            <div class = "Logo-Container">
-            <img class = "logo"src="{{url_for('static',filename='/images/Logo_fill.svg')}}">
-          </div>
-            <ul class="barItem">
-              <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li> <!-- Takes to appropraite homepage-->
-              
-             {%if g.User['Role']=='admin' %}
-              <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('admin.chat_bp.chat_view') }}'">CHAT</button></li>
-              <li><button id="ViewAccounts" onclick="window.location.href = ''">Pending Accounts</button></li>
-              <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
-              
-             
-              {%elif g.User['Role']=='vendor'%}
-                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
-                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts')}}'">SEE YOUR PRODUCTS</button></li>
-                <li><button id="ViewAccounts" onclick="window.location.href = ''">Settings</button></li>
-              {% elif g.User['Role']=='customer' %}
-                <li><button id="ViewAccounts" onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
-              {% else %}
-              {%endif%}
-              
-  
-             
-            </ul>
-            <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="post">
-            <input type="search" name="Search" id="Search" placeholder="Search">
-            <input class="BTN" type="submit" value="Search">
-          </form>
-          </div>
-  
-          <div class="Right-side">
-            {%if g.User %}
-            <h4>Hello {{g.User["Name"].title()}}</h4>
-            {%else%}
-            {% endif %}
-            
-            {%if not g.User  %}
-            
-            <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
-            {% else %}
-            <iconify-icon class="Profile" icon="mdi:account-circle">   </iconify-icon>
-            <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
-              <button id='GotoCart' type="submit">
-                  <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon>
-              </button>
-          </form>
-            <button id="ViewAccounts" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log Out</button>
-            {% endif %}
-            
-           
-            
-          </div>
-  
+  <header>
+    <div class="topBar">
+      <div class="Left-side">
+        <div class="Logo-Container">
+          <img class="logo" src="{{url_for('static',filename='/images/Logo_fill.svg')}}">
         </div>
-      </header>
-      
-        {% block body %}
-        <section class="Main">
-          <h1>GUEST</h1>
-        </section>
-      
-        {% endblock body %}
-      
-        <section class="product_container">
-          {% for product in products %}
-            {% if product.discount_date and product.discount_date > CurDate %}
-            <!-- Regular Price -->
-              <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
-                  <section class="product_img">
-                      <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
-                  </section>
-                  <section class="product">
-                      <h3 class="title">{{ product.title }}</h3>
-                      <h4 class="desc">{{ product.description }}</h4>
-                      <h4 class="price">${{ '%0.2f'| format(product.price|float) }}</h4>
-                </section>
-              </section>
-            {% else %}
-            <!-- Discounted Price Display -->
-                <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
-                  <section class="product_img">
-                    {% if product.discount %}
-                      <div class="discount-badge">{{ (product.discount * 100)|int }}% OFF</div>
-                    {%endif%}
-                      <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
-                  </section>
-                  <section class="product">
-                      <h3 class="title">{{ product.title }}</h3>
-                      <h4 class="desc">{{ product.description }}</h4>
-                      <div class="price-holder">
-                        <h4 class="price" style="">${{'%0.2f'| format(product.discounted_price|float) }}</h4>
-                        {% if product.discount %}
-                          <strike><h4 class="price" style="color: gray;">${{ '%0.2f'| format(product.price|float) }}</h4></strike>
-                        {%endif%}
-                      </div>
-                  </section>
-                </section>
-              {%endif%}
-          {% endfor %}
-      </section>
-      
-      
-    <footer class="footer">
-      <div class="footer__container">
-        <div class="footer__section">
-          <h2 class="footer__title">PyBank</h2>
-          <p>Your trusted partner in modern banking solutions.</p>
-        </div>
-    
-        <div class="footer__section">
-          <h2 class="footer__title">Contact Us</h2>
-          <address style="color: black;">
-            123 Finance Street, Banking City, 45678<br>
-            <a class="footer__link" href="mailto:support@pybank.com">support@pybank.com</a><br>
-            <a class="footer__link" href="tel:+1234567890">+1 (234) 567-890</a>
-          </address>
-        </div>
-    
-        <div class="footer__section">
-          <h2 class="footer__title">Quick Links</h2>
-          <ul class="footer__links">
-            <li><a class="footer__link" href="/Homepage">Home</a></li>
-            <li><a class="footer__link" href="/UserPage">My Accounts</a></li>
-            <li><a class="footer__link" href="/Contact">Contact Us</a></li>
-            <li><a class="footer__link" href="/PrivacyPolicy">Privacy Policy</a></li>
-          </ul>
-        </div>
+        <ul class="barItem">
+          <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li>
+          {% if g.User['Role']=='admin' %}
+          <li><button onclick="window.location.href = '{{ url_for('admin.chat_bp.chat_view') }}'">CHAT</button></li>
+          <li><button>Pending Accounts</button></li>
+          <li><button>Settings</button></li>
+          {% elif g.User['Role']=='vendor' %}
+          <li><button onclick="window.location.href = '{{ url_for('vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts')}}'">SEE YOUR PRODUCTS</button></li>
+          <li><button>Settings</button></li>
+          {% elif g.User['Role']=='customer' %}
+          <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
+          {% endif %}
+        </ul>
+        <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="post">
+          <input type="search" name="Search" id="Search" placeholder="Search">
+          <input class="BTN" type="submit" value="Search">
+        </form>
       </div>
-    
-      <div class="footer__bottom">
-        <p>&copy; 2025 PyBank. All rights reserved.</p>
-        <p>Made with ❤️ by the PyBank Team.</p>
-      </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.3.0/dist/iconify-icon.min.js"></script>
-    
-    <script>
-      document.getElementById('HomePage').addEventListener('click',function(){
-        window.location.href = this.dataset.href;
-      });
 
-    </script>
-  </body>
+      <div class="Right-side">
+        {% if g.User %}
+        <h4>Hello {{g.User["Name"].title()}}</h4>
+        <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
+        <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
+          <button id='GotoCart' type="submit">
+            <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon>
+          </button>
+        </form>
+        <button onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log Out</button>
+        {% else %}
+        <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% block body %}
+  <section class="Main">
+    <h1>GUEST</h1>
+  </section>
+  {% endblock body %}
+
+  <section class="product_container">
+    {% for product in products %}
+      {% if product.PID %}
+        <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
+          <section class="product_img">
+            {% if product.discount_date and product.discount_date <= CurDate and product.discount %}
+              <div class="discount-badge">{{ (product.discount * 100)|int }}% OFF</div>
+            {% endif %}
+            <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
+          </section>
+          <section class="product">
+            <h3 class="title">{{ product.title }}</h3>
+            <h4 class="desc">{{ product.description }}</h4>
+            <div class="price-holder">
+              {% if product.discount_date and product.discount_date <= CurDate and product.discounted_price is not none %}
+                <h4 class="price">${{ '%0.2f' | format(product.discounted_price | float) }}</h4>
+                <strike><h4 class="price" style="color: gray;">${{ '%0.2f' | format(product.price | float) }}</h4></strike>
+              {% else %}
+                <h4 class="price">${{ '%0.2f' | format(product.price | float) }}</h4>
+              {% endif %}
+            </div>
+          </section>
+        </section>
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__section">
+        <h2 class="footer__title">PyBank</h2>
+        <p>Your trusted partner in modern banking solutions.</p>
+      </div>
+
+      <div class="footer__section">
+        <h2 class="footer__title">Contact Us</h2>
+        <address style="color: black;">
+          123 Finance Street, Banking City, 45678<br>
+          <a class="footer__link" href="mailto:support@pybank.com">support@pybank.com</a><br>
+          <a class="footer__link" href="tel:+1234567890">+1 (234) 567-890</a>
+        </address>
+      </div>
+
+      <div class="footer__section">
+        <h2 class="footer__title">Quick Links</h2>
+        <ul class="footer__links">
+          <li><a class="footer__link" href="/Homepage">Home</a></li>
+          <li><a class="footer__link" href="/UserPage">My Accounts</a></li>
+          <li><a class="footer__link" href="/Contact">Contact Us</a></li>
+          <li><a class="footer__link" href="/PrivacyPolicy">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer__bottom">
+      <p>&copy; 2025 PyBank. All rights reserved.</p>
+      <p>Made with ❤️ by the PyBank Team.</p>
+    </div>
+  </footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.3.0/dist/iconify-icon.min.js"></script>
+  <script>
+    document.getElementById('HomePage').addEventListener('click', function () {
+      window.location.href = this.dataset.href;
+    });
+  </script>
+</body>
 </html>
