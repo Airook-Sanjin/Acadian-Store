@@ -71,7 +71,9 @@ def start():
                 image_url
                 FROM product 
         """)).mappings().fetchall()  # changed from .first() to .fetchall()
-
+        
+        print
+        
         inventory = conn.execute(text("""
             SELECT size, color, amount
             FROM product_inventory
@@ -123,14 +125,76 @@ def ProductView():
             FROM reviews
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
+        
+        Review_Count = conn.execute(text("""
+            SELECT COUNT(*) AS review_count
+            FROM reviews
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().first()
 
-# print("Specific Product:", specific_product)  # Debugging output
-        return render_template('Product.html', product=product, inventory=inventory,CurDate=CurDate, images=images, Reviews=Reviews)
+        Avg_Rating = conn.execute(text("""
+            SELECT COALESCE(AVG(rating), 0) AS average_rating
+            FROM reviews
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().first()
+
+        Rating_Distribution = conn.execute(text("""
+            SELECT rating, COUNT(*) AS count
+            FROM reviews
+            WHERE PID = :pid
+            GROUP BY rating
+        """), {"pid": pid}).mappings().fetchall()
+
+        # Convert rating distribution to a dictionary {rating: count}
+        rating_counts = {row["rating"]: row["count"] for row in Rating_Distribution}
+        
+        # Calculate rating percentages
+        total_reviews = Review_Count["review_count"] if Review_Count and Review_Count["review_count"] else 0
+        rating_percentages = {star: (rating_counts.get(star, 0) / total_reviews * 100) if total_reviews > 0 else 0 for star in range(1, 6)}
+
+        return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages)
+
     except Exception as e:
-        print("Error:", e)  # Print the actual error
-        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate)
+        print("##############################################") 
+        print("Error:", e)  
+        print("##############################################") 
+        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate, Review_Count=0, Avg_Rating=0, Rating_Percentages={})
+
+    
+
+@app.route('/Review', methods=["POST"])
+def Review():
+    try:
+        if not g.User:
+            return redirect(url_for('login_bp.Login'))
+
+        pid = request.form.get('pid')
+        rating = request.form.get('rating')
+        title = request.form.get('title', '')
+        review = request.form.get('description', '')
+        cid = g.User.get('ID')
+
+        # Ensure rating is an integer and properly handled
+        if rating:
+            rating = int(rating)
+        else:
+            rating = 0  # Default to 0 if no rating is selected
+
+        # Insert review into the database
+        conn.execute(text("""INSERT INTO reviews (CID, PID, rating, title, description) 
+                             VALUES (:CID, :PID, :rating, :title, :description)"""), 
+                     {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
+        conn.commit()
+        print(f"Redirecting to ProductView with PID: {pid}")  # Log the pid
+        return redirect(url_for('ProductView', pid=pid))
+    except Exception as e:
+        print(f"Error: {e}")
+        return redirect(url_for('ProductView', pid=request.form.get('pid')))
+
+
+
     
 
 
 if __name__ == '__main__':
-        app.run(debug=True)  
+        app.run(debug=True)
