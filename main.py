@@ -190,8 +190,6 @@ def Review():
             rating = int(rating)
         else:
             rating = 0  # Default to 0 if no rating is selected
-
-        # Insert review into the database
         conn.execute(text("""INSERT INTO reviews (CID, PID, rating, title, description) 
                              VALUES (:CID, :PID, :rating, :title, :description)"""), 
                      {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
@@ -202,9 +200,6 @@ def Review():
         print(f"Error: {e}")
         return redirect(url_for('ProductView', pid=request.form.get('pid')))
 
-
-
-    
 
 
 if __name__ == '__main__':
