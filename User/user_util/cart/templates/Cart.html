@@ -1,4 +1,18 @@
 <style>
+  .Empty{
+    display: flex;
+    flex:1;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap:2em;
+  }
+  #EmpText{
+    font-size: xx-large;
+  }
+  #ShockedEm{
+    width:5rem;
+  }
   .Cart-Container {
     display: flex;
     height:70vh;
@@ -247,6 +261,12 @@
 </style>
 {% extends 'GuestHomepage.html' %}
  {% block body %}
+ {% if CartList==[] %}
+ <section class="Empty">
+  <h1 id = 'EmpText'>Your cart is empty!</h1>
+  <img id ='ShockedEm' src="https://wallpapers.com/images/hd/surprised-emoji-expression-avxqgla4xh0x2gl7.jpg"  alt="SHocked" srcset="">
+</section>
+ {% else %}
  <section class="Main">
 <h1 id="Title">{{username.title()}}'s Cart</h1>
 <section class="Cart-Total-Section">
@@ -255,11 +275,8 @@
     <section class="item-Card">
       <section class="item-info">
         <img src="{{item['image_url']}}" alt="{{item['title']}}">
-        <h3>{{item['title']}}</h3>
-        <h4>{{item['size']}}</h4>
-        
+        <h3>{{item['title']}}</h3>   
         <p>{{item['color']}}</p>
-        
         <p>{{item['description']}}</p>
       </section>
       <section class="item-fun">
@@ -608,5 +625,6 @@
   </section>
 </section>
 </section>
+{% endif %}
 
 {% endblock %}

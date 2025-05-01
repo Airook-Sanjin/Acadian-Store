@@ -13,6 +13,31 @@
 
 }
 
+h1,h2,h3,h4,h5,h6{
+  font-family: "Oswald", sans-serif;
+  font-optical-sizing: auto;
+/* <weight>: Use a value from 200 to 700 */
+  font-weight:500 ;
+  font-style: normal;
+}
+h3{
+
+/* <weight>: Use a value from 200 to 700 */
+  font-weight:550 ;
+  font-size:larger;
+  
+}
+h4{
+/* <weight>: Use a value from 200 to 700 */
+  font-weight:550 ;
+  font-size:medium;
+}
+p{
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 a,a:active,a:visited{
   color:#F8F2F4;
   text-decoration: none;
@@ -77,6 +102,7 @@ header li {
 
 .input,
 .barItem input {
+  
   height: 35px;
   border: none;
   border-radius: 5px;
@@ -107,6 +133,9 @@ h1 {
 }
 
 button,.BTN{
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
   height: 35px;
   border: none;
   border-radius: 5px;
@@ -192,7 +221,7 @@ body {
   justify-content: center;
   gap:2rem;
   /* height:100%; */
-  margin-bottom: 2%;
+  padding-bottom: 2%;
 }
 .product_card{
   min-width: 20%;

@@ -1,6 +1,6 @@
 
 from globals import Blueprint, render_template, request,g,session,Connecttodb,text
-
+from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
 
@@ -24,6 +24,7 @@ def load_user():
 @vendor_bp.route('/Home', methods=["GET"])
 def VendorHomePage():
     try:
+        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -40,15 +41,15 @@ def VendorHomePage():
         """)).mappings().fetchall()  # changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount
+            SELECT color, amount
             FROM product_inventory
         """)).mappings().fetchall()
 
         conn.commit()
-        return render_template('GuestHomepage.html', products=products, inventory=inventory)
+        return render_template('VendorHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html', products=[], inventory=[])
+        return render_template('VendorHomepage.html', products=[],CurDate=CurDate, inventory=[])
 
 ###########################################################
 # IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
@@ -138,18 +139,16 @@ def AddInventory():
         # Get form data
         PID = request.form.get("PID")
         Color = request.form.get("Color")
-        Size = request.form.get("Size")
         Amount = request.form.get("Amount")
 
         # Insert inventory data into the database
         conn = Connecttodb()
         conn.execute(text("""
-            INSERT INTO product_inventory (PID, color, size, amount)
-            VALUES (:product_id, :color, :size, :amount)
+            INSERT INTO product_inventory (PID, color, amount)
+            VALUES (:product_id, :color,:amount)
         """), {
             'product_id': PID,
             'color': Color,
-            'size': Size,
             'amount': Amount
         })
         conn.commit()
