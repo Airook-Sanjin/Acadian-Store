@@ -52,6 +52,7 @@
           {% elif g.User['Role']=='vendor' %}
           <li><button onclick="window.location.href = '{{ url_for('vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
           <li><button onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts')}}'">SEE YOUR PRODUCTS</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('vendor_bp.VendorEditProducts')}}'">EDIT YOUR PRODUCTS</button></li>
           <li><button>Settings</button></li>
           {% elif g.User['Role']=='customer' %}
           <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
@@ -91,7 +92,7 @@
       {% if product.PID %}
         <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
           <section class="product_img">
-            {% if product.discount_date and product.discount_date <= CurDate and product.discount %}
+            {% if product.discount_date and product.discount_date > CurDate and product.discount %}
               <div class="discount-badge">{{ (product.discount * 100)|int }}% OFF</div>
             {% endif %}
             <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
@@ -100,7 +101,7 @@
             <h3 class="title">{{ product.title }}</h3>
             <h4 class="desc">{{ product.description }}</h4>
             <div class="price-holder">
-              {% if product.discount_date and product.discount_date <= CurDate and product.discounted_price is not none %}
+              {% if product.discount_date and product.discount_date >CurDate and product.discounted_price is not none %}
                 <h4 class="price">${{ '%0.2f' | format(product.discounted_price | float) }}</h4>
                 <strike><h4 class="price" style="color: gray;">${{ '%0.2f' | format(product.price | float) }}</h4></strike>
               {% else %}

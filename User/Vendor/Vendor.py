@@ -1,6 +1,6 @@
 
 from globals import Blueprint, render_template, request,g,session,Connecttodb,text
-
+from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
 
@@ -24,6 +24,7 @@ def load_user():
 @vendor_bp.route('/Home', methods=["GET"])
 def VendorHomePage():
     try:
+        CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
                 PID, title, CAST(price AS DECIMAL(10,2)) AS price,
@@ -45,21 +46,17 @@ def VendorHomePage():
         """)).mappings().fetchall()
 
         conn.commit()
-        return render_template('GuestHomepage.html', products=products, inventory=inventory)
+        return render_template('VendorHomepage.html', products=products,CurDate=CurDate, inventory=inventory)
     except Exception as e:
         print(f"Error adding product: {e}")
-        return render_template('GuestHomepage.html', products=[], inventory=[])
-
-###########################################################
-# IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
-###########################################################
+        return render_template('VendorHomepage.html', products=[],CurDate=CurDate, inventory=[])
 
 @vendor_bp.route('/AddProduct', methods=["GET"])
 def VendorViewProducts():
     try:
         # Get database connection
         conn = Connecttodb()
-
+        
         # Fetch all products to display
         AllProducts = conn.execute(text("""SELECT 
                                 PID,
@@ -76,13 +73,12 @@ def VendorViewProducts():
                                 AID,
                                 image_url
                             FROM product 
-                            """)).fetchall()
-        # print(AllProducts)  # Debugging: Print the fetched products
-
-        return render_template('AddProduct.html', AllProducts=AllProducts, message="Successfully added", success=True)
+                            """)).mappings().first()
+    
+        return render_template('AddProduct.html', AllProducts=AllProducts, images=images, message="Successfully added", success=True)
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('AddProduct.html', AllProducts=[], message="Failed to add product.", success=False)
+        return render_template('AddProduct.html', AllProducts=[], images=[], message="Failed to add product.", success=False)
     
 @vendor_bp.route('/AddProduct', methods=["POST"])
 def VendorAddProduct():
@@ -121,6 +117,10 @@ def VendorAddProduct():
             'VID': VID,
             'image_url': IMAGE
         })
+        
+        
+        
+        
 
         # Commit the changes to the database
         conn.commit()
@@ -179,3 +179,99 @@ def AddImages():
     except Exception as e:
         print(f"ERROR: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add image", success=False))
+
+
+
+# ////////////////////////////////////////////////////////////// #
+# //                                                          // #
+# //                      EDIT PRODUCT                        // #
+# //                                                          // #
+# ////////////////////////////////////////////////////////////// #
+
+# @vendor_bp.route('/EditProduct', methods=["GET"])
+# def VendorEditProducts():
+#     try:
+#         # Get database connection
+#         conn = Connecttodb()
+#         # Fetch all products to display
+#         AllProducts = conn.execute(text("""
+#             SELECT 
+#                 p.PID,
+#                 p.title,
+#                 CAST(p.price AS DECIMAL(10,2)) AS price, -- Corrected CAST syntax
+#                 (p.price * p.discount) AS saving_discount, -- Corrected column references
+#                 p.price - (p.price * p.discount) AS discounted_price, -- Corrected column references
+#                 p.description,
+#                 p.warranty,
+#                 p.discount,
+#                 p.discount_date,
+#                 p.availability,
+#                 p.VID,
+#                 p.AID,
+#                 p.image_url,
+#                 pi.image
+#             FROM product AS p
+#             LEFT JOIN product_images AS pi ON p.PID = pi.PID
+#         """)).mappings().fetchall()
+        
+        
+      
+#         # print(AllProducts)  # Debugging: Print the fetched products
+
+#         return render_template('editProduct.html', AllProducts=AllProducts, message="Successfully added", success=True)
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         return render_template('editProduct.html', AllProducts=[], message="Failed to add product.", success=False)
+
+
+@vendor_bp.route('/EditProduct', methods=["GET"])
+def VendorEditProducts():
+    try:
+        # Get database connection
+        conn = Connecttodb()
+
+        # Fetch all products to display
+        AllProducts = conn.execute(text("""
+            SELECT 
+                p.PID AS product_id,
+                p.title,
+                CAST(p.price AS DECIMAL(10,2)) AS price,
+                (p.price * p.discount) AS saving_discount,
+                p.price - (p.price * p.discount) AS discounted_price,
+                p.description,
+                p.warranty,
+                p.discount,
+                p.discount_date,
+                p.availability,
+                p.VID,
+                p.AID,
+                p.image_url,
+                GROUP_CONCAT(pi.image SEPARATOR '|') AS additional_images
+            FROM product AS p
+            LEFT JOIN product_images AS pi ON p.PID = pi.PID
+            GROUP BY 
+                p.PID, 
+                p.title, 
+                p.price, 
+                p.discount, 
+                p.description, 
+                p.warranty, 
+                p.discount_date, 
+                p.availability, 
+                p.VID, 
+                p.AID, 
+                p.image_url
+        """)).mappings().fetchall()
+
+        # Convert RowMapping objects to dictionaries and process additional_images
+        AllProducts = [dict(product) for product in AllProducts]
+        for product in AllProducts:
+            product['additional_images'] = product['additional_images'].split('|') if product['additional_images'] else []
+        
+        for product in AllProducts:
+            print(f"Product ID: {product['product_id']}, Additional Images: {product['additional_images']}")
+
+        return render_template('editProduct.html', AllProducts=AllProducts, message="Successfully added", success=True)
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template('editProduct.html', AllProducts=[], message="Failed to add product.", success=False)
