@@ -6,6 +6,9 @@
         justify-content: center;
         margin: 20px;
     }
+    .chat-container{
+        max-width: 45%;
+    }
     h1, h2{
         text-align: center;
     }
@@ -84,7 +87,7 @@
         background: linear-gradient(180deg, rgba(222, 222, 173, 1) 0%, rgba(198, 194, 149, 1) 100%);
         border: 1px solid lightgray;
         border-radius: 10px 10px 10px 0;
-        max-width: 47%;
+        max-width: 45%;
     }
     .outgoing-message{
         text-align: right;
@@ -96,7 +99,7 @@
         background: linear-gradient(180deg, rgba(212, 240, 182, 1) 0%, rgba(191, 223, 159, 1) 100%);
         border: 1px solid lightgray;
         border-radius: 10px 10px 0 10px;
-        max-width: 47%;
+        max-width: 45%;
     }
     .send-message-container{
         width: 100%;
@@ -178,6 +181,10 @@
             </div>
 
             <div class="chat-messages">
+                {% if message %}
+                    <p style="color: red; text-align: center;">{{ message }}</p>
+                {% endif %}
+
                 {% for message in messages %}
                     {% if message['message'] == "* * Start of Chat * *" %}
                         <div class="system-message">
@@ -205,9 +212,41 @@
                                     {% endif %}
                                 </div>
                             </div>
+                        {% elif message['AID'] %}
+                            <div class="incoming-message">
+                                <div class="info"><p>Admin at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
                         {% endif %}
                     {% elif g.User['Role'] == 'vendor' %}
                         {% if message['VID'] %}
+                            <div class="outgoing-message">
+                                <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% elif message['CID'] %}
+                            <div class="incoming-message">
+                                <div class="info"><p>Customer at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% elif g.User['Role'] == 'admin' %}
+                        {% if message['AID'] %}
                             <div class="outgoing-message">
                                 <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
                                 <div class="message">
@@ -247,10 +286,6 @@
                     <p style="text-align: center;">Customer ID: {{ selected_chat.CID if selected_chat and selected_chat.CID else "N/A" }}</p>
                     <p style="text-align: center;">Product ID: {{ selected_chat.PID if selected_chat and selected_chat.PID else "N/A" }}</p>
                 </div>
-                
-                {% if message %}
-                    <p style="color: red; text-align: center;">{{ message }}</p>
-                {% endif %}
             </div>
         </div>
 
