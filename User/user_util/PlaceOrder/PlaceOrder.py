@@ -18,19 +18,23 @@ def load_user():
     else:
         g.User = None
 
-@OrderPlace_bp.route('/OrderPlaced')
+@OrderPlace_bp.route('/OrderPlaced', methods=["POST"])
 def placeOrder():
     try:
-        total = request.args.get('total')
+        total = request.form.get('Total')
         
         CurTime = datetime.now()
         print(str(CurTime)[0:19])
         # * Get ItemIDs without an ORDER_ID
         ItemIDTable = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid,ca.ORDER_ID as OrderID
-                FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID AND ca.ORDER_ID is Null """),{'ID': g.User['ID']}).mappings().fetchall()
+                SELECT ca.ITEM_ID AS itemid,p.VID as VID,ca.ORDER_ID as OrderID,
+                CASE
+                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
+                END as Price
+	            FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
+	            WHERE ca.CID = 3 AND (ca.ORDER_ID is Null or ca.ORDER_ID = 0) """),{'ID': g.User['ID']}).mappings().fetchall()
         listofitemid = tuple([item['itemid'] for item in ItemIDTable])
         print(listofitemid)
         # * Get Count of cart items
@@ -50,22 +54,42 @@ def placeOrder():
 	                (date,total,amount)
                 VALUES
 	                (now(),:total, :quantity);"""),{'total':total,'quantity':int(CartQuantity['CartQuantity'])})
-        conn.commit()
+        # conn.commit()
         # * Gets Recent OrderID
         RecentOrder=conn.execute(text("""
-                SELECT max(ORDER_ID) as recent from orders""")).mappings().fetchone()
+                SELECT max(ORDER_ID) as ID from orders""")).mappings().fetchone()
         
-        conn.commit()
+        # conn.commit()
+        #* Sends money to the proper Vendor
+        for item in list(ItemIDTable):
+            conn.execute(text("""
+                Update vendor set balance = balance + :Price
+                Where VID = :VID;"""),{'VID':item['VID'],'Price':item['Price']})
+        
         # * Updates Cart items
         conn.execute(text("""
                 Update cart
                 set ORDER_ID = :recent
                 Where CID = :cid AND (ORDER_ID IS NULL OR ORDER_ID = 0) AND ITEM_ID in :itemids;"""),
-                {'cid':g.User['ID'],'itemids':listofitemid,'recent':RecentOrder['recent']})
-        conn.commit()
+                {'cid':g.User['ID'],'itemids':listofitemid,'recent':RecentOrder['ID']}) # Sets ORDER ID to the correct items
+        # conn.commit()
         
-        return render_template('OrderPlaced.html')
+        #* ORDER HISTORY
+        OrderHistory = conn.execute(text("""
+            SELECT ca.title AS ItemTitle,
+            CASE
+                WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
+	            WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
+            END AS ItemPrice,
+            ca.quantity AS ItemQuantity, o.ORDER_ID AS ORDERID, o.date AS DatePlaced,o.status AS Status, 
+            o.amount AS OrderQuantity,o.total as Total from orders AS o 
+            LEFT JOIN cart AS ca ON o.ORDER_ID = ca.ORDER_ID
+            LEFT JOIN product AS p ON ca.PID = p.PID WHERE ca.ORDER_ID = :recent"""),
+                {'recent':RecentOrder['ID']}).mappings().fetchall()
+        
+        
+        return render_template('OrderPlaced.html',OrderHistory= OrderHistory)
     except Exception as e:
         print(f'Error: {e}')
-        return render_template('OrderPlaced.html')
+        return render_template('OrderPlaced.html',OrderHistory=[])
     
