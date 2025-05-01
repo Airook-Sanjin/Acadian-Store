@@ -41,7 +41,7 @@ def VendorHomePage():
         """)).mappings().fetchall()  # changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount
+            SELECT color, amount
             FROM product_inventory
         """)).mappings().fetchall()
 
@@ -138,18 +138,16 @@ def AddInventory():
         # Get form data
         PID = request.form.get("PID")
         Color = request.form.get("Color")
-        Size = request.form.get("Size")
         Amount = request.form.get("Amount")
 
         # Insert inventory data into the database
         conn = Connecttodb()
         conn.execute(text("""
-            INSERT INTO product_inventory (PID, color, size, amount)
-            VALUES (:product_id, :color, :size, :amount)
+            INSERT INTO product_inventory (PID, color, amount)
+            VALUES (:product_id, :color,:amount)
         """), {
             'product_id': PID,
             'color': Color,
-            'size': Size,
             'amount': Amount
         })
         conn.commit()

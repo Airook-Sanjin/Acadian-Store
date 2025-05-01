@@ -54,7 +54,7 @@
         padding: 5px 0;
     }
 
-    input[type="submit"] {
+    .BTN.btn-AddProduct {
         margin-top: 10px;
         padding: 8px 12px;
         background-color: antiquewhite;
@@ -173,12 +173,12 @@
         width: 100%;
     }
 
-    .btn {
+    /* .btn {
         background-color: antiquewhite;
         padding: 8px 14px;
         border-radius: 5px;
         border: none;
-    }
+    } */
 
     .btn-primary {
         margin-top: 3%;
@@ -276,7 +276,7 @@
              <label for="VID">Vendor ID:</label>
              <input type="number" id="VID" name="VID" placeholder="Enter your Vendor ID" required>
  
-             <input type="submit" value="Add Product to Acadia">
+             <input class='BTN btn-AddProduct'type="submit" value="Add Product to Acadia">
          </form>
      </section>
     
@@ -369,7 +369,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="CloseImageModal()">Close</button>
+                <button type="button" class="BTN btn-secondary" onclick="CloseImageModal()">Close</button>
             </div>
         </div>
     </div>

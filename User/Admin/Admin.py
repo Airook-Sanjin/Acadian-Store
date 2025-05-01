@@ -35,7 +35,7 @@ def AdminHomePage():
         """)).mappings().fetchall()  # changed from .first() to .fetchall()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount
+            SELECT color, amount
             FROM product_inventory
         """)).mappings().fetchall()
 

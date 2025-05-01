@@ -1,4 +1,5 @@
-from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request
+from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify
+
 import secrets
 from datetime import datetime
 from Auth.Login import login_bp
@@ -75,7 +76,7 @@ def start():
         print
         
         inventory = conn.execute(text("""
-            SELECT size, color, amount
+            SELECT color, amount
             FROM product_inventory
         """)).mappings().fetchall()
 
@@ -89,6 +90,7 @@ def start():
 @app.route('/Product-View')
 def ProductView():
     try:
+        conn.commit()
         CurDate = datetime.now().date()
         pid = request.args.get('pid')
 
@@ -109,7 +111,7 @@ def ProductView():
         """), {"pid": pid}).mappings().first()
 
         inventory = conn.execute(text("""
-            SELECT size, color, amount
+            SELECT color, amount
             FROM product_inventory
             WHERE PID = :pid
         """), {"pid": pid}).mappings().fetchall()
@@ -160,6 +162,15 @@ def ProductView():
         print("##############################################") 
         return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate, Review_Count=0, Avg_Rating=0, Rating_Percentages={})
 
+@app.route('/api/inventory')
+def GetInventory():
+    pid=request.args.get('PID')
+    color=request.args.get('color')
+    inventory= conn.execute(text("""
+        SELECT amount FROM product_inventory
+        WHERE PID = :pid AND color = :color """),{'pid':pid,'color': color}).fetchone()
+    
+    return jsonify({'amount':inventory.amount if inventory else 0 })
     
 
 @app.route('/Review', methods=["POST"])

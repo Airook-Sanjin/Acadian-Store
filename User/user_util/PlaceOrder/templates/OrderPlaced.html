@@ -1,9 +1,289 @@
-{% extends 'GuestHomepage.html' %}
-{% block body %}
-{% for item in OrderHistory %}
-<p>{{item['ItemTitle' or 'Title']}}</p>
-<p>{{item['ItemPrice'or'$100.00']}}</p>
-<p>{{item['ItemQuantity' or '3']}}</p>
-{% endfor %}
+<style>
+  .product_container {
+    display: none !important;
+  }
+  
+  .OrderSummary {
+    display: flex;
+    height: 100%;
+    width: 100%;
+
+    justify-content: space-around;
+    padding: 3em 0;
+  }
+  .ThanksCont {
+    
+    display: grid;
+    height: max-content;
+    align-items: center;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: .5fr 0;
+    border-right: 0.125px solid var(--Tertiary);
+    column-gap: 2em;
+    row-gap: 0px;
+    padding: 24px;
+
+  }
+  .ThanksContent {
+    display: flex;
+    flex-direction: column;
+
+    align-items: start;
+    justify-content: center;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 0.125em;
+  }
+  #Order {
+    border-bottom: 0.125px solid var(--Tertiary);
+    padding-bottom: 1em;
+  }
+  #ThanksInfo {
+    font-weight: 300;
+    padding-left: 0.25em;
+
+    justify-self: start;
+  }
+  #InfoSpan {
+    color: hsla(0, 0%, 0%, 0.375);
+  }
+  #Thumbs {
+    height: 20em;
+  }
+
+  .OrderContent {
+    display: grid;
+    grid-template-rows: 15% auto 40% auto;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+    
+  }
+  .OrderDetails {
+    border-bottom: 0.125px solid var(--Tertiary);
+    padding-bottom: 1em;
+  }
+  .OrderInf {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    /* justify-content: space-between; */
+    text-align: left;
+  }
+  /* Cart */
+  .Cart-Container {
+    display: flex;
+    max-height: 40vh;
+    flex-direction: column;
+    /* background-color: var(--Primary); */
+    padding: 2em 0;
+    gap: 1em;
+
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+  .Cart-Container::-webkit-scrollbar {
+    width: 0.2em;
+    /* height: 2em; */
+  }
+  .Cart-Container::-webkit-scrollbar-track {
+    background: hsl(0, 0%, 95%);
+    /* height:80%; */
+  }
+  .Cart-Container::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      0deg,
+      hsl(0, 0%, 95%) 0 10%,
+      black 50% 55%,
+      hsl(0, 0%, 95%) 90% 100%
+    );
+    border-radius: 32px;
+  }
+  .item-Card {
+    display: flex;
+    flex-direction: row;
+    width: 40vw;
+    max-width: 100%;
+    min-height: 9em;
+    height: 9em;
+    max-height: 9em;
+    background-color: white;
+    padding: 0.5em;
+    border-radius: 20px;
+    justify-content: space-between;
+    box-shadow: var(--BoxShadow);
+  }
+  .item-info {
+    display: flex;
+    flex-direction: row;
+    gap: 2em;
+    width: 2.5em;
+    align-items: center;
+  }
+  .item-info img {
+    height: 5em;
+  }
+
+  #Title {
+    text-align: left;
+    padding: 1em;
+  }
+  #Total {
+    border-top: 1px black solid;
+  }
+
+  .item-fun {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1em;
+    align-items: center;
+  }
+  #quantity {
+    padding: 0.2em;
+    outline: none;
+    border: 0.5px solid var(--Secondary);
+    border-radius: 10px;
+    width: 3.1em;
+  }
+</style>
+{% extends 'GuestHomepage.html' %} {% block body %}
+
+  <section class="OrderSummary">
+    <section class="ThanksCont">
+      <section class="ThanksContent">
+        <h1>Thank you for your order {{g.User['Name'].title()}}!</h1>
+        <!--  <h4 id="ThanksInfo">We will send you your info to your email: <span id ="InfoSpan">{OrderHistory['CustEmail'][0]} (no we won't!)</span></h4>-->
+        <h4 id="ThanksInfo">
+          We will send you your info to your email:
+          <span id="InfoSpan">{{OrderHistory[0]['CustEmail']}} (no we won't!)</span>
+        </h4>
+      </section>
+      <section class="imgCont">
+        <img
+          id="Thumbs"
+          src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fthumbnails%2F035%2F470%2F699%2Fsmall_2x%2Fok-emoji-emoticon-thumb-up-icons-4k-transparent-background-free-png.png&sp=1746016404Tf8d10f2197a55950edc25a16d83b31e51e56dc26d47a5c6dea9ff9f27881c10d"
+          alt="ThumbsupEmoticon"
+        />
+      </section>
+    </section>
+    <section class="OrderContent">
+      <h1 id="Order">Order Summary</h1>
+      <section class="OrderDetails">
+        <section class="OrderInf">
+          <h3>Order Number -</h3>
+          <p>
+            #{{OrderHistory[0]['ORDERID'] | default('OrderID unavailable')}}
+          </p>
+        </section>
+        <section class="OrderInf">
+          <h3>Delivery Date -</h3>
+          <p>
+            {{OrderHistory[0]['DeliveryDate']| default('Delivery date unavailable')}}
+          </p>
+        </section>
+        <section class="OrderInf">
+          <h3>Shipping Details -</h3>
+          <p>703 Hay Road,Temple,PA,19560</p>
+        </section>
+      </section>
+      <section class="Cart-Container">
+        {% if OrderHistory %} 
+            {% for item in OrderHistory %}
+        <section class="item-Card">
+          <section class="item-info">
+            <img src="{{item['ItemImage']}}" alt="{{item['ItemTitle']}}" />
+            <h3>{{item['ItemTitle']}}</h3>
+            
+          </section>
+          <section class="item-fun">
+            <!-- Formating  -->
+            <h4>{{item['ItemQuantity']}}x</h4>
+            <h3>${{'%0.2f' | format(item['ItemPrice']|float)}}</h3>
+          </section>
+        </section>
+            {% endfor %} 
+        {% else %}
+        <section class="item-Card">
+          <section class="item-info">
+            <img
+              src="https://m.media-amazon.com/images/I/71rjXl9tmJL.jpg"
+              alt="HeadPhones"
+            />
+            <h3>HeadPhones</h3>
+            <h4>2</h4>
+          </section>
+          <section class="item-fun">
+            <!-- Formating  -->
+            <h3>$119.99</h3>
+          </section>
+        </section>
+        <section class="item-Card">
+          <section class="item-info">
+            <img
+              src="https://m.media-amazon.com/images/I/71rjXl9tmJL.jpg"
+              alt="HeadPhones"
+            />
+            <h3>HeadPhones</h3>
+            <h4>2</h4>
+          </section>
+          <section class="item-fun">
+            <!-- Formating  -->
+            <h3>$119.99</h3>
+          </section>
+        </section>
+        <section class="item-Card">
+          <section class="item-info">
+            <img
+              src="https://m.media-amazon.com/images/I/71rjXl9tmJL.jpg"
+              alt="HeadPhones"
+            />
+            <h3>HeadPhones</h3>
+            <h4>2</h4>
+          </section>
+          <section class="item-fun">
+            <!-- Formating  -->
+            <h3>$119.99</h3>
+          </section>
+        </section>
+        <section class="item-Card">
+          <section class="item-info">
+            <img
+              src="https://m.media-amazon.com/images/I/71rjXl9tmJL.jpg"
+              alt="HeadPhones"
+            />
+            <h3>HeadPhones</h3>
+            <h4>2</h4>
+          </section>
+          <section class="item-fun">
+            <!-- Formating  -->
+            <h3>$119.99</h3>
+          </section>
+        </section>
+        <section class="item-Card">
+          <section class="item-info">
+            <img
+              src="https://m.media-amazon.com/images/I/71rjXl9tmJL.jpg"
+              alt="HeadPhones"
+            />
+            <h3>HeadPhones</h3>
+            <h4>2</h4>
+          </section>
+          <section class="item-fun">
+            <!-- Formating  -->
+            <h3>$119.99</h3>
+          </section>
+        </section>
+        {% endif %}
+      </section>
+      <section class="OrderInf">
+        <h3>Total</h3>
+        <p>
+          ${{'%0.2f' | format(OrderHistory[0]['Total']|float)| default('Total unavailable')}}
+        </p>
+      </section>
+    </section>
+  </section>
 
 {% endblock body %}
