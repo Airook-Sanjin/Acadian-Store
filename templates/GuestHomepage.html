@@ -34,6 +34,12 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='/style/Homepagebase.css') }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- FONTS -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
+
 </head>
 
 <body>
@@ -50,8 +56,8 @@
           <li><button>Pending Accounts</button></li>
           <li><button>Settings</button></li>
           {% elif g.User['Role']=='vendor' %}
-          <li><button onclick="window.location.href = '{{ url_for('vendor_bp.chat_bp.chat_view') }}'">CHAT</button></li>
           <li><button onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts')}}'">SEE YOUR PRODUCTS</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
           <li><button>Settings</button></li>
           {% elif g.User['Role']=='customer' %}
           <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
@@ -67,12 +73,16 @@
         {% if g.User %}
         <h4>Hello {{g.User["Name"].title()}}</h4>
         <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
-        <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
-          <button id='GotoCart' type="submit">
-            <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon>
-          </button>
-        </form>
+          {% if g.User['Role']=='customer' %}
+          <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
+            <button id='GotoCart' type="submit">
+              <iconify-icon icon="prime:shopping-cart" width="24" height="24"></iconify-icon>
+            </button>
+          </form>
+          {%else%}
+          {% endif %}
         <button onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log Out</button>
+        
         {% else %}
         <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
         {% endif %}
@@ -91,7 +101,7 @@
       {% if product.PID %}
         <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
           <section class="product_img">
-            {% if product.discount_date and product.discount_date <= CurDate and product.discount %}
+            {% if product.discount_date and product.discount_date > CurDate and product.discount %}
               <div class="discount-badge">{{ (product.discount * 100)|int }}% OFF</div>
             {% endif %}
             <img src="{{ product.image_url }}" alt="{{ product.title }}" class="product-img">
@@ -100,7 +110,7 @@
             <h3 class="title">{{ product.title }}</h3>
             <h4 class="desc">{{ product.description }}</h4>
             <div class="price-holder">
-              {% if product.discount_date and product.discount_date <= CurDate and product.discounted_price is not none %}
+              {% if product.discount_date and product.discount_date > CurDate and product.discounted_price is not none %}
                 <h4 class="price">${{ '%0.2f' | format(product.discounted_price | float) }}</h4>
                 <strike><h4 class="price" style="color: gray;">${{ '%0.2f' | format(product.price | float) }}</h4></strike>
               {% else %}

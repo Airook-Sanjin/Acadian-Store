@@ -398,20 +398,10 @@
                            <input type="hidden" name="Title" value={{product.title}}>
                            <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
                       
-                        
-                       <!-- Size Dropdown -->
-                           <label for="size">Size:</label>
-                           <select name="Size" id="sizes">
-                               <option value="">Select Size</option>
-                               {% for item in inventory %}
-                                   <option value="{{ item.size }}">{{ item.size }}</option>
-                                   
-                               {% endfor %}
-                           </select>
                            
                            <!-- Color Dropdown -->
                            <label for="Color">Colors:</label>
-                           <select name="Color" id="Colors">
+                           <select name="Color" id="Colors" required onchange="InventoryUpdate('{{product.PID}}',this.value)">
                                <option value="">Select Color</option>
                                {% for item in inventory %}
                                    <option value="{{ item.color }}">{{ item.color }}</option>
@@ -444,7 +434,7 @@
                             <p id="description">{{ product.description }}</p>
                         </div>
     
-                        <div class="product-amount">
+                        <div id ='inventory-amount'class="product-amount">
                             <p><strong>Amount Available:</strong> 
                                 {{ inventory[0].amount if inventory else 'N/A' }}
                             </p>
@@ -535,6 +525,17 @@
 </section>
 
 <script>
+    // Update Inventory
+    function InventoryUpdate(PID,color){
+        if(!color) return;
+
+        fetch(`/api/inventory?PID=${PID}&color=${color}`)
+        .then(response => response.json())
+        .then(data => {document.getElementById('inventory-amount').innerHTML = 
+            `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
+        });
+    }
+
     // Image Thumbnail Switcher
     function changeImage(thumbnail) {
         const mainImage = document.getElementById('main-image');

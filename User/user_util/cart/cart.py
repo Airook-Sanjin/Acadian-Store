@@ -26,7 +26,7 @@ def UserCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
@@ -35,7 +35,7 @@ def UserCart(username):
                 WHERE ca.CID = :ID AND (ca.ORDER_ID is Null OR ca.ORDER_ID = 0)"""),{'ID': g.User['ID']}).mappings().fetchall()
         
         if CartList== []:
-            return render_template('EmptyCart.html')
+            return render_template('Cart.html')
         
         total = 0
         
@@ -43,7 +43,7 @@ def UserCart(username):
         for item in CartList:
             total+=float(item['Price'])
             print(item)#!Debug
-            # print (f'PIDs:{item['PID'],item['size'],item['color']}')
+            print (f'PIDs:{item['PID'],item['color']}')
             
         print(total) #!Debug
         return render_template('Cart.html',username=username,CartList = CartList,total =total)
@@ -64,7 +64,7 @@ def RemoveFromCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
@@ -101,20 +101,19 @@ def addToCart():
                 image_url
                 FROM product
             """)).mappings().first()  # ✅ changed from .first() to .fetchall()
-
+        
         inventory = conn.execute(text("""
-            SELECT size, color, amount FROM product_inventory
+            SELECT color, amount FROM product_inventory
             """)).mappings().fetchall()#! Needed to then get the PID
         
         EMAIL = g.User['Email']
         ID = g.User['ID']
         PID = int(request.args.get('PID'))
-        SIZE = request.form.get('Size')
         COLOR = request.form.get('Color')
         Matchingitem =conn.execute(text("""
-                SELECT ca.ITEM_ID AS itemid,ca.size AS size, ca.color AS color,ca.quantity as quantity,ca.PID as PID,ca.ORDER_ID
+                SELECT ca.ITEM_ID AS itemid, ca.color AS color,ca.quantity as quantity,ca.PID as PID,ca.ORDER_ID
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID AND ca.size = :size AND ca.color = :color and ca.PID = :PID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID'],'size':SIZE,'color':COLOR,'PID':PID}).mappings().fetchall()
+                WHERE ca.CID = :ID AND ca.color = :color and ca.PID = :PID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID'],'color':COLOR,'PID':PID}).mappings().fetchall()
         print(Matchingitem)
         if Matchingitem:
             print('Updating')
@@ -131,10 +130,10 @@ def addToCart():
             conn.execute(text(
             """
             INSERT INTO cart 
-            (title,size,color,email,PID,CID)
+            (title,color,email,PID,CID)
             VALUES
-            (:title,:size,:color,:email,:PID,:CID)"""),
-            {'title':request.form.get('Title'),'size':SIZE,'color':COLOR,'email':EMAIL,'PID':PID,'CID':ID})
+            (:title,:color,:email,:PID,:CID)"""),
+            {'title':request.form.get('Title'),'color':COLOR,'email':EMAIL,'PID':PID,'CID':ID})
             print('ITEMADDED')
     
         conn.commit()
@@ -155,7 +154,7 @@ def addToCart():
         """), {"pid": PID}).mappings().first()
         
         inventory = conn.execute(text("""
-            SELECT size, color, amount
+            SELECT color, amount
             FROM product_inventory
             WHERE PID = :pid
         """), {"pid": PID}).mappings().fetchall()
@@ -182,7 +181,7 @@ def quantityUpdate(username):
                       Where item_ID = :item_id"""),{'quantity':request.form.get('quantity'),'item_id':request.form.get('UpdatedItem')})
         conn.commit()
         
-        return redirect(request.referrer) # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
+        return redirect(request.referreror or url_for('ProductView',username=g.User['Name'])) # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
     except Exception as e:
         print(f'Error: {e}')
 @cart_bp.route('/checkout/<username>')
@@ -193,7 +192,7 @@ def GotoCheckout(username):
         #             Select """))
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.size AS size, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
                 CASE
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
