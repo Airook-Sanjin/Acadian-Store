@@ -6,6 +6,9 @@
         justify-content: center;
         margin: 20px;
     }
+    .chat-container{
+        max-width: 45%;
+    }
     h1, h2{
         text-align: center;
     }
@@ -44,7 +47,7 @@
         display: flex;
         flex-direction: row;
     }
-    #chat_id_select, #vendor_id, #product_id, #user_type,
+    #chat_id_select, #vendor_admin_id, #product_id, #user_type,
     #start_new_chat, #open_previous_chat{
         outline: none;
         padding: 5px;
@@ -84,7 +87,7 @@
         background: linear-gradient(180deg, rgba(222, 222, 173, 1) 0%, rgba(198, 194, 149, 1) 100%);
         border: 1px solid lightgray;
         border-radius: 10px 10px 10px 0;
-        max-width: 47%;
+        max-width: 45%;
     }
     .outgoing-message{
         text-align: right;
@@ -96,7 +99,7 @@
         background: linear-gradient(180deg, rgba(212, 240, 182, 1) 0%, rgba(191, 223, 159, 1) 100%);
         border: 1px solid lightgray;
         border-radius: 10px 10px 0 10px;
-        max-width: 47%;
+        max-width: 45%;
     }
     .send-message-container{
         width: 100%;
@@ -144,13 +147,20 @@
                         {% if previous_chats %}
                             <select name="chat_id" id="chat_id_select">
                                 {% for chat in previous_chats %}
-                                    <option value="{{ chat['CHAT_ID'] }}" id="chat_id">Chat ID: {{ chat['CHAT_ID'] }}</option>
+                                    <option value="{{ chat['CHAT_ID'] }}">
+                                        Chat ID: {{ chat['CHAT_ID'] }}
+                                    </option>
                                 {% endfor %}
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat">
                         {% else %}
                             <select name="chat_id" id="chat_id_select">
-                                <option id="chat_id">No chats found</option>
+                                {% for chat in previous_chats %}
+                                    <option value="{{ chat['CHAT_ID'] }}">
+                                        Chat ID: {{ chat['CHAT_ID'] }} 
+                                        {% if chat['chat_type'] == 'admin' %}(Admin){% else %}(Vendor){% endif %}
+                                    </option>
+                                {% endfor %}
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat" disabled>
                         {% endif %}
@@ -160,18 +170,21 @@
                 <div class="start-new-chat-container">
                     <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="new_chat_form">
                         <select id="user_type" name="user_type">
-                            <option id="vendor">Vendor</option>
+                            <option value="Vendor">Vendor</option>
+                            <option value="Admin">Admin</option>
                         </select>
-                        <div style="display: inline-block;">
-                            <input type="text" placeholder="Vendor ID" id="vendor_id" name="vendor_id" required>
-                        </div>
+                        <input type="text" placeholder="Vendor ID" id="id_input" name="vendor_id" required>
                         <input type="text" placeholder="Product ID" id="product_id" name="product_id" required>
-                        <input type="submit" value="Start Chat" id="start_new_chat">
+                        <input type="submit" value="Start Chat">
                     </form>
                 </div>
             </div>
 
             <div class="chat-messages">
+                {% if message %}
+                    <p style="color: red; text-align: center;">{{ message }}</p>
+                {% endif %}
+
                 {% for message in messages %}
                     {% if message['message'] == "* * Start of Chat * *" %}
                         <div class="system-message">
@@ -199,9 +212,41 @@
                                     {% endif %}
                                 </div>
                             </div>
+                        {% elif message['AID'] %}
+                            <div class="incoming-message">
+                                <div class="info"><p>Admin at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
                         {% endif %}
                     {% elif g.User['Role'] == 'vendor' %}
                         {% if message['VID'] %}
+                            <div class="outgoing-message">
+                                <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% elif message['CID'] %}
+                            <div class="incoming-message">
+                                <div class="info"><p>Customer at {{ message['timestamp'] }}</p></div>
+                                <div class="message">
+                                    <p>{{ message['message'] }}</p>
+                                    {% if message['images'] %}
+                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% elif g.User['Role'] == 'admin' %}
+                        {% if message['AID'] %}
                             <div class="outgoing-message">
                                 <div class="info"><p>You at {{ message['timestamp'] }}</p></div>
                                 <div class="message">
@@ -233,17 +278,41 @@
                 </form>
                 <div class="etc_info">
                     <p style="text-align: center;">Chat ID: {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
-                    <p style="text-align: center;">Vendor ID: {{ selected_chat.VID if selected_chat and selected_chat.VID else "N/A" }}</p>
+                    {% if selected_chat and selected_chat.chat_type == 'admin' %}
+                        <p style="text-align: center;">Admin ID: {{ selected_chat.AID if selected_chat.AID else "N/A" }}</p>
+                    {% else %}
+                        <p style="text-align: center;">Vendor ID: {{ selected_chat.VID if selected_chat.VID else "N/A" }}</p>
+                    {% endif %}
                     <p style="text-align: center;">Customer ID: {{ selected_chat.CID if selected_chat and selected_chat.CID else "N/A" }}</p>
                     <p style="text-align: center;">Product ID: {{ selected_chat.PID if selected_chat and selected_chat.PID else "N/A" }}</p>
                 </div>
-                
-                {% if message %}
-                    <p style="color: red; text-align: center;">{{ message }}</p>
-                {% endif %}
             </div>
         </div>
 
-    </div>
-    {% endblock %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        function updateIdInput(){
+            const userType = document.getElementById('user_type').value;
+            const idInput = document.getElementById('id_input');
+            if(userType === 'Admin'){
+                idInput.placeholder = 'Admin ID';
+                idInput.name = 'admin_id';
+            }
+            else{
+                idInput.placeholder = 'Vendor ID';
+                idInput.name = 'vendor_id';
+            }
+        }
+        updateIdInput();
+        document.getElementById('user_type').addEventListener('change', updateIdInput);
+        document.getElementById('new_chat_form').addEventListener('submit', function(e){
+            e.preventDefault();
+            updateIdInput();
+            this.submit();
+        });
+    });
+</script>
+{% endblock %}
 </body>
