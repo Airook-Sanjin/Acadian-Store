@@ -7,7 +7,8 @@
         margin: 20px;
     }
     .chat-container{
-        max-width: 45%;
+        width: 40%;
+        max-width: 40%;
     }
     h1{
         text-align: center;
@@ -45,14 +46,22 @@
         border-width: 1px 1px 0px 1px;
         padding: 5px 0px 5px 0px;
     }
-    #previous_chat_form, #new_chat_form{
+    #previous_chat_form{
         display: flex;
         flex-direction: row;
     }
-    #chat_id_select, #vendor_admin_id, #product_id, #user_type,
-    #start_new_chat, #open_previous_chat{
+    #open_previous_chat{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
         outline: none;
         padding: 5px;
+    }
+    .open-previous-chat-container{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
     .chat-messages{
         display: flex;
@@ -173,14 +182,71 @@
         padding: 5px;
         outline: none;
     }
-    .broken-image {
+    .broken-image{
         display: none;
+    }
+    .chat-options{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: auto;
+        width: 30%;
+        height: 300px;
+        background-color: white;
+        border: 1px solid lightgray;
+    }
+    .chat-options h2{
+        text-align: center;
+        margin: 0 0 20px 0;
+    }
+    #chat-options-form{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 200px;
+    }
+    #chat-options-form input[type="submit"]{
+        width: 90%;
+        padding: 10px;
+        background-color: #c6c295;
+        border-radius: 5px;
+        color: #2D4B48;
+        border: none;
+        cursor: pointer;
+    }
+    #chat-options-form input[type="text"], #chat-options-form select{
+        padding: 5px;
+    }
+    .chat-user-type-container{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
     }
 </style>
 {% extends 'GuestHomepage.html' %}
 <body>
     {% block body %}
     <h1>Chat</h1>
+
+    <div class="chat-options">
+        <h2>Select a Chat Type:</h2>
+        <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="chat-options-form">
+            <div class="chat-user-type-container">
+                <select>
+                    <option value="Vendor">Vendor</option>
+                    <option value="Admin">Admin</option>
+                </select>
+                <input type="text" placeholder="Vendor ID">
+                <input type="text" placeholder="Product ID">
+            </div>
+            <input type="submit" value="WARRANTY CLAIM">
+            <input type="submit" value="REFUND">
+            <input type="submit" value="RETURN">
+        </form>
+    </div>
 
     <div class="outer-container">
 
@@ -208,18 +274,6 @@
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat" disabled>
                         {% endif %}
-                    </form>
-                </div>
-        
-                <div class="start-new-chat-container">
-                    <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="new_chat_form">
-                        <select id="user_type" name="user_type">
-                            <option value="Vendor">Vendor</option>
-                            <option value="Admin">Admin</option>
-                        </select>
-                        <input type="text" placeholder="Vendor ID" id="id_input" name="vendor_id" required>
-                        <input type="text" placeholder="Product ID" id="product_id" name="product_id" required>
-                        <input type="submit" value="Start Chat" id="start_new_chat">
                     </form>
                 </div>
             </div>
