@@ -23,6 +23,7 @@
         border-color: lightgray;
         border-radius: 5px;
         border-width: 1px;
+        outline: none;
     }
     form input[type="submit"]{
         background-color: #c6c295;
@@ -33,6 +34,7 @@
     form input[type="submit"]:hover{
         background-color: #bdb884;
         transition: .5s ease-in-out;
+        cursor: pointer;
     }
     .chat-options-container{
         display: flex;
@@ -111,6 +113,7 @@
     }
     #send_message_form{
         display: flex;
+        flex-direction: row;
         justify-content: space-between;
         align-items: center;
     }
@@ -131,6 +134,47 @@
     }
     hr{
         background-color: #757575;
+    }
+    .image-popup{
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .popup-image{
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 10px;
+        border: 2px solid black;
+    }
+    .close-popup{
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 30px;
+        color: white;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    .chat-image{
+        border: 1px solid lightgray;
+        border-radius: 10px;
+    }
+    .chat-image:hover{
+        cursor: zoom-in;
+    }
+    #image_url{
+        padding: 5px;
+        outline: none;
+    }
+    .broken-image {
+        display: none;
     }
 </style>
 {% extends 'GuestHomepage.html' %}
@@ -175,16 +219,12 @@
                         </select>
                         <input type="text" placeholder="Vendor ID" id="id_input" name="vendor_id" required>
                         <input type="text" placeholder="Product ID" id="product_id" name="product_id" required>
-                        <input type="submit" value="Start Chat">
+                        <input type="submit" value="Start Chat" id="start_new_chat">
                     </form>
                 </div>
             </div>
 
             <div class="chat-messages">
-                {% if message %}
-                    <p style="color: red; text-align: center;">{{ message }}</p>
-                {% endif %}
-
                 {% for message in messages %}
                     {% if message['message'] == "* * Start of Chat * *" %}
                         <div class="system-message">
@@ -198,7 +238,12 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
@@ -208,7 +253,12 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
@@ -218,7 +268,12 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
@@ -230,7 +285,12 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
@@ -240,7 +300,12 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
@@ -252,7 +317,12 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
@@ -262,18 +332,28 @@
                                 <div class="message">
                                     <p>{{ message['message'] }}</p>
                                     {% if message['images'] %}
-                                        <img src="{{ url_for('static', filename='images/' + message['images']) }}" alt="Image" style="max-width: 100px;">
+                                        <img src="{{ message['images'] }}" 
+                                        alt="Image" 
+                                        class="chat-image" 
+                                        style="max-width: 100px;" 
+                                        data-src="{{ message['images'] }}" 
+                                        onerror="this.style.display='none';">
                                     {% endif %}
                                 </div>
                             </div>
                         {% endif %}
                     {% endif %}
                 {% endfor %}
+                <div id="image-popup" class="image-popup">
+                    <span id="close-popup" class="close-popup">X</span>
+                    <img id="popup-image" class="popup-image" src="" alt="Full-size Image">
+                </div>
             </div>
 
             <div class="send-message-container">
                 <form method="POST" action="{{ url_for('chat_bp.chat_view', chat_id=selected_chat['CHAT_ID']) }}" id="send_message_form">
                     <input type="text" placeholder="Type your message here..." id="message" name="message" required>
+                    <input type="text" placeholder="Image URL (optional)" id="image_url" name="image_url">
                     <input type="submit" value="Send" id="send_message">
                 </form>
                 <div class="etc_info">
@@ -285,13 +365,17 @@
                     {% endif %}
                     <p style="text-align: center;">Customer ID: {{ selected_chat.CID if selected_chat and selected_chat.CID else "N/A" }}</p>
                     <p style="text-align: center;">Product ID: {{ selected_chat.PID if selected_chat and selected_chat.PID else "N/A" }}</p>
+                    {% if message %}
+                        <p style="color: red; text-align: center;">{{ message }}</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-</div>
+    </div>
 
 <script>
+    // Switch between Vendor ID and Admin ID based on form selection
     document.addEventListener('DOMContentLoaded', function(){
         function updateIdInput(){
             const userType = document.getElementById('user_type').value;
@@ -311,6 +395,29 @@
             e.preventDefault();
             updateIdInput();
             this.submit();
+        });
+    });
+
+    // Image popup functionality
+    document.addEventListener('DOMContentLoaded', function(){
+        const images = document.querySelectorAll('.chat-image');
+        const popup = document.getElementById('image-popup');
+        const popupImage = document.getElementById('popup-image');
+        const closePopup = document.getElementById('close-popup');
+
+        images.forEach(image =>{
+            image.addEventListener('click', function(){
+                popupImage.src = this.dataset.src;
+                popup.style.display = 'flex';
+            });
+        });
+        closePopup.addEventListener('click', function(){
+            popup.style.display = 'none';
+        });
+        popup.addEventListener('click', function(e){
+            if(e.target === popup){
+                popup.style.display = 'none';
+            }
         });
     });
 </script>

@@ -72,7 +72,16 @@ def chat_view():
         vendor_id = request.form.get("vendor_id")
         product_id = request.form.get("product_id")
         message_content = request.form.get("message")
+        image_url = request.form.get("image_url")
+        error_message = None
         new_chat_id = None
+
+        # Checks for image URL
+        if image_url:
+            valid_extensions = (".jpg", ".jpeg", ".png", ".gif")
+            if not image_url.lower().endswith(valid_extensions):
+                error_message = "Image URL is not valid."
+                image_url = None
 
         # Creating a new admin chat
         if user_type_selected == "Admin" and admin_id and product_id:
@@ -111,13 +120,13 @@ def chat_view():
 
             # Get chat details
             if chat_type == "vendor":
-                conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, PID, message, timestamp) VALUES (:chat_id, :user_id, :pid, :message, CURRENT_TIMESTAMP)"),
-                            {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content})
+                conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, PID, message, images, timestamp) VALUES (:chat_id, :user_id, :pid, :message, :images, CURRENT_TIMESTAMP)"),
+                            {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content, "images": image_url})
             elif chat_type == "admin":
-                conn.execute(text(f"INSERT INTO chatroom_admin (CHAT_ID, {user_type}, PID, message, timestamp) VALUES (:chat_id, :user_id, :pid, :message, CURRENT_TIMESTAMP)"),
-                            {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content})
+                conn.execute(text(f"INSERT INTO chatroom_admin (CHAT_ID, {user_type}, PID, message, images, timestamp) VALUES (:chat_id, :user_id, :pid, :message, :images, CURRENT_TIMESTAMP)"),
+                            {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content, "images": image_url})
             conn.commit()
-            return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
+            return redirect(url_for("chat_bp.chat_view", chat_id=chat_id, message=error_message))
         # If no message content is provided, return an error message
         else:
             message = "No message content provided."
