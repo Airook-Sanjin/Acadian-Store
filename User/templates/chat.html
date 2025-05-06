@@ -251,6 +251,9 @@
     <div class="outer-container">
 
         <div class="chat-container">
+            {% if message %}
+                <p style="color: red; text-align: center;">{{ message }}</p>
+            {% endif %}
             <div class="chat-options-container">
                 <div class="open-previous-chat-container">
                     <form method="GET" action="{{ url_for('chat_bp.chat_view') }}" id="previous_chat_form">
@@ -419,9 +422,6 @@
                     {% endif %}
                     <p style="text-align: center;">Customer ID: {{ selected_chat.CID if selected_chat and selected_chat.CID else "N/A" }}</p>
                     <p style="text-align: center;">Product ID: {{ selected_chat.PID if selected_chat and selected_chat.PID else "N/A" }}</p>
-                    {% if message %}
-                        <p style="color: red; text-align: center;">{{ message }}</p>
-                    {% endif %}
                 </div>
             </div>
         </div>
