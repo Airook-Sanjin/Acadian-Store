@@ -235,16 +235,16 @@
         <h2>Select a Chat Type:</h2>
         <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="chat-options-form">
             <div class="chat-user-type-container">
-                <select>
+                <select id="user_type" name="user_type">
                     <option value="Vendor">Vendor</option>
                     <option value="Admin">Admin</option>
                 </select>
-                <input type="text" placeholder="Vendor ID">
-                <input type="text" placeholder="Product ID">
+                <input type="text" id="id_input" name="vendor_id" placeholder="Vendor ID">
+                <input type="text" id="product_id" name="product_id" placeholder="Product ID">
             </div>
-            <input type="submit" value="WARRANTY CLAIM">
-            <input type="submit" value="REFUND">
-            <input type="submit" value="RETURN">
+            <button type="submit" name="action" value="WARRANTY CLAIM">WARRANTY CLAIM</button>
+            <button type="submit" name="action" value="REFUND">REFUND</button>
+            <button type="submit" name="action" value="RETURN">RETURN</button>
         </form>
     </div>
 
@@ -431,26 +431,21 @@
 <script>
     // Switch between Vendor ID and Admin ID based on form selection
     document.addEventListener('DOMContentLoaded', function(){
-        function updateIdInput(){
-            const userType = document.getElementById('user_type').value;
-            const idInput = document.getElementById('id_input');
-            if(userType === 'Admin'){
-                idInput.placeholder = 'Admin ID';
-                idInput.name = 'admin_id';
-            }
-            else{
-                idInput.placeholder = 'Vendor ID';
-                idInput.name = 'vendor_id';
-            }
+    function updateIdInput(){
+        let userType = document.getElementById('user_type').value;
+        let idInput = document.getElementById('id_input');
+        if(userType === 'Admin'){
+            idInput.placeholder = 'Admin ID';
+            idInput.name = 'admin_id';
         }
-        updateIdInput();
-        document.getElementById('user_type').addEventListener('change', updateIdInput);
-        document.getElementById('new_chat_form').addEventListener('submit', function(e){
-            e.preventDefault();
-            updateIdInput();
-            this.submit();
-        });
-    });
+        else{
+            idInput.placeholder = 'Vendor ID';
+            idInput.name = 'vendor_id';
+        }
+    }
+    updateIdInput();
+    document.getElementById('user_type').addEventListener('change', updateIdInput);
+});
 
     // Image popup functionality
     document.addEventListener('DOMContentLoaded', function(){

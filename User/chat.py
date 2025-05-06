@@ -87,6 +87,9 @@ def chat_view():
             admin_id = request.form.get("admin_id")
             vendor_id = request.form.get("vendor_id")
             product_id = request.form.get("product_id")
+            action = request.form.get("action")
+            user_id = g.User.get("ID")
+            user_role = g.User.get("Role")
             message_content = request.form.get("message")
             image_url = request.form.get("image_url")
             error_message = None
