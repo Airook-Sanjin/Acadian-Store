@@ -82,25 +82,22 @@ def chat_view():
 
     try:
         if request.method == "POST":
-            # Get information from sending messages + creating new chats
+        # Get information from the form
             user_type_selected = request.form.get("user_type")
             admin_id = request.form.get("admin_id")
             vendor_id = request.form.get("vendor_id")
             product_id = request.form.get("product_id")
-            action = request.form.get("action")
             user_id = g.User.get("ID")
-            user_role = g.User.get("Role")
             message_content = request.form.get("message")
             image_url = request.form.get("image_url")
+            action = request.form.get("action")
             error_message = None
             new_chat_id = None
 
-            # Checks for image URL
-            if image_url:
-                valid_extensions = (".jpg", ".jpeg", ".png", ".gif")
-                if not image_url.lower().endswith(valid_extensions):
-                    error_message = "Image URL is not valid."
-                    image_url = None
+            # Determine which column to set to "YES" based on the action
+            returns = "YES" if action == "RETURN" else "NO"
+            refund = "YES" if action == "REFUND" else "NO"
+            warranty_claim = "YES" if action == "WARRANTY CLAIM" else "NO"
 
             # Creating a new admin chat
             if user_type_selected == "Admin" and admin_id and product_id:
@@ -109,8 +106,18 @@ def chat_view():
                     new_chat_id = 1
 
                 conn.execute(text("INSERT INTO chat (CHAT_ID) VALUES (:chat_id)"), {"chat_id": new_chat_id})
-                conn.execute(text("INSERT INTO chatroom_admin (CHAT_ID, CID, AID, PID, message, timestamp) VALUES (:chat_id, :cid, :aid, :pid, :message, CURRENT_TIMESTAMP)"),
-                            {"chat_id": new_chat_id, "cid": user_id, "aid": admin_id, "pid": product_id, "message": "* * Start of Chat * *"})
+                conn.commit()
+
+                conn.execute(text("""INSERT INTO chatroom_admin (CHAT_ID, CID, AID, PID, message, returns, refund, warranty_claim, timestamp)
+                                VALUES (:chat_id, :cid, :aid, :pid, :message, :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)"""),
+                                {"chat_id": new_chat_id,
+                                "cid": user_id,
+                                "aid": admin_id,
+                                "pid": product_id,
+                                "message": "* * Start of Chat * *",
+                                "returns": returns,
+                                "refund": refund,
+                                "warranty_claim": warranty_claim})
                 conn.commit()
                 return redirect(url_for("chat_bp.chat_view", chat_id=new_chat_id))
             # Creating a new vendor chat
@@ -120,68 +127,103 @@ def chat_view():
                     new_chat_id = 1
 
                 conn.execute(text("INSERT INTO chat (CHAT_ID) VALUES (:chat_id)"), {"chat_id": new_chat_id})
-                conn.execute(text("INSERT INTO chatroom_vendor (CHAT_ID, CID, VID, PID, message, timestamp) VALUES (:chat_id, :cid, :vid, :pid, :message, CURRENT_TIMESTAMP)"),
-                            {"chat_id": new_chat_id, "cid": user_id, "vid": vendor_id, "pid": product_id, "message": "* * Start of Chat * *"})
+                conn.commit()
+
+                conn.execute(text("""INSERT INTO chatroom_vendor (CHAT_ID, CID, VID, PID, message, returns, refund, warranty_claim, timestamp)
+                            VALUES (:chat_id, :cid, :vid, :pid, :message, :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)"""),
+                            {"chat_id": new_chat_id,
+                            "cid": user_id,
+                            "vid": vendor_id,
+                            "pid": product_id,
+                            "message": "* * Start of Chat * *",
+                            "returns": returns,
+                            "refund": refund,
+                            "warranty_claim": warranty_claim})
                 conn.commit()
                 return redirect(url_for("chat_bp.chat_view", chat_id=new_chat_id))
             # Sending messages in existing chats
             elif message_content:
-                chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+                chat_id = request.args.get("chat_id")
+                chat_details = conn.execute(text("""
+                    SELECT CHAT_ID, CID, VID, PID, returns, refund, warranty_claim
+                    FROM chatroom_vendor
+                    WHERE CHAT_ID = :chat_id
+                """), {"chat_id": chat_id}).mappings().first()
+
                 chat_type = "vendor"
                 if not chat_details:
-                    chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+                    chat_details = conn.execute(text("""
+                        SELECT CHAT_ID, CID, AID, PID, returns, refund, warranty_claim
+                        FROM chatroom_admin
+                        WHERE CHAT_ID = :chat_id
+                    """), {"chat_id": chat_id}).mappings().first()
                     chat_type = "admin" if chat_details else None
 
                 # Check if chat exists
                 if not chat_details:
                     message = "Chat not found."
-                    return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
+                    return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
 
-                # Get chat details
+                # Insert message into the appropriate chatroom
                 if chat_type == "vendor":
-                    conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, PID, message, images, timestamp) VALUES (:chat_id, :user_id, :pid, :message, :images, CURRENT_TIMESTAMP)"),
-                                {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content, "images": image_url})
+                    conn.execute(text("""
+                        INSERT INTO chatroom_vendor (CHAT_ID, CID, PID, message, images, timestamp)
+                        VALUES (:chat_id, :cid, :pid, :message, :images, CURRENT_TIMESTAMP)
+                    """), {
+                        "chat_id": chat_id,
+                        "cid": user_id,
+                        "pid": chat_details["PID"],
+                        "message": message_content,
+                        "images": image_url
+                    })
                 elif chat_type == "admin":
-                    conn.execute(text(f"INSERT INTO chatroom_admin (CHAT_ID, {user_type}, PID, message, images, timestamp) VALUES (:chat_id, :user_id, :pid, :message, :images, CURRENT_TIMESTAMP)"),
-                                {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content, "images": image_url})
+                    conn.execute(text("""
+                        INSERT INTO chatroom_admin (CHAT_ID, CID, PID, message, images, timestamp)
+                        VALUES (:chat_id, :cid, :pid, :message, :images, CURRENT_TIMESTAMP)
+                    """), {
+                        "chat_id": chat_id,
+                        "cid": user_id,
+                        "pid": chat_details["PID"],
+                        "message": message_content,
+                        "images": image_url
+                    })
                 conn.commit()
-                return redirect(url_for("chat_bp.chat_view", chat_id=chat_id, message=error_message))
-            # If no message content is provided, return an error message
-            else:
-                message = "No message content provided."
-                return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
+                return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
 
-        chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+        # Retrieve chat details for GET requests
+        chat_id = request.args.get("chat_id")
+        chat_details = conn.execute(text("""
+            SELECT CHAT_ID, CID, VID, PID, returns, refund, warranty_claim
+            FROM chatroom_vendor
+            WHERE CHAT_ID = :chat_id
+        """), {"chat_id": chat_id}).mappings().first()
+
         chat_type = "vendor"
         if not chat_details:
-            chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+            chat_details = conn.execute(text("""
+                SELECT CHAT_ID, CID, AID, PID, returns, refund, warranty_claim
+                FROM chatroom_admin
+                WHERE CHAT_ID = :chat_id
+            """), {"chat_id": chat_id}).mappings().first()
             chat_type = "admin" if chat_details else None
 
         # Check if chat exists
         if not chat_details:
             message = "Chat not found."
-            return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
+            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
 
-        # Selecting chat type and details
+        # Pass chat details to the template
         selected_chat = dict(chat_details)
         selected_chat['chat_type'] = chat_type
-        if chat_type == "admin":
-            selected_chat['AID'] = chat_details.get('AID')
-        elif chat_type == "vendor":
-            selected_chat['VID'] = chat_details.get('VID')
-        else:
-            selected_chat['VID'] = None
-            selected_chat['AID'] = None
 
-        # Getting messages for the selected chat and chat type
-        if chat_type == "vendor":
-            messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
-        elif chat_type == "admin":
-            messages = conn.execute(text("SELECT * FROM chatroom_admin WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
-        else:
-            messages = []
+        messages = conn.execute(text(f"""
+            SELECT * FROM chatroom_{chat_type}
+            WHERE CHAT_ID = :chat_id
+            ORDER BY timestamp ASC
+        """), {"chat_id": chat_id}).mappings().all()
 
-        return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=selected_chat, message=None)
+        return render_template("chat.html", messages=messages, selected_chat=selected_chat, message=None)
+
     except Exception as e:
         message = f"An error occurred: {e}"
         return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
