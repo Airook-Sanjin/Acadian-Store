@@ -114,16 +114,40 @@
         color: #333;
     }
     
-    select,
+    #Colors,
    .AddtoCart-Form .BTN{
        padding: 10px;
        font-size: 1rem;
        margin-bottom: 15px;
        border-radius: 5px;
        border: 1px solid #ccc;
+
    }
+   .OoS{
+  cursor:pointer;
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  padding: 10px;
+  font-size: 1rem;
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-left: 10px;
+  margin-bottom: 15px;
+  color:hsl(174, 5%, 24%) ;
+  background-color: hsl(55, 10%, 68%);
+  box-shadow: var(--BoxShadow);
+  text-decoration: line-through;
+  
+}
+.Oos:hover{
+    background-color: hsl(0, 17%, 44%);
+    transition: .2s ease-in-out;
+}
+
     
-    select {
+    #Colors {
         width: 100%;
         background-color: #fff;
     }
@@ -409,7 +433,7 @@
                                {% endfor %}
                            </select>
                         
-                        {% if product.discount_date and product.discount_date < CurDate %}
+                        {% if product.discount_date and product.discount_date > CurDate %}
                         <div class="product-price">
                             <div class="price-summary">
                                 <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format(product.discounted_price |float ) }}</p>
@@ -436,11 +460,18 @@
     
                         <div id ='inventory-amount'class="product-amount">
                             <p><strong>Amount Available:</strong> 
-                                {{ inventory[0].amount if inventory else 'N/A' }}
+                                {{ inventory[0].amount if inventory else 'Out of Stock' }}
+                                <input id="inv" type="hidden" name="inv" value="">
                             </p>
                         </div>
-    
-                        <input class="BTN" type="submit" value="Add to Cart">
+                            {% if inventory[0] != 0 %}
+                        <input id = 'AddtoCartBtn' class="BTN" type="submit" value="Add to Cart">
+                        <p>{{inventory[0] and status}}</p>
+                        {% else %}
+                        <p>{{status}}</p>
+                        <input class="OoS" type="button" value="Add to Cart">
+                        {% endif %}
+
                     </form>
                 </section>
             </section>
@@ -533,7 +564,26 @@
         .then(response => response.json())
         .then(data => {document.getElementById('inventory-amount').innerHTML = 
             `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
+
+            let Amount = data.amount
+            document.getElementById('inv').value = data.amount;
+            console.log(Amount)
+            // Activates and Deactivates button based on amount
+            if (Amount == 'Out of Stock'){
+                
+                document.getElementById('AddtoCartBtn').className = 'OoS';
+                document.getElementById('AddtoCartBtn').type='button';
+                document.getElementById('AddtoCartBtn').disabled=true;
+            }
+            else{
+                document.getElementById('AddtoCartBtn').className = 'BTN'
+                ocument.getElementById('AddtoCartBtn').type='submit';
+                document.getElementById('AddtoCartBtn').disabled=false;
+            }
+            
+
         });
+        
     }
 
     // Image Thumbnail Switcher

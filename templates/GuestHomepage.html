@@ -63,8 +63,20 @@
           <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
           {% endif %}
         </ul>
-        <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="post">
-          <input type="search" name="Search" id="Search" placeholder="Search">
+        <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="POST">
+          <div class="CustomSelect" >
+          <select id = "Category" name="Category">
+            <option value="" {% if not CategoryChoice or CategoryChoice =="" %}selected {%endif%}>All Departments</option>
+            <option value="Cell Phones" {% if CategoryChoice == 'Cell Phones'%}selected {%endif%}>Cell Phones</option>
+            <option value="Computers & Accessories" {% if CategoryChoice == 'Computers & Accessories'%}selected {%endif%}>Computers & Accessories</option>
+            <option value="Televisions" {% if CategoryChoice == 'Televisions'%}selected {%endif%}>Televisions</option>
+            <option value="Headphones" {% if CategoryChoice == 'Headphones'%}selected {%endif%}>Headphones</option>
+            <option value="Photography & Videography" {% if CategoryChoice == 'Photography & Videography'%}selected {%endif%}>Photography & Videography</option>
+            <option value="Wearable Tech" {% if CategoryChoice == 'Wearable Tech'%}selected {%endif%}>Wearable Tech</option>
+          </select>
+        </div>
+          <input type="text" name="Search" value='{{SearchedItem}}' id="Search" placeholder="Search products...">
+          <input type="hidden" name="Inv" value="{{InvChoice}}" />
           <input class="BTN" type="submit" value="Search">
         </form>
       </div>
@@ -72,7 +84,11 @@
       <div class="Right-side">
         {% if g.User %}
         <h4>Hello {{g.User["Name"].title()}}</h4>
-        <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
+        <form {% if g.User['Role']=='admin' %} action="{{ url_for('admin.GetProfileInfo') }}"{% elif g.User['Role']=='vendor' %} action="{{ url_for('vendor_bp.GetProfileInfo') }}"{% else %} action="{{ url_for('customer_bp.GetProfileInfo') }}"{% endif %} method="POST">
+        <button id="GoToProfile" type="submit">
+          <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
+        </button>
+      </form>
           {% if g.User['Role']=='customer' %}
           <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
             <button id='GotoCart' type="submit">
@@ -164,5 +180,6 @@
       window.location.href = this.dataset.href;
     });
   </script>
+  {%block scripts%}{%endblock scripts%}
 </body>
 </html>

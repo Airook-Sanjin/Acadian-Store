@@ -1,6 +1,137 @@
-{% extends 'GuestHomepage.html' %}
-{% block body %}
+<style>
+  .filterForm {
+    display: flex;
+    flex-direction: row;
+  }
+  .Range {
+    display: flex;
+    align-items: center;
+  }
+  .Results{
+    width:2rem;
+    text-align: center;
+  }
+  .SliderContainer {
+    position: relative;
+    width: 144px;
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 50px;
+    margin: 0 10px;
+  }
+  .SliderContainer .SliderTrack {
+    height: 100%;
+    width: 100%; /* Add this */
+    left: 0; /* Add this */
+    right: 0;
+    position: absolute;
+    background-color: var(--Primary);
+    border-radius: 5px;
+    z-index: 1;
+  }
+  .SliderContainer input[type="range"] {
+    position: absolute;
+    width: 100%;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 0px;
+    background: transparent;
+    z-index: 3;
+  }
+
+  .SliderContainer input[type="range"]::-webkit-slider-thumb {
+    pointer-events: all;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--Primary);
+    border: 2px solid white;
+    box-shadow: var(--BoxShadow);
+    cursor: pointer;
+    z-index: 3;
+  }
+</style>
+{% extends 'GuestHomepage.html' %} {% block body %}
 <section class="Main">
-<h1>Results</h1>
+  <h1>Results = {{ResultAmount}} items found!</h1>
+  <section>
+    <form
+      class="filterForm"
+      action="{{url_for('search_bp.searchedItem')}}"
+      method="POST"
+    >
+      
+      <section class="Range">
+        <h5 class ="Results"id="MinResult">$0</h5>
+        <section class="SliderContainer">
+          <div class="SliderTrack"></div>
+          <input
+            type="range"
+            name="MinPrice"
+            min="0"
+            max="1000"
+            value="{{min}}"
+            id="MinPriceRange"     
+          />
+          <input
+            type="range"
+            name="MaxPrice"
+            min="0"
+            max="1000"
+            value="{{max}}"
+            id="MaxPriceRange" 
+          />
+          <input type="hidden" name="Category" value="{{CategoryChoice}}" />
+        </section>
+        <h5 class ="Results"id="MaxResult">$1,000+</h5>
+      </section>
+
+      <select id ='Inv' name="Inv" onchange="this.form.submit();">
+        <option value="" {% if not CategoryChoice or CategoryChoice =="" %}selected {%endif%}>Availablity</option>
+        <option {% if InvChoice == "IN STOCK"%} selected {% endif %} value="IN STOCK">In Stock</option>
+        <option {% if InvChoice == "OUT OF STOCK"%} selected {% endif %} value="OUT OF STOCK">Out of Stock</option>
+      </select>
+    </form>
+  </section>
 </section>
+
 {%endblock body%}
+{%block scripts%}
+<!-- IDK WHY THIS DELETED  -->
+ <!-- I did need help from the interwebs for this -->
+ <script>
+  const MinSlide = document.getElementById("MinPriceRange");
+  const MaxSlide = document.getElementById("MaxPriceRange");
+  const resultsMax = document.getElementById("MaxResult");
+  const resultsMin = document.getElementById("MinResult");
+  const track = document.querySelector(".SliderTrack");
+  function updateRange() {
+    const min = parseFloat(MinSlide.value);
+    const max = parseFloat(MaxSlide.value);
+
+    if (min > max) {
+      MinSlide.value = max;
+      return;
+    }
+
+    // Track Update
+    const firstPercent = (min / MinSlide.max) * 100;
+    const secondPercent = (max / MaxSlide.max) * 100;
+    track.style.background = `linear-gradient(to right, #ddd ${firstPercent}%, var(--Primary) ${firstPercent}%, var(--Primary) ${secondPercent}%, #ddd ${secondPercent}%)`;
+
+    resultsMin.innerText = `$${parseFloat(MinSlide.value).toLocaleString()}`;
+    resultsMax.innerText = `$${parseFloat(MaxSlide.value).toLocaleString()}`;
+  }
+
+  MinSlide.addEventListener("input", updateRange);
+  MaxSlide.addEventListener("input", updateRange);
+
+  MinSlide.addEventListener("change", () => setTimeout(() => document.querySelector('.filterForm').submit(), 500));
+  MaxSlide.addEventListener("change", () => setTimeout(() => document.querySelector('.filterForm').submit(), 500));
+
+  updateRange();
+</script>
+
+{%endblock scripts%}

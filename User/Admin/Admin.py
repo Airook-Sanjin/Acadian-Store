@@ -44,3 +44,20 @@ def AdminHomePage():
     except Exception as e:
         print(f"Error adding product: {e}")
         return render_template('GuestHomepage.html', products=[],CurDate=CurDate, inventory=[])
+    
+    
+@admin.route('/Profile',methods=["POST"])
+def GetProfileInfo():
+    try:
+        return render_template('Profile.html')
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template('Profile.html')
+
+@admin.route('/Profile',methods=["GET"])
+def ViewProfile():
+    try:
+        return render_template('Profile.html')
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template('Profile.html')

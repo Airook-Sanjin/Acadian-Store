@@ -547,60 +547,60 @@
     <section class="totals-Container">
       <section class="Cart-Container">
         {% for item in CartList %}
-        <section class="item-Card">
-          <section class="item-info">
-            <img src="{{item['image_url']}}" alt="{{item['title']}}" />
-            <h3>{{item['title']}}</h3>
-            <h4>{{item['size']}}</h4>
+        {% if item['Price'] != 'OUT OF STOCK' %}
+    <section class="item-Card">
+      <section class="item-info">
+        <img src="{{item['image_url']}}" alt="{{item['title']}}">
+        <h3>{{item['title']}}</h3>   
+        <p>{{item['color']}}</p>
+        <p>{{item['description']}}</p>
+      </section>
+      <section class="item-fun">
+        
+        <form action="{{url_for('cart_bp.quantityUpdate',username=g.User['Name'])}}" method="post">
+        <input type="hidden" name="UpdatedItem" value="{{item['itemid']}}" />
+        <input type="hidden" name="UpdatedItemPID" value="{{item['PID']}}" />
+        <input type="hidden" name="UpdatedItemColor" value="{{item['color']}}" />
+        <input type="number" name="ItemQuantity" id="quantity" value="{{item['quantity']}}" min="1" max="{{item['Inventory']}}" onchange="this.form.submit();">
+        </form>
+        
+        <h3 id="Instock">${{'%0.2f' | format(item['Price']|float)}}</h3>
+        <form id="Removesection"
+          action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
+          method="POST"
+        >
+          <input type="hidden" name="RemovedItem" value="{{item['itemid']}}" />
+          <input class="BTN"type="submit" name="RemoveBTN" value="Remove Item" />
+        </form>
+      </section>
+    </section>
+        {% else %}
+        <section class="item-Card OutOfStock">
+          <section class="item-info OutOfStock">
+            <img src="{{item['image_url']}}" alt="{{item['title']}}">
+            <h3>{{item['title']}}</h3>   
             <p>{{item['color']}}</p>
+            <p>{{item['description']}}</p>
           </section>
           <section class="item-fun">
-            <form
-              id="QuantityForm"
-              action="{{url_for('cart_bp.quantityUpdate',username=g.User['Name'])}}"
-              method="post"
-            >
-              <input
-                type="hidden"
-                name="UpdatedItem"
-                value="{{item['itemid']}}"
-              />
-              <input
-                type="number"
-                name="quantity"
-                id="quantity"
-                value="{{item['quantity']}}"
-                min="1"
-                max="99"
-                onchange="this.form.submit();"
-              />
-            </form>
-            <!-- Formating  -->
-            <h3>${{'%0.2f' | format(item['Price']|float)}}</h3>
-            <form
-              id="Removesection"
-              action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
-              method="POST"
-            >
-              <input
-                type="hidden"
-                name="RemovedItem"
-                value="{{item['itemid']}}"
-              />
-              <input
-                class="Removebtn"
-                type="submit"
-                name="RemoveBTN"
-                value="X"
-              />
-            </form>
-          </section>
-        </section>
+            
+            
+        <h3 ID="OutStock">{{item['Price']|string}}</h3>
+        <form id="Removesection"
+          action="{{url_for('cart_bp.RemoveFromCart',username=g.User['Name'])}}"
+          method="POST"
+        >
+          <input type="hidden" name="RemovedItem" value="{{item['itemid']}}" />
+          <input class="BTN OutOfStock"type="submit" name="RemoveBTN" value="Remove Item" />
+        </form>
+      </section>
+    </section>
+        {% endif %}
         {% endfor %}
       </section>
       <h2>Cart Totals</h2>
 
-      <h3 id="Total">Total: {{total}}</h3>
+      <h3 id="Total">Total: {{'%0.2f' | format(total| float)}}</h3>
     </section>
   </section>
 </section>

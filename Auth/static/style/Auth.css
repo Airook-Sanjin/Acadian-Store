@@ -79,19 +79,14 @@ font-size: 2em;
 .form-input{
     padding: .5em;
     width:100%;
-    
     border: none;
     border-bottom: 1px solid hsla(0, 0%, 99%,0.5);
     background-color: transparent;
-    
     outline: none;
-
     &::placeholder{
         color: #F8F2F4;
-        
     } 
     color:#F8F2F4;
-    
 }
 
 .form-sub{
