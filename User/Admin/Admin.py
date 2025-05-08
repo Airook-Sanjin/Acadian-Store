@@ -150,11 +150,11 @@ def AdminViewProducts():
             product['inventory_map'] = {str(row.IMG_ID): {'color': row.color, 'amount': row.amount} for row in inventory if row.IMG_ID}
             product['main_inventory'] = [dict(row) for row in inventory if row.IMG_ID is None]
 
-        return render_template('editProduct.html', AllProducts=AllProducts, CurDate=CurDate, message="Successfully added", success=True)
+        return render_template('AdminEditProduct.html', AllProducts=AllProducts, CurDate=CurDate, message="Successfully added", success=True)
 
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('editProduct.html', AllProducts=[], CurDate=CurDate, message="Failed to add product.", success=False)
+        return render_template('AdminEditProduct.html', AllProducts=[], CurDate=CurDate, message="Failed to add product.", success=False)
     
 @admin_bp.route('/AddProduct', methods=["POST"])
 def AdminAddProduct():
@@ -362,27 +362,24 @@ def AdminDeleteProduct():
         print('working...', pid)
         print("######################################")
         print("######################################")
+
         conn = Connecttodb()
-        conn.execute(text("""
-            SET FOREIGN_KEY_CHECKS = 0
-        """))
-        conn.execute(text("""
-            DELETE FROM product WHERE PID = :pid
-        """), {
-            'pid': pid
-        })
-        conn.execute(text("""
-            DELETE FROM product_inventory WHERE PID = :pid
-        """), {
-            'pid': pid
-        })
-        conn.execute(text("""
-            DELETE FROM product_images WHERE PID = :pid
-        """), {
-            'pid': pid
-        })
+
+        # Disable foreign key checks
+        conn.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
+
+        # Perform deletions
+        conn.execute(text("DELETE FROM product_inventory WHERE PID = :pid"), {'pid': pid})
+        conn.execute(text("DELETE FROM product_images WHERE PID = :pid"), {'pid': pid})
+        conn.execute(text("DELETE FROM product WHERE PID = :pid"), {'pid': pid})
+
+        # Re-enable foreign key checks
+        conn.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
+
         conn.commit()
-        return redirect(url_for('admin_bp.AdminViewProducts', message="Product Deleted successfully", success=True))
+
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product deleted successfully", success=True))
+
     except Exception as e:
         print(f"ERROR DELETING PRODUCT: {e}")
         print("######################################")
@@ -390,7 +387,8 @@ def AdminDeleteProduct():
         print('nope...')
         print("######################################")
         print("######################################")
-        return redirect(url_for('admin_bp.AdminViewProducts', message="Product Delete failed", success=False))
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product delete failed", success=False))
+
 
 @admin_bp.route('/AddImages', methods=["POST"])
 def AdminAddImages():

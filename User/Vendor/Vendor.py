@@ -325,7 +325,7 @@ def VendorDeleteProduct():
             'pid': pid
         })
         conn.commit()
-        return redirect(url_for('vendor_bp.VendorViewProducts', message="Product Deleted successfully", success=True))
+        return redirect(url_for('admin_bp.VendorViewProducts', message="Product Deleted successfully", success=True))
     except Exception as e:
         print(f"ERROR DELETING PRODUCT: {e}")
         print("######################################")

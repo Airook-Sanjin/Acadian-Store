@@ -82,7 +82,7 @@
       </div>
 
       <div class="Right-side">
-        <!-- {% if g.User %}
+        {% if g.User %}
         <h4>Hello {{g.User["Name"].title()}}</h4>
         <form 
         {% if g.User['Role'] == 'admin' %} action="{{ url_for('admin_bp.GetProfileInfo') }}"
@@ -107,7 +107,7 @@
         
         {% else %}
         <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
-        {% endif %} -->
+        {% endif %}
         <button id="Login_btn" onclick="window.location.href = '{{url_for('login_bp.Login')}}'">Log In</button>
       </div>
     </div>

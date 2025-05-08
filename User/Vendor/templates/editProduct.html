@@ -1025,16 +1025,13 @@ input[type="submit"] {
     function toggleWarrantyFields(el, show) {
         const form = el.closest("form");
         const warrantyFields = form.querySelector('.warranty_field_css');
-    
         if (warrantyFields) {
             warrantyFields.style.display = show ? 'flex' : 'none';
-    
             const warrantyInput = form.querySelector('input[name="warranty"]');
             if (warrantyInput) warrantyInput.required = show;
         }
     }
-    
-    
+
         let currentPID = null; // Global variable to store the current PID
     
         function OpenEditProductModal() {
@@ -1160,7 +1157,6 @@ input[type="submit"] {
 
             modal.style.display = "flex";
         };
-    
         window.CloseImageModal = function() {
             let modal = document.querySelector("#AddImageModal");
             modal.style.display = "none";
@@ -1198,14 +1194,10 @@ input[type="submit"] {
 
         modal.style.display = "flex";
     };
-
-
     window.CloseEditImageModal = function() {
         document.getElementById("EditImageModal").style.display = "none";
     };
-    
-
-    
+      
         // Edit Inventory Modal
         window.OpenEditInvetoryModal = function(PID) {
             if (!PID) {
@@ -1234,7 +1226,6 @@ input[type="submit"] {
 
             modal.style.display = "flex";
         };
-   
         window.CloseEditInventoryModal = function() {
             const modal = document.querySelector("#EditInventoryModal");
             if (modal) modal.style.display = "none";
@@ -1250,10 +1241,7 @@ input[type="submit"] {
             const amountInput = document.querySelector('#EditInventoryModal input[name="Amount"]');
             if (colorInput) colorInput.value = "";
             if (amountInput) amountInput.value = "";
-        };
-    
-       
-    
+        };   
         function changeImage(imageUrl, productId) {
         const mainImage = document.getElementById(`main-image-${productId}`);
             if (mainImage) {
@@ -1308,7 +1296,5 @@ input[type="submit"] {
             if (amountInput) amountInput.value = amount;
         }
 
-
-        
-     </script> 
+    </script> 
      {% endblock body%}
