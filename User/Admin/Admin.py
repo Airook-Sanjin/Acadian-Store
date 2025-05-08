@@ -1,7 +1,8 @@
 
-from globals import Blueprint,render_template,g,session,Connecttodb,text
+from globals import Blueprint,render_template,g,session,Connecttodb,text,request
 from datetime import datetime
 from User.chat import chat_bp
+from globals import redirect, url_for
 
 admin_bp=Blueprint('admin_bp',__name__, url_prefix='/admin',template_folder='templates',static_folder='static',static_url_path='/static') # * init blueprint
 admin_bp.register_blueprint(chat_bp)
@@ -154,21 +155,316 @@ def AdminViewProducts():
     except Exception as e:
         print(f"Error: {e}")
         return render_template('editProduct.html', AllProducts=[], CurDate=CurDate, message="Failed to add product.", success=False)
-
     
-@admin.route('/Profile',methods=["POST"])
+@admin_bp.route('/AddProduct', methods=["POST"])
+def AdminAddProduct():
+    try:
+        # Get database connection
+        conn = Connecttodb()
+
+        # Get form data
+        TITLE = request.form.get("title")
+        PRICE = request.form.get("price")
+        DESCRIPTION = request.form.get("description")
+        WARRANTY = request.form.get("warranty")
+        DISCOUNT = request.form.get("discount")
+        DISCOUNT_DATE = request.form.get("discount_date")
+        AVAILABILITY = request.form.get("availability")
+        VID = g.User['ID']
+        IMAGE = request.form.get("URL")
+
+        # Handle empty discount, discount_date, and warranty
+        DISCOUNT = float(DISCOUNT) / 100 if DISCOUNT else None
+        DISCOUNT_DATE = DISCOUNT_DATE if DISCOUNT_DATE else None
+        WARRANTY = WARRANTY if WARRANTY else None
+
+        # Insert product into the database
+        conn.execute(text("""
+            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url)
+            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :VID, :image_url)
+        """), {
+            'title': TITLE,
+            'price': PRICE,
+            'description': DESCRIPTION,
+            'warranty': WARRANTY,
+            'discount': DISCOUNT,
+            'discount_date': DISCOUNT_DATE,
+            'availability': AVAILABILITY,
+            'VID': VID,
+            'image_url': IMAGE
+        })
+
+        # Commit the changes to the database
+        conn.commit()
+
+        # Redirect to GET route that loads and displays all products
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product added successfully", success=True))
+    except Exception as e:
+        print(f"ERROR ADDING PRODUCT: {e}")
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product failed to add", success=False))
+
+@admin_bp.route('/editProduct', methods=['POST'])
+def AdminEditProduct():
+    try:
+        pid = request.form.get('PID')
+        title = request.form.get('title')
+        price = request.form.get('price')
+        description = request.form.get('description')
+        image_url = request.form.get('URL')
+        warranty = request.form.get('warranty') if request.form.get('add_warranty') == 'yes' else None
+        discount = float(request.form.get('discount')) / 100 if request.form.get('add_discount') == 'yes' else None
+        discount_date = request.form.get('discount_date') if request.form.get('add_discount') == 'yes' else None
+        availability = request.form.get('availability')
+        vid = request.form.get('VID')
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            UPDATE product SET
+                title = :title,
+                price = :price,
+                description = :description,
+                image_url = :image_url,
+                warranty = :warranty,
+                discount = :discount,
+                discount_date = :discount_date,
+                availability = :availability,
+                VID = :vid
+            WHERE PID = :pid
+        """), {
+            'title': title,
+            'price': price,
+            'description': description,
+            'image_url': image_url,
+            'warranty': warranty,
+            'discount': discount,
+            'discount_date': discount_date,
+            'availability': availability,
+            'vid': vid,
+            'pid': pid
+        })
+        conn.commit()
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product updated successfully", success=True))
+    except Exception as e:
+        print(f"ERROR UPDATING PRODUCT: {e}")
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product update failed", success=False))
+
+@admin_bp.route('/AddInventory', methods=["POST"])
+def AdminAddInventory():
+    try:
+        PID = request.form.get("PID")
+        IMG_ID = request.form.get("image_ids")  # This is 'main' if no IMG_ID
+        Color = request.form.get("Color")
+        Amount = request.form.get("Amount")
+
+        conn = Connecttodb()
+
+        is_main = IMG_ID == 'main'
+
+        # Check if the inventory already exists
+        if is_main:
+            inventory_exists = conn.execute(text("""
+                SELECT 1 FROM product_inventory
+                WHERE PID = :pid AND
+                      IMG_ID IS NULL AND
+                      color = :color
+            """), {
+                'pid': PID,
+                'color': Color
+            }).first()
+        else:
+            inventory_exists = conn.execute(text("""
+                SELECT 1 FROM product_inventory
+                WHERE PID = :pid AND
+                      IMG_ID = :img_id AND
+                      color = :color
+            """), {
+                'pid': PID,
+                'img_id': IMG_ID,
+                'color': Color
+            }).first()
+
+        if inventory_exists:
+            print("Inventory already exists for this image/color combination.")
+            return redirect(url_for('admin_bp.AdminViewProducts', messageinv="Inventory already exists", successinv=False))
+
+        # Insert new inventory
+        if is_main:
+            conn.execute(text("""
+                INSERT INTO product_inventory (PID, color, amount)
+                VALUES (:pid, :color, :amount)
+            """), {
+                'pid': PID,
+                'color': Color,
+                'amount': Amount
+            })
+        else:
+            conn.execute(text("""
+                INSERT INTO product_inventory (PID, IMG_ID, color, amount)
+                VALUES (:pid, :img_id, :color, :amount)
+            """), {
+                'pid': PID,
+                'img_id': IMG_ID,
+                'color': Color,
+                'amount': Amount
+            })
+
+        conn.commit()
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Inventory added successfully", success=True))
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Failed to add inventory", success=False))
+
+@admin_bp.route('/AddInventory', methods=["POST"])
+def AdminEditInventory():
+    try:
+        # Get form data
+        PID = request.form.get("PID")
+        IMG_ID = request.form.get("image_ids")
+        Color = request.form.get("Color")
+        Amount = request.form.get("Amount")
+
+        # Insert inventory data into the database
+        # IMG_ID
+        conn = Connecttodb()
+        if IMG_ID == 'main':
+            conn.execute(text("""
+                update INTO product_inventory (PID, color, amount)
+                VALUES (:pid, :color, :amount)
+            """), {
+                'pid': PID,
+                'color': Color,
+                'amount': Amount
+            })
+        else:
+            conn.execute(text("""
+                update INTO product_inventory (PID, IMG_ID ,color, amount)
+                VALUES (:pid, :img_id, :color, :amount)
+            """), {
+                'pid': PID,
+                'img_id': IMG_ID,
+                'color': Color,
+                'amount': Amount
+            })
+        conn.commit()
+
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Inventory added successfully", success=True))
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Failed to add inventory", success=False))
+     
+@admin_bp.route('/deleteProduct', methods=['POST'])
+def AdminDeleteProduct():
+    try:
+        pid = request.form.get('PID')
+        print("######################################")
+        print("######################################")
+        print('working...', pid)
+        print("######################################")
+        print("######################################")
+        conn = Connecttodb()
+        conn.execute(text("""
+            SET FOREIGN_KEY_CHECKS = 0
+        """))
+        conn.execute(text("""
+            DELETE FROM product WHERE PID = :pid
+        """), {
+            'pid': pid
+        })
+        conn.execute(text("""
+            DELETE FROM product_inventory WHERE PID = :pid
+        """), {
+            'pid': pid
+        })
+        conn.execute(text("""
+            DELETE FROM product_images WHERE PID = :pid
+        """), {
+            'pid': pid
+        })
+        conn.commit()
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product Deleted successfully", success=True))
+    except Exception as e:
+        print(f"ERROR DELETING PRODUCT: {e}")
+        print("######################################")
+        print("######################################")
+        print('nope...')
+        print("######################################")
+        print("######################################")
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product Delete failed", success=False))
+
+@admin_bp.route('/AddImages', methods=["POST"])
+def AdminAddImages():
+    try:
+        conn = Connecttodb()
+        image_url = request.form.get("image_url")
+        pid = request.form.get("image_PID")
+
+        if not pid or not image_url:
+            print("Missing product ID or image URL.")
+            return redirect(url_for("admin_bp.AdminViewProducts"))
+
+        conn.execute(text("""
+            INSERT INTO product_images (PID, image) VALUES (:pid, :image)
+        """), {"pid": pid, "image": image_url})
+
+        conn.commit()
+        print("Image added successfully.")
+        return redirect(url_for("admin_bp.AdminViewProducts"))
+
+    except Exception as e:
+        print(f"Error adding image: {e}")
+        print("Failed to add image.")
+        return redirect(url_for("admin_bp.AdminViewProducts"))
+
+@admin_bp.route('/editProductImages', methods=['POST'])
+def AdminEditProductImages():
+    try:
+        pid = request.form.get('PID')
+        img_id = request.form.get('image_ids')
+        image_url = request.form.get('image_url')
+
+        # Basic validation
+        if not pid or not img_id or not image_url:
+            raise ValueError("Missing form data")
+
+        # Make sure img_id is a single number
+        if '|' in img_id or '||' in img_id:
+            raise ValueError(f"Invalid img_id received: {img_id}")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            UPDATE product_images SET
+                image = :image_url
+            WHERE PID = :pid AND img_id = :img_id
+        """), {
+            'image_url': image_url,
+            'img_id': img_id,
+            'pid': pid
+        })
+        conn.commit()
+
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product image updated successfully", success=True))
+
+    except Exception as e:
+        print(f"ERROR UPDATING PRODUCT IMAGE: {e}")
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Product image update failed", success=False))
+    
+@admin_bp.route('/Profile',methods=["POST"])
 def GetProfileInfo():
     try:
-        return render_template('Profile.html')
+        return render_template('Adminprofile.html')
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('Profile.html')
+        return render_template('Adminprofile.html')
 
-@admin.route('/Profile',methods=["GET"])
+@admin_bp.route('/Profile',methods=["GET"])
 def ViewProfile():
     try:
-        return render_template('Profile.html')
+        return render_template('Adminprofile.html')
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('Profile.html')
-
+        return render_template('Adminprofile.html')
+    
+    
+    
+    
