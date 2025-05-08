@@ -102,7 +102,6 @@ header li {
 
 .input,
 .barItem input {
-  
   height: 35px;
   border: none;
   border-radius: 5px;
@@ -111,7 +110,6 @@ header li {
 
 
 .Profile{
-  
   font-size: 2rem;
   padding:.5rem;
   width:50px;

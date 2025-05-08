@@ -50,11 +50,11 @@
           <img class="logo" src="{{url_for('static',filename='/images/Logo_fill.svg')}}">
         </div>
         <ul class="barItem">
-          <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li>
+          <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin_bp.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li>
           {% if g.User['Role']=='admin' %}
-          <li><button onclick="window.location.href = '{{ url_for('admin.chat_bp.chat_view') }}'">CHAT</button></li>
-          <li><button>Pending Accounts</button></li>
-          <li><button>Settings</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('admin_bp.chat_bp.chat_view') }}'">CHAT</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('admin_bp.AdminViewAccounts') }}'">PENDING ACCOUNTS</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('admin_bp.AdminViewProducts')}}'">VENDOR PRODUCTS</button></li>
           {% elif g.User['Role']=='vendor' %}
           <li><button onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts')}}'">SEE YOUR PRODUCTS</button></li>
           <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>

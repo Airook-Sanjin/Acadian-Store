@@ -4,7 +4,7 @@ import secrets
 from datetime import datetime
 from Auth.Login import login_bp
 from Auth.Register import register_bp
-from User.Admin.Admin import admin
+from User.Admin.Admin import admin_bp
 from User.Customer.Customer import customer_bp
 from User.Vendor.Vendor import vendor_bp
 from User.user import user_bp
@@ -48,7 +48,7 @@ app.register_blueprint(chat_bp)
 app.register_blueprint(search_bp)
 app.register_blueprint(OrderPlace_bp)
 
-app.register_blueprint(admin)
+app.register_blueprint(admin_bp)
 app.register_blueprint(customer_bp)
 app.register_blueprint(vendor_bp)
 
@@ -72,8 +72,7 @@ def start():
                 image_url
                 FROM product 
         """)).mappings().fetchall()  # changed from .first() to .fetchall()
-        
-        print
+
         
         inventory = conn.execute(text("""
             SELECT color, amount
