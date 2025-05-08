@@ -1,9 +1,17 @@
 from globals import Blueprint, render_template, request,g,session,redirect,url_for,Connecttodb,text
 from flask import make_response
+from urllib.parse import urlparse,parse_qs,urlencode,urlunparse
 cart_bp = Blueprint('cart_bp', __name__, url_prefix='/cart', template_folder='templates')
 
 conn = Connecttodb()
 
+
+def calculate_total(CartList):
+    try:
+        return sum(float(item['Price']) for item in CartList if item['Price'] is not None)
+    except (TypeError,ValueError) as e:
+        print(e)
+        return 0
 @cart_bp.before_request # Before each request it will look for the values below
 def load_user():
     try:
@@ -26,8 +34,9 @@ def UserCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
+					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
@@ -37,16 +46,14 @@ def UserCart(username):
         if CartList== []:
             return render_template('Cart.html')
         
-        total = 0
-        
         print(CartList)#!Debug
-        for item in CartList:
-            total+=float(item['Price'])
-            print(item)#!Debug
-            print (f'PIDs:{item['PID'],item['color']}')
-            
+        total = calculate_total(CartList)
+        
         print(total) #!Debug
-        return render_template('Cart.html',username=username,CartList = CartList,total =total)
+       
+        item_status = request.args.get('ItemStatus')
+        
+        return render_template('Cart.html',username=username,ItemStatus=item_status,CartList = CartList,total =total)
     except Exception as e:
         print(f'ERROR: {e}')
         return render_template('Cart.html',username=username,CartList = CartList,total = 0)
@@ -64,18 +71,16 @@ def RemoveFromCart(username):
         
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
+					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND ca.ORDER_ID is Null """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
         
-        total = 0
-        for item in CartList:
-            total+=float(item['Price'])
-            
+        total = calculate_total(CartList)
         return redirect(request.referrer or url_for('Cart.html',username=username,CartList = CartList,total=total))
     except Exception as e:
         print(f'ERROR: {e}')
@@ -111,21 +116,34 @@ def addToCart():
         PID = int(request.args.get('PID'))
         COLOR = request.form.get('Color')
         Matchingitem =conn.execute(text("""
-                SELECT ca.ITEM_ID AS itemid, ca.color AS color,ca.quantity as quantity,ca.PID as PID,ca.ORDER_ID
-                FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
+                SELECT ca.ITEM_ID AS itemid, ca.color AS color,ca.quantity as quantity,ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory
+                FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID 
                 WHERE ca.CID = :ID AND ca.color = :color and ca.PID = :PID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID'],'color':COLOR,'PID':PID}).mappings().fetchall()
-        print(Matchingitem)
+        
         if Matchingitem:
-            print('Updating')
+            if Matchingitem[0]['quantity'] <= Matchingitem[0]['Inventory']:
+                print('Updating')
             
-            newQuantity = Matchingitem[0]['quantity'] +1
-            print(newQuantity)
-            conn.execute(text("""
+                newQuantity = Matchingitem[0]['quantity'] +1
+                print(newQuantity)
+                conn.execute(text("""
                       UPDATE cart
                       SET quantity =:quantity
                       Where item_ID = :item_id"""),{'quantity':newQuantity,'item_id':Matchingitem[0]['itemid']})
-            conn.commit()
-            
+                conn.commit()
+            else:
+                # !-----------------------------------------------
+                # ! HAD TO LOOK THIS UP!
+                # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
+                if request.referrer:   #* this is just so I can add a variable to the request.referrer
+                    parsed = urlparse(request.referrer)
+                    params = parse_qs(parsed.query)
+                    params['status']= ["Can't add anymore"] #* adds new parameter
+                    #* recreates url with the new parameters
+                    newQuery = urlencode(params, doseq=True)
+                    newURL = parsed._replace(query=newQuery).geturl()
+                    return redirect(newURL)
+                # !---------------------------------------------
         else:
             conn.execute(text(
             """
@@ -174,14 +192,36 @@ def addToCart():
 @cart_bp.route('/quantity-update/<username>', methods=["POST"])
 def quantityUpdate(username):
     try:
+        ITEMID = request.form.get('UpdatedItem')
+        UPDATEDITEMPID= request.form.get('UpdatedItemPID')
+        UPDATEDITEMCOLOR = request.form.get('UpdatedItemColor')
+        ITEMQUANTITY = request.form.get('ItemQuantity')
         print('Updating')
         conn.execute(text("""
-                      UPDATE cart
-                      SET quantity =:quantity
-                      Where item_ID = :item_id"""),{'quantity':request.form.get('quantity'),'item_id':request.form.get('UpdatedItem')})
+                      Update cart
+                        set quantity = Case
+                        WHEN quantity <= (Select amount from product_inventory WHERE PID = :PID and color = :color ) 
+                        THEN :quantity
+                        ELSE  quantity
+                        END
+                        Where item_ID = :item_id;
+                      """),{'quantity':ITEMQUANTITY,'item_id':ITEMID,'PID':UPDATEDITEMPID,'color':UPDATEDITEMCOLOR})
+        print(f"UPDATED ITEM ID:{ITEMID}\nNEW QUANTITY:{ITEMQUANTITY}\nUPDATEDITEMPID: {UPDATEDITEMPID}\nUPDATED ITEM COLOR: {UPDATEDITEMCOLOR}")
         conn.commit()
         
-        return redirect(request.referreror or url_for('ProductView',username=g.User['Name'])) # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
+        # !-----------------------------------------------
+        # ! HAD TO LOOK THIS UP!
+        # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
+        if request.referrer:   #* this is just so I can add a variable to the request.referrer
+            parsed = urlparse(request.referrer)
+            params = parse_qs(parsed.query)
+            params['status']= ['success'] #* adds new parameter
+            #* recreates url with the new parameters
+            newQuery = urlencode(params, doseq=True)
+            newURL = parsed._replace(query=newQuery).geturl()
+            return redirect(newURL)
+        # !---------------------------------------------
+        return redirect(url_for('ProductView',username=g.User['Name'])) 
     except Exception as e:
         print(f'Error: {e}')
 @cart_bp.route('/checkout/<username>')
@@ -192,17 +232,32 @@ def GotoCheckout(username):
         #             Select """))
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity,ca.ORDER_ID,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
+					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
 	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID']}).mappings().fetchall()
+        
+        listofItemStock = tuple([item['Price'] for item in CartList])
+        print(listofItemStock)
+        if 'OUT OF STOCK' in listofItemStock:
+            # !-----------------------------------------------
+            # ! HAD TO LOOK THIS UP!
+            # * THIS IS MY LIFE SAVER. request.referrer gets the URL of the page that MADE the request!!!!
+            if request.referrer:   #* this is just so I can add a variable to the request.referrer
+                parsed = urlparse(request.referrer)
+                base_url = url_for('cart_bp.UserCart', username = g.User["Name"])
+                params={'ItemStatus':["OUT OF STOCK"]} #* adds new parameter
+                #* recreates url with the new parameters
+                newQuery = urlencode(params, doseq=True)
+                # newURL = parsed._replace(query=newQuery).geturl()
+                return redirect(f"{base_url}?{newQuery}")
+            # !---------------------------------------------
         print (CartList)
-        total = 0
-        for item in CartList:
-            total+=float(item['Price'])
+        total = calculate_total(CartList)
             
         print(total)
         return render_template('Checkout.html',username=username,CartList = CartList,total=total)

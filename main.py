@@ -152,7 +152,7 @@ def ProductView():
         # Calculate rating percentages
         total_reviews = Review_Count["review_count"] if Review_Count and Review_Count["review_count"] else 0
         rating_percentages = {star: (rating_counts.get(star, 0) / total_reviews * 100) if total_reviews > 0 else 0 for star in range(1, 6)}
-
+        
         return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages)
 
     except Exception as e:
@@ -167,9 +167,13 @@ def GetInventory():
     color=request.args.get('color')
     inventory= conn.execute(text("""
         SELECT amount FROM product_inventory
-        WHERE PID = :pid AND color = :color """),{'pid':pid,'color': color}).fetchone()
+        WHERE PID = :pid AND color = :color """),{'pid':pid,'color': color}).mappings().fetchone()
+        
+    print(inventory['amount'])
+    return jsonify({'amount':inventory.amount if inventory.amount > 0 else 'Out of Stock' })
+
     
-    return jsonify({'amount':inventory.amount if inventory else 0 })
+    
     
 
 @app.route('/Review', methods=["POST"])

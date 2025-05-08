@@ -163,7 +163,7 @@
       <section class="imgCont">
         <img
           id="Thumbs"
-          src="https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fthumbnails%2F035%2F470%2F699%2Fsmall_2x%2Fok-emoji-emoticon-thumb-up-icons-4k-transparent-background-free-png.png&sp=1746016404Tf8d10f2197a55950edc25a16d83b31e51e56dc26d47a5c6dea9ff9f27881c10d"
+          src="https://bluemoji.io/cdn-proxy/646218c67da47160c64a84d5/64634bf644ea290c3bbf033f_86.png"
           alt="ThumbsupEmoticon"
         />
       </section>
@@ -191,16 +191,19 @@
       <section class="Cart-Container">
         {% if OrderHistory %} 
             {% for item in OrderHistory %}
-        <section class="item-Card">
+        <section class="item-Card" >
           <section class="item-info">
             <img src="{{item['ItemImage']}}" alt="{{item['ItemTitle']}}" />
             <h3>{{item['ItemTitle']}}</h3>
             
+            
           </section>
           <section class="item-fun">
             <!-- Formating  -->
+            <button onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ item.PID }}'">Leave a review?</button>
             <h4>{{item['ItemQuantity']}}x</h4>
             <h3>${{'%0.2f' | format(item['ItemPrice']|float)}}</h3>
+            
           </section>
         </section>
             {% endfor %} 
