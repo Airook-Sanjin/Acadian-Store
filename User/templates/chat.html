@@ -409,6 +409,8 @@
 
             <div class="send-message-container">
                 <form method="POST" action="{{ url_for('chat_bp.chat_view', chat_id=selected_chat['CHAT_ID']) }}" id="send_message_form">
+                    <input type="hidden" name="chat_id" value="{{ selected_chat.CHAT_ID }}">
+                    <input type="hidden" name="chat_type" value="{{ selected_chat.chat_type }}">
                     <input type="text" placeholder="Type your message here..." id="message" name="message" required>
                     <input type="text" placeholder="Image URL (optional)" id="image_url" name="image_url">
                     <input type="submit" value="Send" id="send_message">
