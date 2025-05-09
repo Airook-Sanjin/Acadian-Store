@@ -161,11 +161,13 @@ def VendorAddProduct():
         print(f"ERROR ADDING PRODUCT: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Product failed to add", success=False))
 
-@vendor_bp.route('/AddInventory', methods=["POST"])
-def AddInventory():
+
+    
+@vendor_bp.route('/EditInventory', methods=["POST"])
+def editInventory():
     try:
         PID = request.form.get("PID")
-        IMG_ID = request.form.get("image_ids")  # This is 'main' if no IMG_ID
+        IMG_ID = request.form.get("image_ids")
         Color = request.form.get("Color")
         Amount = request.form.get("Amount")
 
@@ -173,13 +175,11 @@ def AddInventory():
 
         is_main = IMG_ID == 'main'
 
-        # Check if the inventory already exists
+        # Check if inventory exists
         if is_main:
             inventory_exists = conn.execute(text("""
                 SELECT 1 FROM product_inventory
-                WHERE PID = :pid AND
-                      IMG_ID IS NULL AND
-                      color = :color
+                WHERE PID = :pid AND IMG_ID IS NULL AND color = :color
             """), {
                 'pid': PID,
                 'color': Color
@@ -187,60 +187,79 @@ def AddInventory():
         else:
             inventory_exists = conn.execute(text("""
                 SELECT 1 FROM product_inventory
-                WHERE PID = :pid AND
-                      IMG_ID = :img_id AND
-                      color = :color
+                WHERE PID = :pid AND IMG_ID = :img_id AND color = :color
             """), {
                 'pid': PID,
                 'img_id': IMG_ID,
                 'color': Color
             }).first()
 
+        # Perform update or insert depending on existence
         if inventory_exists:
-            print("Inventory already exists for this image/color combination.")
-            return redirect(url_for('vendor_bp.VendorViewProducts', messageinv="Inventory already exists", successinv=False))
-
-        # Insert new inventory
-        if is_main:
-            conn.execute(text("""
-                INSERT INTO product_inventory (PID, color, amount)
-                VALUES (:pid, :color, :amount)
-            """), {
-                'pid': PID,
-                'color': Color,
-                'amount': Amount
-            })
+            if is_main:
+                conn.execute(text("""
+                    UPDATE product_inventory
+                    SET amount = :amount
+                    WHERE PID = :pid AND IMG_ID IS NULL AND color = :color
+                """), {
+                    'pid': PID,
+                    'color': Color,
+                    'amount': Amount
+                })
+            else:
+                conn.execute(text("""
+                    UPDATE product_inventory
+                    SET amount = :amount
+                    WHERE PID = :pid AND IMG_ID = :img_id AND color = :color
+                """), {
+                    'pid': PID,
+                    'img_id': IMG_ID,
+                    'color': Color,
+                    'amount': Amount
+                })
         else:
-            conn.execute(text("""
-                INSERT INTO product_inventory (PID, IMG_ID, color, amount)
-                VALUES (:pid, :img_id, :color, :amount)
-            """), {
-                'pid': PID,
-                'img_id': IMG_ID,
-                'color': Color,
-                'amount': Amount
-            })
+            if is_main:
+                conn.execute(text("""
+                    INSERT INTO product_inventory (PID, color, amount)
+                    VALUES (:pid, :color, :amount)
+                """), {
+                    'pid': PID,
+                    'color': Color,
+                    'amount': Amount
+                })
+            else:
+                conn.execute(text("""
+                    INSERT INTO product_inventory (PID, IMG_ID, color, amount)
+                    VALUES (:pid, :img_id, :color, :amount)
+                """), {
+                    'pid': PID,
+                    'img_id': IMG_ID,
+                    'color': Color,
+                    'amount': Amount
+                })
 
         conn.commit()
-        return redirect(url_for('vendor_bp.VendorViewProducts', message="Inventory added successfully", success=True))
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Inventory saved successfully", success=True))
 
     except Exception as e:
         print(f"ERROR: {e}")
-        return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add inventory", success=False))
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to save inventory", success=False))
+
+
 
 
 @vendor_bp.route('/AddImages', methods=["POST"])
 def AddImages():
     try:
-        conn = Connecttodb()
         image_url = request.form.get("image_url")
-        pid = request.form.get("image_PID")
+        pid = request.form.get("PID")
 
         if not pid or not image_url:
-            print("Missing product ID or image URL.")
+            print(f"Missing product ID or image URL. PID: {pid}, Image URL: {image_url}")
             return redirect(url_for("vendor_bp.VendorViewProducts"))
 
-        conn.execute(text("""
+        conn = Connecttodb()
+        conn.execute(text(""" 
             INSERT INTO product_images (PID, image) VALUES (:pid, :image)
         """), {"pid": pid, "image": image_url})
 
@@ -252,6 +271,8 @@ def AddImages():
         print(f"Error adding image: {e}")
         print("Failed to add image.")
         return redirect(url_for("vendor_bp.VendorViewProducts"))
+
+
 
 
 
@@ -318,14 +339,15 @@ def VendorDeleteProduct():
         print("######################################")
         print("######################################")
         conn = Connecttodb()
-        conn.execute(text("""
-            DELETE FROM product WHERE PID = :pid and VID = :vid
-        """), {
-            'vid': vid,
-            'pid': pid
-        })
+        
+        if vid:
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
+            conn.execute(text("DELETE FROM product WHERE PID = :pid and VID = :vid"), {'vid': vid, 'pid': pid})
+            conn.execute(text("DELETE FROM product_images WHERE PID = :pid"), {'pid': pid})
+            conn.execute(text("DELETE FROM product_inventory WHERE PID = :pid"), {'pid': pid})
+            conn.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
         conn.commit()
-        return redirect(url_for('admin_bp.VendorViewProducts', message="Product Deleted successfully", success=True))
+        return redirect(url_for('vendor_bp.VendorViewProducts', message="Product Deleted successfully", success=True))
     except Exception as e:
         print(f"ERROR DELETING PRODUCT: {e}")
         print("######################################")
@@ -343,6 +365,9 @@ def VendorEditProductImages():
         img_id = request.form.get('image_ids')
         image_url = request.form.get('image_url')
 
+        # Debugging: print out received data
+        print(f"PID: {pid}, Image ID: {img_id}, Image URL: {image_url}")
+
         # Basic validation
         if not pid or not img_id or not image_url:
             raise ValueError("Missing form data")
@@ -352,11 +377,9 @@ def VendorEditProductImages():
             raise ValueError(f"Invalid img_id received: {img_id}")
 
         conn = Connecttodb()
-        conn.execute(text("""
-            UPDATE product_images SET
-                image = :image_url
-            WHERE PID = :pid AND img_id = :img_id
-        """), {
+        conn.execute(text("""UPDATE product_images SET
+            image = :image_url
+            WHERE PID = :pid AND img_id = :img_id"""), {
             'image_url': image_url,
             'img_id': img_id,
             'pid': pid
@@ -369,40 +392,21 @@ def VendorEditProductImages():
         print(f"ERROR UPDATING PRODUCT IMAGE: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Product image update failed", success=False))
 
-@vendor_bp.route('/AddInventory', methods=["POST"])
-def editInventory():
+
+    
+@vendor_bp.route('/Profile',methods=["POST"])
+def GetProfileInfo():
     try:
-        # Get form data
-        PID = request.form.get("PID")
-        IMG_ID = request.form.get("image_ids")
-        Color = request.form.get("Color")
-        Amount = request.form.get("Amount")
-
-        # Insert inventory data into the database
-        # IMG_ID
-        conn = Connecttodb()
-        if IMG_ID == 'main':
-            conn.execute(text("""
-                update INTO product_inventory (PID, color, amount)
-                VALUES (:pid, :color, :amount)
-            """), {
-                'pid': PID,
-                'color': Color,
-                'amount': Amount
-            })
-        else:
-            conn.execute(text("""
-                update INTO product_inventory (PID, IMG_ID ,color, amount)
-                VALUES (:pid, :img_id, :color, :amount)
-            """), {
-                'pid': PID,
-                'img_id': IMG_ID,
-                'color': Color,
-                'amount': Amount
-            })
-        conn.commit()
-
-        return redirect(url_for('vendor_bp.VendorViewProducts', message="Inventory added successfully", success=True))
+        return render_template('Vendorprofile.html')
     except Exception as e:
-        print(f"ERROR: {e}")
-        return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add inventory", success=False))
+        print(f"Error: {e}")
+        return render_template('Vendorprofile.html')
+
+@vendor_bp.route('/Profile',methods=["GET"])
+def ViewProfile():
+    try:
+        return render_template('Vendorprofile.html')
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template('Vendorprofile.html')
+    
