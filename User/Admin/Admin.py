@@ -156,7 +156,7 @@ def AdminViewProducts():
         return render_template('editProduct.html', AllProducts=[], CurDate=CurDate, message="Failed to add product.", success=False)
 
     
-@admin.route('/Profile',methods=["POST"])
+@admin_bp.route('/Profile',methods=["POST"])
 def GetProfileInfo():
     try:
         return render_template('Profile.html')
@@ -164,7 +164,7 @@ def GetProfileInfo():
         print(f"Error: {e}")
         return render_template('Profile.html')
 
-@admin.route('/Profile',methods=["GET"])
+@admin_bp.route('/Profile',methods=["GET"])
 def ViewProfile():
     try:
         return render_template('Profile.html')
