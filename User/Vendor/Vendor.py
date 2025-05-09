@@ -178,7 +178,7 @@ def AddInventory():
         inventory_exists = conn.execute(text("""
             SELECT 1 FROM product_inventory
             WHERE PID = :pid AND
-                  IMG_ID = :img_id AND
+                  IMG_ID IS :img_id AND
                   color = :color
         """), {
             'pid': PID,
@@ -393,8 +393,10 @@ def editInventory():
 
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Inventory added successfully", success=True))
     except Exception as e:
+
         print(f"ERROR: {e}")
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Failed to add inventory", success=False))
+
     
     
     
