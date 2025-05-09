@@ -1,5 +1,7 @@
 <style>
-    
+    .product_container{
+    display: none !important;
+  }
     /* === Add Product Page === */
     .add-product-page {
             display: flex;
@@ -138,7 +140,7 @@
         padding: 5px 0;
     }
 
-    input[type="submit"] {
+    #AddProductBTN {
         margin-top: 10px;
         padding: 8px 12px;
         background-color: antiquewhite;
@@ -560,7 +562,7 @@
                     <option value="IN STOCK">IN STOCK</option>
                     <option value="OUT OF STOCK">OUT OF STOCK</option>
                 </select>
-                <input type="submit" value="Add Product to Acadia">
+                <input id="AddProductBTN" type="submit" value="Add Product to Acadia">
             </form>
             
          </section>
