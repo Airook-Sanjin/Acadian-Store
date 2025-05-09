@@ -28,6 +28,20 @@
   .price-holder h4 {
     margin: 0;
   }
+  .Empty{
+    display: flex;
+    flex:1;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap:2em;
+  }
+  #EmpText{
+    font-size: xx-large;
+  }
+  #ShockedEm{
+    width:5rem;
+  }
 </style>
 <head>
   <meta charset="UTF-8">
@@ -113,6 +127,7 @@
   {% endblock body %}
 
   <section class="product_container">
+    {% if products %}
     {% for product in products %}
       {% if product.PID %}
         <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
@@ -137,6 +152,12 @@
         </section>
       {% endif %}
     {% endfor %}
+    {% else %}
+    <section class="Empty">
+      <h1 id = 'EmpText'>There are no products!</h1>
+      <img id ='ShockedEm' src="https://wallpapers.com/images/hd/surprised-emoji-expression-avxqgla4xh0x2gl7.jpg"  alt="SHocked" srcset="">
+    </section>
+    {% endif %}
   </section>
 
   <footer class="footer">
