@@ -98,7 +98,13 @@
       <div class="Right-side">
         {% if g.User %}
         <h4>Hello {{g.User["Name"].title()}}</h4>
-        <form {% if g.User['Role']=='admin' %} action="{{ url_for('admin_bp.GetProfileInfo') }}"{% elif g.User['Role']=='vendor' %} action="{{ url_for('vendor_bp.GetProfileInfo') }}"{% else %} action="{{ url_for('customer_bp.GetProfileInfo') }}"{% endif %} method="POST">
+        <form 
+        {% if g.User['Role'] == 'admin' %} action="{{ url_for('admin_bp.GetProfileInfo') }}"
+        {% elif g.User['Role'] == 'vendor' %} action="{{ url_for('vendor_bp.GetProfileInfo') }}"
+        {% elif g.User['Role'] == 'customer' %} action="{{ url_for('customer_bp.GetProfileInfo') }}"
+        {% endif %}
+        method="POST">
+
         <button id="GoToProfile" type="submit">
           <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
         </button>
@@ -201,6 +207,5 @@
       window.location.href = this.dataset.href;
     });
   </script>
-  {%block scripts%}{%endblock scripts%}
 </body>
 </html>
