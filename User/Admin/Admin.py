@@ -248,11 +248,11 @@ def AdminEditProduct():
         print(f"ERROR UPDATING PRODUCT: {e}")
         return redirect(url_for('admin_bp.AdminViewProducts', message="Product update failed", success=False))
 
-@admin_bp.route('/AddInventory', methods=["POST"])
-def AdminAddInventory():
+@admin_bp.route('/EditInventory', methods=["POST"])
+def AdminEditInventory():
     try:
         PID = request.form.get("PID")
-        IMG_ID = request.form.get("image_ids")  # This is 'main' if no IMG_ID
+        IMG_ID = request.form.get("image_ids")
         Color = request.form.get("Color")
         Amount = request.form.get("Amount")
 
@@ -260,13 +260,11 @@ def AdminAddInventory():
 
         is_main = IMG_ID == 'main'
 
-        # Check if the inventory already exists
+        # Check if inventory exists
         if is_main:
             inventory_exists = conn.execute(text("""
                 SELECT 1 FROM product_inventory
-                WHERE PID = :pid AND
-                      IMG_ID IS NULL AND
-                      color = :color
+                WHERE PID = :pid AND IMG_ID IS NULL AND color = :color
             """), {
                 'pid': PID,
                 'color': Color
@@ -274,85 +272,63 @@ def AdminAddInventory():
         else:
             inventory_exists = conn.execute(text("""
                 SELECT 1 FROM product_inventory
-                WHERE PID = :pid AND
-                      IMG_ID = :img_id AND
-                      color = :color
+                WHERE PID = :pid AND IMG_ID = :img_id AND color = :color
             """), {
                 'pid': PID,
                 'img_id': IMG_ID,
                 'color': Color
             }).first()
 
+        # Perform update or insert depending on existence
         if inventory_exists:
-            print("Inventory already exists for this image/color combination.")
-            return redirect(url_for('admin_bp.AdminViewProducts', messageinv="Inventory already exists", successinv=False))
-
-        # Insert new inventory
-        if is_main:
-            conn.execute(text("""
-                INSERT INTO product_inventory (PID, color, amount)
-                VALUES (:pid, :color, :amount)
-            """), {
-                'pid': PID,
-                'color': Color,
-                'amount': Amount
-            })
+            if is_main:
+                conn.execute(text("""
+                    UPDATE product_inventory
+                    SET amount = :amount
+                    WHERE PID = :pid AND IMG_ID IS NULL AND color = :color
+                """), {
+                    'pid': PID,
+                    'color': Color,
+                    'amount': Amount
+                })
+            else:
+                conn.execute(text("""
+                    UPDATE product_inventory
+                    SET amount = :amount
+                    WHERE PID = :pid AND IMG_ID = :img_id AND color = :color
+                """), {
+                    'pid': PID,
+                    'img_id': IMG_ID,
+                    'color': Color,
+                    'amount': Amount
+                })
         else:
-            conn.execute(text("""
-                INSERT INTO product_inventory (PID, IMG_ID, color, amount)
-                VALUES (:pid, :img_id, :color, :amount)
-            """), {
-                'pid': PID,
-                'img_id': IMG_ID,
-                'color': Color,
-                'amount': Amount
-            })
+            if is_main:
+                conn.execute(text("""
+                    INSERT INTO product_inventory (PID, color, amount)
+                    VALUES (:pid, :color, :amount)
+                """), {
+                    'pid': PID,
+                    'color': Color,
+                    'amount': Amount
+                })
+            else:
+                conn.execute(text("""
+                    INSERT INTO product_inventory (PID, IMG_ID, color, amount)
+                    VALUES (:pid, :img_id, :color, :amount)
+                """), {
+                    'pid': PID,
+                    'img_id': IMG_ID,
+                    'color': Color,
+                    'amount': Amount
+                })
 
         conn.commit()
-        return redirect(url_for('admin_bp.AdminViewProducts', message="Inventory added successfully", success=True))
-
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Inventory saved successfully", success=True))
     except Exception as e:
         print(f"ERROR: {e}")
-        return redirect(url_for('admin_bp.AdminViewProducts', message="Failed to add inventory", success=False))
+        return redirect(url_for('admin_bp.AdminViewProducts', message="Failed to save inventory", success=False))
 
-@admin_bp.route('/AddInventory', methods=["POST"])
-def AdminEditInventory():
-    try:
-        # Get form data
-        PID = request.form.get("PID")
-        IMG_ID = request.form.get("image_ids")
-        Color = request.form.get("Color")
-        Amount = request.form.get("Amount")
-
-        # Insert inventory data into the database
-        # IMG_ID
-        conn = Connecttodb()
-        if IMG_ID == 'main':
-            conn.execute(text("""
-                update INTO product_inventory (PID, color, amount)
-                VALUES (:pid, :color, :amount)
-            """), {
-                'pid': PID,
-                'color': Color,
-                'amount': Amount
-            })
-        else:
-            conn.execute(text("""
-                update INTO product_inventory (PID, IMG_ID ,color, amount)
-                VALUES (:pid, :img_id, :color, :amount)
-            """), {
-                'pid': PID,
-                'img_id': IMG_ID,
-                'color': Color,
-                'amount': Amount
-            })
-        conn.commit()
-
-        return redirect(url_for('admin_bp.AdminViewProducts', message="Inventory added successfully", success=True))
-    except Exception as e:
-        print(f"ERROR: {e}")
-        return redirect(url_for('admin_bp.AdminViewProducts', message="Failed to add inventory", success=False))
-     
 @admin_bp.route('/deleteProduct', methods=['POST'])
 def AdminDeleteProduct():
     try:
@@ -393,15 +369,15 @@ def AdminDeleteProduct():
 @admin_bp.route('/AddImages', methods=["POST"])
 def AdminAddImages():
     try:
-        conn = Connecttodb()
         image_url = request.form.get("image_url")
-        pid = request.form.get("image_PID")
+        pid = request.form.get("PID")
 
         if not pid or not image_url:
-            print("Missing product ID or image URL.")
-            return redirect(url_for("admin_bp.AdminViewProducts"))
+            print(f"Missing product ID or image URL. PID: {pid}, Image URL: {image_url}")
+            return redirect(url_for("vendor_bp.AdminViewProducts"))
 
-        conn.execute(text("""
+        conn = Connecttodb()
+        conn.execute(text(""" 
             INSERT INTO product_images (PID, image) VALUES (:pid, :image)
         """), {"pid": pid, "image": image_url})
 
@@ -421,6 +397,9 @@ def AdminEditProductImages():
         img_id = request.form.get('image_ids')
         image_url = request.form.get('image_url')
 
+        # Debugging: print out received data
+        print(f"PID: {pid}, Image ID: {img_id}, Image URL: {image_url}")
+
         # Basic validation
         if not pid or not img_id or not image_url:
             raise ValueError("Missing form data")
@@ -430,11 +409,9 @@ def AdminEditProductImages():
             raise ValueError(f"Invalid img_id received: {img_id}")
 
         conn = Connecttodb()
-        conn.execute(text("""
-            UPDATE product_images SET
-                image = :image_url
-            WHERE PID = :pid AND img_id = :img_id
-        """), {
+        conn.execute(text("""UPDATE product_images SET
+            image = :image_url
+            WHERE PID = :pid AND img_id = :img_id"""), {
             'image_url': image_url,
             'img_id': img_id,
             'pid': pid

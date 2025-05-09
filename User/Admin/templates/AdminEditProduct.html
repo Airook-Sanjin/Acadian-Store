@@ -119,381 +119,381 @@
 }
 
     
-.warranty_field_css,
-
-/* === Discount Field Section === */
-.discount_field_css {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    background-color: #f0f0f0;
-    padding: 1rem;
-    border-radius: 4px;
-}
-
-
-
-
-label {
-    padding: 5px 0;
-}
-
-input[type="submit"] {
-    margin-top: 10px;
-    padding: 8px 12px;
-    background-color: antiquewhite;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
+    .warranty_field_css,
     
-/* === Sidebar of Add Product Page === */
-.leftside-of-add-product-page {
-        text-align: center;
-        width: 20%;
-    }
-
-    
-/* === Discount Field Section === */
-.discount_field_css {
+    /* === Discount Field Section === */
+    .discount_field_css {
         display: flex;
         flex-direction: column;
-        height: auto;
-        align-items: center;
-        width: 100%;
+        gap: 0.5rem;
+        background-color: #f0f0f0;
+        padding: 1rem;
+        border-radius: 4px;
     }
-
     
-/* === Warranty Field Section === */
-.warranty_field_css {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-        align-items: center;
-        width: 100%;
+    
+    
+    
+    label {
+        padding: 5px 0;
     }
 
-    .grid-products {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(240px, 1fr));
-        gap: 20px;
-    }
-
-    .product-card {
-        padding: 15px;
-        background-color: #fefefe;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        text-align: center;
-        height: auto;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-
-    .product-card img {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-        border-radius: 3px;
-    }
-
-    .product-card .title,
-    .product-card .price {
-        font-weight: bold;
-        margin: 4px 0;
-    }
-
-    .inventory-button {
-        background-color: antiquewhite;
-        color: black;
+    input[type="submit"] {
+        margin-top: 10px;
         padding: 8px 12px;
+        background-color: antiquewhite;
         border: none;
-        border-radius: 6px;
+        border-radius: 5px;
         cursor: pointer;
     }
-
-    .inventory-button:hover {
-        background-color: #e2d1b8;
+    
+        
+    /* === Sidebar of Add Product Page === */
+    .leftside-of-add-product-page {
+            text-align: center;
+            width: 20%;
+        }
+    
+        
+    /* === Discount Field Section === */
+    .discount_field_css {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            align-items: center;
+            width: 100%;
+        }
+    
+        
+    /* === Warranty Field Section === */
+    .warranty_field_css {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            align-items: center;
+            width: 100%;
+        }
+    
+        .grid-products {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(240px, 1fr));
+            gap: 20px;
+        }
+    
+        .product-card {
+            padding: 15px;
+            background-color: #fefefe;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            height: auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    
+        .product-card img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+    
+        .product-card .title,
+        .product-card .price {
+            font-weight: bold;
+            margin: 4px 0;
+        }
+    
+        .inventory-button {
+            background-color: antiquewhite;
+            color: black;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    
+        .inventory-button:hover {
+            background-color: #e2d1b8;
+        }
+    
+        .button-holder{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-height: 100px;
+        }
+    
+        .img-title-holder{
+            display: flex;
+            width: 50%;
+            flex-direction: column;
+            justify-content: space-around;
+            min-height: 100px;
+        }
+        .price-holder{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30%;
+            min-width: 150px;
+            padding: 0px 20px;
+            min-height: 100px;
+        }
+        .price-holder p{
+            font-size: 13px;
+        }
+    
+    
+        /* Modal */
+        #OptionsModal,
+        #EditProductModal,
+        #DeleteProductModal,
+        #AddImageModal,
+        #InventoryModal,
+        #EditInventoryModal,
+        #ImageModal,
+        #EditImageModal {
+            flex-direction: row;
+            justify-content: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+    
+        .modal-dialog {
+            padding: 20px;
+        }
+    
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .modal-body div,section{
+            align-content: center;
+        }
+    
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        /* ################################### */
+        .Options-dialog {
+            
+        }
+        .Options-content {
+            
+        }
+        .Options-button-holder {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        .Options-body {
+            display: flex;
+            justify-content: space-around;
+            height: 300px;
+        }
+        .Options-footer {
+            
+        }
+        /* ################################### */
+        .edit-product-dialog {
+            background-color: #007BFF;
+            max-height: 300px;
+        }
+        /* ################################### */
+        .delete-product-dialog {
+            
+        }
+        /* ################################### */
+        .add-image-dialog {
+            
+        }
+        /* ################################### */
+        .edit-image-content {
+            width: 1200px;
+        }
+        .edit-image-dialog {
+            
+        }
+        /* ################################### */
+        .add-inventory-dialog {
+            
+        }
+        /* ################################### */
+        .edit-inventory-dialog {
+            
+        }
+    
+    
+    .btn {
+        background-color: antiquewhite;
+        padding: 8px 14px;
+        border-radius: 5px;
+        border: none;
     }
-
-    .button-holder{
+    
+    .btn-primary {
+        margin-top: 3%;
+        background-color: antiquewhite;
+    }
+    
+    .Inventory-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .discount-badge {
+        position: absolute;
+        top: 10px;
+        left: -10px;
+        background: crimson;
+        color: white;
+        font-weight: bold;
+        padding: 5px 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 10;
+    }
+    .product-card {
+        box-shadow: var(--BoxShadow);
+        position: relative; /* Needed so the badge is positioned correctly */
+    }
+    
+    .inventory-button{
+        width: auto;
+        height: 40px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .edit-button{
+        background-color: antiquewhite;
+        width: auto;
+        height: 30px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    .modal-button-holder{
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-        min-height: 100px;
     }
-
-    .img-title-holder{
+    
+    
+    .img-contrainter{
+        width: auto;
+        height: auto;
+    }
+    .img-contrainter-modal{
         display: flex;
-        width: 50%;
-        flex-direction: column;
         justify-content: space-around;
-        min-height: 100px;
+        width: 100%;
     }
-    .price-holder{
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        width: 30%;
-        min-width: 150px;
-        padding: 0px 20px;
-        min-height: 100px;
-    }
-    .price-holder p{
-        font-size: 13px;
-    }
-
-
-    /* Modal */
-    #OptionsModal,
-    #EditProductModal,
-    #DeleteProductModal,
-    #AddImageModal,
-    #InventoryModal,
-    #EditInventoryModal,
-    #ImageModal,
-    #EditImageModal {
+    
+    /* old thumbnail */
+    /* .thumbnail-bar {
+        width: 100%; 
+        height: auto; 
+        display: flex; 
         flex-direction: row;
-        justify-content: center;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1000;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        display: none;
+        gap: 10px; 
+        overflow-x: auto; 
+        overflow-y: hidden; 
+        padding-right: 10px;
+        white-space: nowrap;
+        align-content: center;
+        scroll-behavior: smooth; 
     }
-
-    .modal-dialog {
-        padding: 20px;
-    }
-
-    .modal-content {
+        
+    .thumbnail, .placeholder-thumb {
+        width: 60px; 
+        height: auto;
+        object-fit: cover;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 0px;
         display: flex;
-        flex-direction: column;
-        padding: 20px;
-        border-radius: 10px;
-        background-color: #f9f9f9;
+        align-content: center;
+    } */
+
+    .thumbnail-bar {
+        width: 100%;
+        height: auto; 
+        display: flex; 
+        flex-direction: row;
+        gap: 10px; 
+        overflow-x: auto; 
+        overflow-y: hidden; 
+        padding-right: 10px;
+        white-space: nowrap;
+        align-content: center;
+        scroll-behavior: smooth; 
     }
-    .modal-body div,section{
+    .thumbnail-item{
+        width: 45px; 
+        height: auto;
+        object-fit: cover;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 0px;
+        display: flex;
         align-content: center;
     }
 
-    .modal-footer {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
-    /* ################################### */
-    .Options-dialog {
-        
-    }
-    .Options-content {
-        
-    }
-    .Options-button-holder {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-    }
-    .Options-body {
+    .thumbnail, .placeholder-thumb {
+        width: 60px; 
+        height: auto;
+        object-fit: cover;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 0px;
         display: flex;
         justify-content: space-around;
-        height: 300px;
+        align-content: center;
     }
-    .Options-footer {
         
+    .placeholder-thumb:hover {
+        /* transform: scale(1.05); */
+        border-color: #007BFF;
     }
-    /* ################################### */
-    .edit-product-dialog {
-        background-color: #007BFF;
-        max-height: 300px;
-    }
-    /* ################################### */
-    .delete-product-dialog {
-        
-    }
-    /* ################################### */
-    .add-image-dialog {
-        
-    }
-    /* ################################### */
-    .edit-image-content {
-        width: 1200px;
-    }
-    .edit-image-dialog {
-        
-    }
-    /* ################################### */
-    .add-inventory-dialog {
-        
-    }
-    /* ################################### */
-    .edit-inventory-dialog {
-        
-    }
-
-
-.btn {
-    background-color: antiquewhite;
-    padding: 8px 14px;
-    border-radius: 5px;
-    border: none;
-}
-
-.btn-primary {
-    margin-top: 3%;
-    background-color: antiquewhite;
-}
-
-.Inventory-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.discount-badge {
-    position: absolute;
-    top: 10px;
-    left: -10px;
-    background: crimson;
-    color: white;
-    font-weight: bold;
-    padding: 5px 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    border-radius: 4px;
-    font-size: 14px;
-    z-index: 10;
-}
-.product-card {
-    box-shadow: var(--BoxShadow);
-    position: relative; /* Needed so the badge is positioned correctly */
-}
-
-.inventory-button{
-    width: auto;
-    height: 40px;
-    font-size: 16px;
-    cursor: pointer;
-}
-.edit-button{
-    background-color: antiquewhite;
-    width: auto;
-    height: 30px;
-    cursor: pointer;
-    font-size: 12px;
-}
-.modal-button-holder{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-}
-
-
-.img-contrainter{
-    width: auto;
-    height: auto;
-}
-.img-contrainter-modal{
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
-
-/* old thumbnail */
-/* .thumbnail-bar {
-    width: 100%; 
-    height: auto; 
-    display: flex; 
-    flex-direction: row;
-    gap: 10px; 
-    overflow-x: auto; 
-    overflow-y: hidden; 
-    padding-right: 10px;
-    white-space: nowrap;
-    align-content: center;
-    scroll-behavior: smooth; 
-}
     
-.thumbnail, .placeholder-thumb {
-    width: 60px; 
-    height: auto;
-    object-fit: cover;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 0px;
-    display: flex;
-    align-content: center;
-} */
-
-.thumbnail-bar {
-    width: 100%;
-    height: auto; 
-    display: flex; 
-    flex-direction: row;
-    gap: 10px; 
-    overflow-x: auto; 
-    overflow-y: hidden; 
-    padding-right: 10px;
-    white-space: nowrap;
-    align-content: center;
-    scroll-behavior: smooth; 
-}
-.thumbnail-item{
-    width: 45px; 
-    height: auto;
-    object-fit: cover;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 0px;
-    display: flex;
-    align-content: center;
-}
-
-.thumbnail, .placeholder-thumb {
-    width: 60px; 
-    height: auto;
-    object-fit: cover;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 0px;
-    display: flex;
-    justify-content: space-around;
-    align-content: center;
-}
+    .radio-group-horizontal {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
     
-.placeholder-thumb:hover {
-    /* transform: scale(1.05); */
-    border-color: #007BFF;
-}
-
-.radio-group-horizontal {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-}
-
-.radio-option {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.3rem; /* spacing between input and label */
-}
-
-</style>
-
+    .radio-option {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.3rem; /* spacing between input and label */
+    }
     
-    {% extends 'GuestHomepage.html'%}
+    </style>
+    
+    
+     {% extends 'GuestHomepage.html'%}
      
      {% block body %}
      <section class="Main">
@@ -511,7 +511,7 @@ input[type="submit"] {
                 {% endif %}
              </div>
      
-             <form class="form-css form1" method="POST" action="{{ url_for('admin_bp.AdminAddProduct') }}">
+             <form class="form-css form1" method="POST" action="{{ url_for('vendor_bp.VendorAddProduct') }}">
                 <h1 class="modal-title">Add Product</h1>
             
                 <label for="URL">Image URL:</label>
@@ -651,6 +651,7 @@ input[type="submit"] {
                         <button class="inventory-button" onclick="OpenDeleteModal()">Delete Product</button>
                         <button class="inventory-button" onclick="OpenImageModal()">Add Images</button>
                         <button class="inventory-button" onclick="OpenEditImageModal()">Edit Images</button>
+                        <!-- <button class="inventory-button" onclick="OpenInventoryModal()">Add Inventory Item</button> -->
                         <button class="inventory-button" onclick="OpenEditInvetoryModal()">Edit Inventory Item</button>
                     </div>
                 </div>
@@ -788,513 +789,451 @@ input[type="submit"] {
         </div>
     </div>
     
-    <!-- Add Image Modal Structure -->
-    <div id="AddImageModal" class="modal" style="display: none;">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title">Add Product Images</h1>
-                    <p style="margin: 0; color: rgb(136, 136, 136);">Upload additional images</p>
-                </div>
-                <div class="modal-body">
-                    <!-- Form for adding product images -->
-                    <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminAddImages') }}" enctype="multipart/form-data">
-                        <label for="image_PID">Product ID: <span id="img-modal-PID"></span></label>
-                        <input type="hidden" id="img-modal-PID-input" name="PID">
-
-                        <label for="image_url">Enter Image URL:</label>
-                        <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
-                        <button type="submit" class="btn btn-primary">Upload Image</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="CloseImageModal()">Close</button>
-                </div>
+<!-- Add Image Modal Structure -->
+<div id="AddImageModal" class="modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Add Product Images</h1>
+                <p style="margin: 0; color: rgb(136, 136, 136);">Upload additional images</p>
+            </div>
+            <div class="modal-body">
+                <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminAddImages') }}" enctype="multipart/form-data">
+                    <label>Product ID: <span id="img-modal-PID"></span></label>
+                    <input type="hidden" id="img-modal-PID-input" name="PID">
+                    <label for="image_url">Enter Image URL:</label>
+                    <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg" required>
+                    <button type="submit" class="btn btn-primary">Upload Image</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CloseImageModal()">Close</button>
             </div>
         </div>
     </div>
-        
-        <!-- Edit Image Modal Structure -->
-    <div id="EditImageModal" class="modal" style="display: none;">
+</div>
+
+    
+    
+    <!-- Edit Image Modal Structure -->
+<div id="EditImageModal" class="modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content edit-image-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Edit Product Images</h1>
+                <p style="margin: 0; color: rgb(136, 136, 136);">Upload additional images</p>
+            </div>
+            <div class="modal-body">
+                <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminEditProductImages') }}" enctype="multipart/form-data">
+                    <!-- Hidden fields dynamically set via JS -->
+                    <input type="hidden" id="edit-image-pid" name="PID"> <!-- Ensure correct name for PID -->
+                    <input type="hidden" id="edit-image-id" name="image_ids"> <!-- Hidden field for img_id -->
+
+                    <label for="image_url">Product ID: <span id="edit-img-modal-PID-input"></span></label>
+                    <label for="pi-img-id">Image ID: <span id="pi-img-id"></span></label>
+
+                    {% for product in AllProducts %}
+                        <div class="product-images-group" data-pid="{{ product['product_id'] }}" style="display: none;">
+                            {% if product['additional_images'] %}
+                                <!-- Modal Image Section -->
+                                <div class="img-contrainter-modal" style="margin-bottom: 10px;">
+                                    <img src="{{ product['image_url'] }}" style="margin-bottom: 10px; width: 300px; height: auto;" alt="Main product Image" id="main-modal-image-{{ product['product_id'] }}">
+                                </div>
+                                <!-- Thumbnail Section -->
+                                <div class="thumbnail-bar">
+                                    <div class="thumbnail placeholder-thumb" style="justify-content: center;">
+                                        <div class="thumbnail-item" style="width:auto;">
+                                            <img src="{{ product['image_url'] or 'https://via.placeholder.com/200' }}" alt="Main product Image" class="thumbnail"
+                                                onclick="changeModalImage('{{ product['image_url'] }}', '{{ product['product_id'] }}', 'main')">
+                                        </div>
+                                    </div>
+                                    {% for img, img_id in product['additional_images'] %}
+                                        <div class="thumbnail placeholder-thumb" style="justify-content: center;">
+                                            <div class="thumbnail-item" style="width:auto;">
+                                                <img src="{{ img }}" alt="Thumbnail" class="thumbnail"
+                                                    onclick="changeModalImage('{{ img }}', '{{ product['product_id'] }}', '{{ img_id }}')">
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p>No additional images.</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <label for="image_url">Enter Image URL:</label>
+                    <input type="url" id="edit-image-url" name="image_url" placeholder="https://example.com/image.jpg">
+                    <button type="submit" class="btn btn-primary">Update Image</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CloseEditImageModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    
+    <!-- Add Inventory Modal Structure -->
+    <div id="InventoryModal" class="modal" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content edit-image-content">
                 <div class="modal-header">
-                    <h1 class="modal-title">Edit Product Images</h1>
-                    <p style="margin: 0; color: rgb(136, 136, 136);">Upload additional images</p>
+                    <h1 class="modal-title">Add Inventory Item</h1>
+                    <p style="margin: 0; color: rgb(136, 136, 136);">Add Inventory to Product</p>
                 </div>
                 <div class="modal-body">
                     <!-- Form for adding product images -->
-                    <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminEditProductImages') }}" enctype="multipart/form-data">
+                    <form class="Inventory-form" method="POST" action="" enctype="multipart/form-data">
                         
                         <!-- Hidden fields dynamically set via JS -->
-                        <!-- <input type="hidden" id="edit-image-pid" name="PID">
-                        <input type="hidden" id="edit-image-id" name="image_ids"> -->
+                        <input type="hidden" id="edit-image-pid" name="PID">
+                        <input type="hidden" id="edit-image-id" name="image_ids">
+                        <input type="hidden" id="edit-image-url" name="image_url">
                         
-
-                        <label for="image_url">Product ID: <span id="edit-img-modal-PID-input"></span></label>
-                        <label for="pi-img-id">Image ID: <span id="pi-img-id"></span></label>
-
+        
+                        <label for="image_url">Product ID: <span id="add-inv-modal-PID-input"></span></label>
+                        <label for="pi-img-id-inv">Image ID: <span id="pi-img-id-inv"></span></label>
+        
                         {% for product in AllProducts %}
-                            <div class="product-images-group" data-pid="{{ product['product_id'] }}" style="display: none;">
-                                {% if product['additional_images'] %}
+                            <div class="product-images-group-inv" data-pid="{{ product['product_id'] }}" style="display: none;">
                                     <!-- Modal Image Section -->
                                     <div class="img-contrainter-modal" style="margin-bottom: 10px;">
-                                        <img src="{{ product['image_url'] }}" style="margin-bottom: 10px; width: 300px; height: auto;" alt="Main product Image" id="main-modal-image-{{ product['product_id'] }}">
+                                        <img src="{{ product['image_url'] }}" style="margin-bottom: 10px; width: 300px; height: auto;" alt="Main product Image" id="main-modal-image-inv-{{ product['product_id'] }}">
                                     </div>
                                     <!-- Thumbnail Section -->
                                     <div class="thumbnail-bar">
                                         <div class="thumbnail placeholder-thumb" style="justify-content: center;">
                                             <div class="thumbnail-item" style="width:auto;">
                                                 <img src="{{ product['image_url'] or 'https://via.placeholder.com/200' }}" alt="Main product Image" class="thumbnail"
-                                                    onclick="changeModalImage('{{ product['image_url'] }}', '{{ product['product_id'] }}', 'main')">
+                                                    onclick="changeModalImageInv('{{ product['image_url'] }}', '{{ product['product_id'] }}', 'main')">
                                             </div>
                                         </div>
                                         {% for img, img_id in product['additional_images'] %}
                                             <div class="thumbnail placeholder-thumb" style="justify-content: center;">
                                                 <div class="thumbnail-item" style="width:auto;">
                                                     <img src="{{ img }}" alt="Thumbnail" class="thumbnail"
-                                                        onclick="changeModalImage('{{ img }}', '{{ product['product_id'] }}', '{{ img_id }}')">
+                                                    onclick="changeModalImageInv('{{ img }}', '{{ product['product_id'] }}', '{{ img_id }}')">
                                                 </div>
                                             </div>
                                         {% endfor %}
                                     </div>
-                                {% else %}
-                                    <p>No additional images.</p>
-                                {% endif %}
                             </div>
                         {% endfor %}
-
-                        <label for="image_url">Enter Image URL:</label>
-                        <input type="url" id="edit-image-url" name="image_url" placeholder="https://example.com/image.jpg">
-                        <button type="submit" class="btn btn-primary">Update Image</button>
+                        <label for="Color">Color:</label>
+                        <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
+        
+                        <label for="Amount">Amount:</label>
+                        <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
+                        
+                        <button type="submit" class="btn btn-primary">add inventory to product</button>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="CloseEditImageModal()">Close</button>
+                    <button type="button" class="btn btn-secondary" onclick="CloseInventoryModal()">Close</button>
                 </div>
             </div>
         </div>
     </div>
-
-        
-        <!-- Add Inventory Modal Structure -->
-        <div id="InventoryModal" class="modal" style="display: none;">
-            <div class="modal-dialog">
-                <div class="modal-content edit-image-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title">Add Inventory Item</h1>
-                        <p style="margin: 0; color: rgb(136, 136, 136);">Add Inventory to Product</p>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Form for adding product images -->
-                        <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminAddInventory') }}" enctype="multipart/form-data">
-                            
-                            <!-- Hidden fields dynamically set via JS -->
-                            <input type="hidden" id="edit-image-pid" name="PID">
-                            <input type="hidden" id="edit-image-id" name="image_ids">
-                            <input type="hidden" id="edit-image-url" name="image_url">
-                            
-            
-                            <label for="image_url">Product ID: <span id="add-inv-modal-PID-input"></span></label>
-                            <label for="pi-img-id-inv">Image ID: <span id="pi-img-id-inv"></span></label>
-            
-                            {% for product in AllProducts %}
-                                <div class="product-images-group-inv" data-pid="{{ product['product_id'] }}" style="display: none;">
-                                        <!-- Modal Image Section -->
-                                        <div class="img-contrainter-modal" style="margin-bottom: 10px;">
-                                            <img src="{{ product['image_url'] }}" style="margin-bottom: 10px; width: 300px; height: auto;" alt="Main product Image" id="main-modal-image-inv-{{ product['product_id'] }}">
-                                        </div>
-                                        <!-- Thumbnail Section -->
-                                        <div class="thumbnail-bar">
-                                            <div class="thumbnail placeholder-thumb" style="justify-content: center;">
-                                                <div class="thumbnail-item" style="width:auto;">
-                                                    <img src="{{ product['image_url'] or 'https://via.placeholder.com/200' }}" alt="Main product Image" class="thumbnail"
-                                                        onclick="changeModalImageInv('{{ product['image_url'] }}', '{{ product['product_id'] }}', 'main')">
-                                                </div>
-                                            </div>
-                                            {% for img, img_id in product['additional_images'] %}
-                                                <div class="thumbnail placeholder-thumb" style="justify-content: center;">
-                                                    <div class="thumbnail-item" style="width:auto;">
-                                                        <img src="{{ img }}" alt="Thumbnail" class="thumbnail"
-                                                        onclick="changeModalImageInv('{{ img }}', '{{ product['product_id'] }}', '{{ img_id }}')">
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                </div>
-                            {% endfor %}
-                            <label for="Color">Color:</label>
-                            <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
-            
-                            <label for="Amount">Amount:</label>
-                            <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
-                            
-                            <button type="submit" class="btn btn-primary">add inventory to product</button>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="CloseInventoryModal()">Close</button>
-                    </div>
-                </div>
-            </div>
+    
+    
+<!-- Edit Inventory Modal -->
+<div id="EditInventoryModal" class="modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content edit-image-content">
+        <div class="modal-header">
+          <h1 class="modal-title">Edit Inventory for Item</h1>
+          <p style="margin: 0; color: rgb(136, 136, 136);">Edit Inventory for Product</p>
         </div>
-        
-        
-    <!-- Edit Inventory Modal -->
-    <div id="EditInventoryModal" class="modal" style="display: none;">
-        <div class="modal-dialog">
-        <div class="modal-content edit-image-content">
-            <div class="modal-header">
-            <h1 class="modal-title">Edit Inventory for Item</h1>
-            <p style="margin: 0; color: rgb(136, 136, 136);">Edit Inventory for Product</p>
+        <div class="modal-body">
+          <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminEditInventory') }}" enctype="multipart/form-data">
+            <input type="hidden" id="edit-inventory-pid" name="PID">
+            <input type="hidden" id="edit-inventory-image-id" name="image_ids">
+            <input type="hidden" id="edit-inventory-image-url" name="image_url">
+  
+            <label>Product ID: <span id="edit-inv-modal-PID-input"></span></label>
+            <label>Image ID: <span id="pi-img-id-edit-inv"></span></label>
+  
+            <div>
+              <label for="Color">Color:</label>
+              <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
             </div>
-            <div class="modal-body">
-            <form class="Inventory-form" method="POST" action="{{ url_for('admin_bp.AdminEditInventory') }}" enctype="multipart/form-data">
-                <input type="hidden" id="edit-inventory-pid" name="PID">
-                <input type="hidden" id="edit-inventory-image-id" name="image_ids">
-                <input type="hidden" id="edit-inventory-image-url" name="image_url">
-    
-                <label>Product ID: <span id="edit-inv-modal-PID-input"></span></label>
-                <label>Image ID: <span id="pi-img-id-edit-inv"></span></label>
-    
-                <div>
-                <label for="Color">Color:</label>
-                <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
+  
+            <div>
+              <label for="Amount">Amount:</label>
+              <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
+            </div>
+  
+            {% for product in AllProducts %}
+              <div class="product-images-group-edit-inv" data-pid="{{ product['product_id'] }}" style="display: none;">
+                <div class="img-contrainter-modal" style="margin-bottom: 10px;">
+                  <img src="{{ product['image_url'] }}" style="margin-bottom: 10px; width: 300px; height: auto;" alt="Main product Image" id="main-modal-image-edit-inv-{{ product['product_id'] }}">
                 </div>
-    
-                <div>
-                <label for="Amount">Amount:</label>
-                <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
-                </div>
-    
-                {% for product in AllProducts %}
-                <div class="product-images-group-edit-inv" data-pid="{{ product['product_id'] }}" style="display: none;">
-                    <div class="img-contrainter-modal" style="margin-bottom: 10px;">
-                    <img src="{{ product['image_url'] }}" style="margin-bottom: 10px; width: 300px; height: auto;" alt="Main product Image" id="main-modal-image-edit-inv-{{ product['product_id'] }}">
+  
+                <div class="thumbnail-bar">
+                  {% set main_inv = product['main_inventory'][0] if product['main_inventory'] else {} %}
+                  <div class="thumbnail placeholder-thumb" style="justify-content: center;">
+                    <div class="thumbnail-item" style="width:auto;">
+                      <img src="{{ product['image_url'] or 'https://via.placeholder.com/200' }}" alt="Main product Image" class="thumbnail"
+                           onclick="changeModalImageEditInv('{{ product['image_url'] }}', '{{ product['product_id'] }}', 'main', '{{ main_inv.color or '' }}', '{{ main_inv.amount or 0 }}')">
                     </div>
-    
-                    <div class="thumbnail-bar">
-                    {% set main_inv = product['main_inventory'][0] if product['main_inventory'] else {} %}
+                  </div>
+  
+                  {% for img, img_id in product['additional_images'] %}
+                    {% set inventory = product['inventory_map'].get(img_id, {}) %}
                     <div class="thumbnail placeholder-thumb" style="justify-content: center;">
-                        <div class="thumbnail-item" style="width:auto;">
-                        <img src="{{ product['image_url'] or 'https://via.placeholder.com/200' }}" alt="Main product Image" class="thumbnail"
-                            onclick="changeModalImageEditInv('{{ product['image_url'] }}', '{{ product['product_id'] }}', 'main', '{{ main_inv.color or '' }}', '{{ main_inv.amount or 0 }}')">
-                        </div>
+                      <div class="thumbnail-item">
+                        <img src="{{ img }}" alt="Thumbnail" class="thumbnail"
+                             onclick="changeModalImageEditInv('{{ img }}', '{{ product['product_id'] }}', '{{ img_id }}', '{{ inventory.color or '' }}', '{{ inventory.amount or 0 }}')">
+                      </div>
                     </div>
-    
-                    {% for img, img_id in product['additional_images'] %}
-                        {% set inventory = product['inventory_map'].get(img_id, {}) %}
-                        <div class="thumbnail placeholder-thumb" style="justify-content: center;">
-                        <div class="thumbnail-item">
-                            <img src="{{ img }}" alt="Thumbnail" class="thumbnail"
-                                onclick="changeModalImageEditInv('{{ img }}', '{{ product['product_id'] }}', '{{ img_id }}', '{{ inventory.color or '' }}', '{{ inventory.amount or 0 }}')">
-                        </div>
-                        </div>
-                    {% endfor %}
-                    </div>
+                  {% endfor %}
                 </div>
-                {% endfor %}
-    
-                <button type="submit" class="btn btn-primary">Update Inventory</button>
-            </form>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="CloseEditInventoryModal()">Close</button>
-            </div>
+              </div>
+            {% endfor %}
+  
+            <button type="submit" class="btn btn-primary">Update Inventory</button>
+          </form>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="CloseEditInventoryModal()">Close</button>
         </div>
+      </div>
     </div>
-
-</section>
+  </div>
+  
+    
+    
+    
+     </section>
      
      <script>
-    function toggleDiscountFields(el, show) {
-        const form = el.closest("form");
-        const discountFields = form.querySelector('.discount_field_css');
-    
-        if (discountFields) {
-            discountFields.style.display = show ? 'flex' : 'none';
-    
-            const discountInput = form.querySelector('input[name="discount"]');
-            const discountDateInput = form.querySelector('input[name="discount_date"]');
-    
-            if (discountInput) discountInput.required = show;
+        // ─── Utility Form Field Toggles ──────────────────────────────
+        function toggleDiscountFields(el, show) {
+            const form = el.closest("form");
+            const discountFields = form.querySelector('.discount_field_css');
+            if (discountFields) {
+                discountFields.style.display = show ? 'flex' : 'none';
+                const discountInput = form.querySelector('input[name="discount"]');
+                if (discountInput) discountInput.required = show;
+            }
         }
-    }
     
-    function toggleWarrantyFields(el, show) {
-        const form = el.closest("form");
-        const warrantyFields = form.querySelector('.warranty_field_css');
-        if (warrantyFields) {
-            warrantyFields.style.display = show ? 'flex' : 'none';
-            const warrantyInput = form.querySelector('input[name="warranty"]');
-            if (warrantyInput) warrantyInput.required = show;
+        function toggleWarrantyFields(el, show) {
+            const form = el.closest("form");
+            const warrantyFields = form.querySelector('.warranty_field_css');
+            if (warrantyFields) {
+                warrantyFields.style.display = show ? 'flex' : 'none';
+                const warrantyInput = form.querySelector('input[name="warranty"]');
+                if (warrantyInput) warrantyInput.required = show;
+            }
         }
-    }
-
-        let currentPID = null; // Global variable to store the current PID
     
-        function OpenEditProductModal() {
-            const pid = currentPID;
-            window.location.href = `/vendor/AddProduct?edit_pid=${pid}`;
-        }   
+        let currentPID = null;
     
-        // Options modal
-        window.OpenModal = function(PID) {
-        currentPID = PID; // Store the PID in the global variable
-        console.log("Current PID:", currentPID); // Debugging log
-        let modal = document.querySelector("#OptionsModal");
-        modal.style.display = "flex"; // Show the modal
-    
-        // Update the PID in the span element
-        const pidSpan = document.getElementById("modal-PID");
-        if (pidSpan) {
-            pidSpan.textContent = currentPID; // Set the text content of the span
-        }
-    };
-    
-        window.CloseModal = function() {
-            let modal = document.querySelector("#OptionsModal");
-            modal.style.display = "none"; // Hide the modal
-        };
-    
-        // Edit Product Modal
-        window.OpenEditProductModal = function(PID) {
-            const modal = document.querySelector("#EditProductModal");
-            modal.style.display = "flex";
-    
-            const pidSpan = document.getElementById("edit-modal-PID");
-            if (pidSpan) {
-                pidSpan.textContent = PID;
-            }
-    
-            // Hide all forms
-            document.querySelectorAll(".product-edit-form").forEach(form => {
-                form.style.display = "none";
-            });
-    
-            // Show the one that matches
-            const targetForm = document.getElementById("form-" + PID);
-            if (targetForm) {
-                targetForm.style.display = "flex";
-            }
-        };
-    
-        window.CloseEditProductModal = function() {
-            const modal = document.querySelector("#EditProductModal");
-            modal.style.display = "none";
-        };
-        // Delete Product Modal
-        window.OpenDeleteModal = function(PID) {
-            if (typeof PID === 'undefined' || PID === null) {
-                PID = currentPID;
-            } else {
-                currentPID = PID;
-            }
-            
-            let modal = document.querySelector("#DeleteProductModal");
-            if (!modal) {
-                console.error("DeleteProductModal element not found!");
-                return;
-            }
-            
-            // Store the PID directly in the modal's data attribute
-            modal.setAttribute("data-pid", PID);
-            
-            let productIdInput = document.querySelector("#PID");
-            if (productIdInput) {
-                productIdInput.value = PID;
-            }
-            
-            const pidSpan = document.getElementById("del-modal-PID");
-            if (pidSpan) {
-                pidSpan.textContent = PID;
-            }
-            
-            // Update the modal with PID
-            document.getElementById("del-modal-PID").textContent = PID;
-
-            // Set values in hidden inputs
-            const pidInput = document.getElementById("del-modal-PID-input");
-            if (pidInput) pidInput.value = PID;
-            
-            modal.style.display = "flex";
-        };
-    
-        window.CloseDeleteModal = function() {
-            let modal = document.querySelector("#DeleteProductModal");
-            modal.style.display = "none"; // Hide the modal
-        };
-    
-        // Add Image Modal
-        window.OpenImageModal = function(PID) {
-            if (typeof PID === 'undefined' || PID === null) {
-                PID = currentPID;
-            } else {
-                currentPID = PID;
-            }
-
-            let modal = document.querySelector("#AddImageModal");
-            modal.setAttribute("data-pid", PID);
-
-            
-            let productIdInput = document.querySelector("#PID");
-            if (productIdInput) {
-                productIdInput.value = PID;
-            }
-
-            const pidSpan = document.getElementById("img-modal-PID");
-            if (pidSpan) {
-                pidSpan.textContent = PID;
-            }
-            
-            // Update the modal with PID
-            document.getElementById("img-modal-PID").textContent = PID;
-
-            // Set values in hidden inputs
-            const pidInput = document.getElementById("img-modal-PID-input");
-            if (pidInput) pidInput.value = PID;
-
-            modal.style.display = "flex";
-        };
-        window.CloseImageModal = function() {
-            let modal = document.querySelector("#AddImageModal");
-            modal.style.display = "none";
-        };
-    
-    
-        // Edit Image Modal
-    window.OpenEditImageModal = function(PID) {
-        if (typeof PID === 'undefined' || PID === null) {
-            PID = currentPID;
-        } else {
+        // ─── Options Modal ───────────────────────────────────────────
+        function OpenModal(PID) {
             currentPID = PID;
+            const modal = document.querySelector("#OptionsModal");
+            modal.style.display = "flex";
+            const pidSpan = document.getElementById("modal-PID");
+            if (pidSpan) pidSpan.textContent = currentPID;
         }
-
-        let modal = document.querySelector("#EditImageModal");
-        modal.setAttribute("data-pid", PID);
-
-        let productIdInput = document.querySelector("#image_PID");
-        if (productIdInput) {
-            productIdInput.value = PID;
+    
+        function CloseModal() {
+            document.querySelector("#OptionsModal").style.display = "none";
         }
-
-        document.getElementById("edit-img-modal-PID-input").textContent = PID;
-
-        // Hide all image groups
-        document.querySelectorAll('.product-images-group').forEach(group => {
-            group.style.display = 'none';
-        });
-
-        // Show only the one with the matching PID
-        const selectedGroup = document.querySelector(`.product-images-group[data-pid="${PID}"]`);
-        if (selectedGroup) {
-            selectedGroup.style.display = 'block';
+    
+        // ─── Edit Product Modal ──────────────────────────────────────
+        function OpenEditProductModal(PID) {
+            const modal = document.querySelector("#EditProductModal");
+            modal.style.display = "flex";
+            document.getElementById("edit-modal-PID").textContent = PID;
+            document.querySelectorAll(".product-edit-form").forEach(form => form.style.display = "none");
+            const targetForm = document.getElementById("form-" + PID);
+            if (targetForm) targetForm.style.display = "flex";
         }
+    
+        function CloseEditProductModal() {
+            document.querySelector("#EditProductModal").style.display = "none";
+        }
+    
+        // ─── Delete Product Modal ────────────────────────────────────
+        function OpenDeleteModal(PID) {
+            currentPID = PID || currentPID;
+            const modal = document.querySelector("#DeleteProductModal");
+            if (!modal) return console.error("DeleteProductModal element not found!");
+            modal.setAttribute("data-pid", currentPID);
+            document.getElementById("del-modal-PID").textContent = currentPID;
+            document.getElementById("del-modal-PID-input").value = currentPID;
+            modal.style.display = "flex";
+        }
+    
+        function CloseDeleteModal() {
+            document.querySelector("#DeleteProductModal").style.display = "none";
+        }
+    
+        // ─── Add Image Modal ─────────────────────────────────────────
+        // Function to open the image modal and set the product ID
+        function OpenImageModal(PID) {
 
-        modal.style.display = "flex";
-    };
-    window.CloseEditImageModal = function() {
-        document.getElementById("EditImageModal").style.display = "none";
-    };
-      
-        // Edit Inventory Modal
-        window.OpenEditInvetoryModal = function(PID) {
-            if (!PID) {
-                PID = currentPID;
-            } else {
-                currentPID = PID;
-            }
-
-            const modal = document.querySelector("#EditInventoryModal");
-            modal.setAttribute("data-pid", PID);
-
-            // Set visible text
-            const pidSpan = document.getElementById("edit-inv-modal-PID-input");
-            if (pidSpan) pidSpan.textContent = PID;
-
-            // Hide all previous image groups
-            document.querySelectorAll('.product-images-group-edit-inv').forEach(group => {
-                group.style.display = 'none';
-            });
-
-            // Show the one for this PID
-            const selectedGroup = document.querySelector(`.product-images-group-edit-inv[data-pid="${PID}"]`);
-            if (selectedGroup) {
-                selectedGroup.style.display = 'block';
-            }
+            currentPID = PID || currentPID;
+            const modal = document.querySelector("#AddImageModal");
+            modal.setAttribute("data-pid", currentPID);
+            document.getElementById("img-modal-PID").textContent = currentPID;
+            document.getElementById("img-modal-PID-input").value = currentPID;
 
             modal.style.display = "flex";
-        };
-        window.CloseEditInventoryModal = function() {
-            const modal = document.querySelector("#EditInventoryModal");
-            if (modal) modal.style.display = "none";
+        }
 
-            // Optional: clear fields
+
+    
+        function CloseImageModal() {
+            document.getElementById("AddImageModal").style.display = "none";
+        }
+    
+        // ─── Edit Image Modal ────────────────────────────────────────
+        function OpenEditImageModal(PID) {
+            currentPID = PID || currentPID;
+            const modal = document.querySelector("#EditImageModal");
+            modal.setAttribute("data-pid", currentPID);
+            document.getElementById("edit-img-modal-PID-input").textContent = currentPID;
+            document.getElementById("edit-image-pid").value = currentPID;
+            document.querySelectorAll('.product-images-group').forEach(g => g.style.display = 'none');
+            const selectedGroup = document.querySelector(`.product-images-group[data-pid="${currentPID}"]`);
+            if (selectedGroup) selectedGroup.style.display = 'block';
+            modal.style.display = "flex";
+        }
+    
+        function CloseEditImageModal() {
+            document.getElementById("EditImageModal").style.display = "none";
+        }
+    
+        // ─── Inventory Modal ─────────────────────────────────────────
+        function OpenInventoryModal(PID) {
+            currentPID = PID || currentPID;
+            const modal = document.querySelector("#InventoryModal");
+            modal.setAttribute("data-pid", currentPID);
+            document.getElementById("add-inv-modal-PID-input").textContent = currentPID;
+            document.querySelectorAll('.product-images-group-inv').forEach(g => g.style.display = 'none');
+            const selectedGroup = document.querySelector(`.product-images-group-inv[data-pid="${currentPID}"]`);
+            if (selectedGroup) selectedGroup.style.display = 'block';
+            modal.style.display = "flex";
+        }
+    
+        function CloseInventoryModal() {
+            document.getElementById("InventoryModal").style.display = "none";
+        }
+    
+        // ─── Edit Inventory Modal ────────────────────────────────────
+        function OpenEditInvetoryModal(PID) {
+            currentPID = PID || currentPID;
+            const modal = document.querySelector("#EditInventoryModal");
+            modal.setAttribute("data-pid", currentPID);
+            document.getElementById("edit-inv-modal-PID-input").textContent = currentPID;
+            document.querySelectorAll('.product-images-group-edit-inv').forEach(g => g.style.display = 'none');
+            const selectedGroup = document.querySelector(`.product-images-group-edit-inv[data-pid="${currentPID}"]`);
+            if (selectedGroup) selectedGroup.style.display = 'block';
+            modal.style.display = "flex";
+        }
+    
+        function CloseEditInventoryModal() {
+            const modal = document.querySelector("#EditInventoryModal");
+            modal.style.display = "none";
+    
             document.getElementById("edit-inventory-pid").value = "";
             document.getElementById("edit-inventory-image-id").value = "";
             document.getElementById("edit-inventory-image-url").value = "";
             document.getElementById("pi-img-id-edit-inv").textContent = "";
             document.getElementById("edit-inv-modal-PID-input").textContent = "";
-
+    
             const colorInput = document.querySelector('#EditInventoryModal input[name="Color"]');
             const amountInput = document.querySelector('#EditInventoryModal input[name="Amount"]');
             if (colorInput) colorInput.value = "";
             if (amountInput) amountInput.value = "";
-        };   
+        }
+    
+        // ─── Image Change Functions ──────────────────────────────────
         function changeImage(imageUrl, productId) {
-        const mainImage = document.getElementById(`main-image-${productId}`);
+            const targets = [
+                `main-image-${productId}`,
+                `main-image-inv-${productId}`,
+                `main-image-edit-inv-${productId}`
+            ];
+            targets.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.src = imageUrl;
+            });
+        }
+    
+        // Function to handle changing the main image and setting the hidden fields
+        function changeModalImage(imageUrl, productId, imgId) {
+            // Update the main image displayed in the modal
+            var mainImage = document.getElementById('main-modal-image-' + productId);
             if (mainImage) {
-                mainImage.src = imageUrl;
+                mainImage.src = imageUrl; // Change the main image source to the selected image
             }
 
-           
+            // Set the image URL input to the selected image
+            var imageUrlInput = document.getElementById('edit-image-url');
+            if (imageUrlInput) {
+                imageUrlInput.value = imageUrl; // Update the URL input with the new image URL
+            }
 
-            const mainImageEditInv = document.getElementById(`main-image-edit-inv-${productId}`);
-            if (mainImageInv) {
-                mainImageInv.src = imageUrl;
+            // Set the hidden fields for PID (Product ID) and img_id (Image ID)
+            var pidInput = document.getElementById('edit-image-pid');
+            if (pidInput) {
+                pidInput.value = productId; // Set the Product ID hidden field
+            }
+
+            var imgIdInput = document.getElementById('edit-image-id');
+            if (imgIdInput) {
+                imgIdInput.value = imgId; // Set the Image ID hidden field
+            }
+
+            // Update the displayed Product ID and Image ID in the modal
+            var pidText = document.getElementById('edit-img-modal-PID-input');
+            if (pidText) {
+                pidText.textContent = productId; // Show the Product ID in the modal
+            }
+
+            var imgIdText = document.getElementById('pi-img-id');
+            if (imgIdText) {
+                imgIdText.textContent = imgId; // Show the Image ID in the modal
             }
         }
-        function changeModalImage(imageUrl, productId, imageId) {
-            // Update the main image preview
-            const mainModalImage = document.getElementById(`main-modal-image-${productId}`);
-            if (mainModalImage) {
-                mainModalImage.src = imageUrl;
-            }
 
-            // Update hidden form fields
+    
+        function changeModalImageInv(imageUrl, productId, imageId) {
+            const mainImg = document.getElementById(`main-modal-image-inv-${productId}`);
+            if (mainImg) mainImg.src = imageUrl;
+    
             document.getElementById('edit-image-pid').value = productId;
             document.getElementById('edit-image-id').value = imageId;
             document.getElementById('edit-image-url').value = imageUrl;
-
-            // Update visible span values (optional)
-
-            const pidSpan = document.getElementById('edit-img-modal-PID-input');
-            if (pidSpan) pidSpan.textContent = productId;
-
-            const imgIdSpan = document.getElementById('pi-img-id');
-            if (imgIdSpan) imgIdSpan.textContent = imageId;
-
+    
+            document.getElementById('add-inv-modal-PID-input').textContent = productId;
+            document.getElementById('pi-img-id-inv').textContent = imageId;
         }
+    
         function changeModalImageEditInv(imageUrl, productId, imageId, color = '', amount = 0) {
-            const mainModalImage = document.getElementById(`main-modal-image-edit-inv-${productId}`);
-            if (mainModalImage) mainModalImage.src = imageUrl;
-
+            const mainImg = document.getElementById(`main-modal-image-edit-inv-${productId}`);
+            if (mainImg) mainImg.src = imageUrl;
+    
             document.getElementById('edit-inventory-pid').value = productId;
             document.getElementById('edit-inventory-image-id').value = imageId;
             document.getElementById('edit-inventory-image-url').value = imageUrl;
-
-            const pidSpan = document.getElementById('edit-inv-modal-PID-input');
-            if (pidSpan) pidSpan.textContent = productId;
-
-            const imgIdSpan = document.getElementById('pi-img-id-edit-inv');
-            if (imgIdSpan) imgIdSpan.textContent = imageId;
-
+    
+            document.getElementById('edit-inv-modal-PID-input').textContent = productId;
+            document.getElementById('pi-img-id-edit-inv').textContent = imageId;
+    
             const colorInput = document.querySelector('#EditInventoryModal input[name="Color"]');
             const amountInput = document.querySelector('#EditInventoryModal input[name="Amount"]');
             if (colorInput) colorInput.value = color;
             if (amountInput) amountInput.value = amount;
         }
-
-    </script> 
+    </script>
+    
      {% endblock body%}
