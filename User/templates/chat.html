@@ -272,12 +272,16 @@
                             <input type="submit" id="open_previous_chat" value="Open Chat">
                         {% else %}
                             <select name="chat_id" id="chat_id_select">
-                                {% for chat in previous_chats %}
-                                    <option value="{{ chat['CHAT_ID'] }}">
-                                        Chat ID: {{ chat['CHAT_ID'] }} 
-                                        {% if chat['chat_type'] == 'admin' %}(Admin){% else %}(Vendor){% endif %}
-                                    </option>
-                                {% endfor %}
+                                {% if previous_chats|length > 0 %}
+                                    {% for chat in previous_chats %}
+                                        <option value="{{ chat['CHAT_ID'] }}">
+                                            Chat ID: {{ chat['CHAT_ID'] }} 
+                                            {% if chat['chat_type'] == 'admin' %}(Admin){% else %}(Vendor){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="Chat ID: N/A">Chat ID: N/A</option>
+                                {% endif %}
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat" disabled>
                         {% endif %}
