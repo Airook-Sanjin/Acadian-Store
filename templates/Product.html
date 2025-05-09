@@ -1,572 +1,572 @@
 <style>
-   /*  Darlin change   */
-.Main-Product {
-       margin: auto;
-       width: 90%;
-       padding: 20px;
-       background-color: #f4f4f4;
-   }
-   
-   .Product {
-       display: flex;
-       flex-direction: row;
-       justify-content: space-between;
-       background-color: #fff;
-       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-       border-radius: 8px;
-       padding: 20px;
-       margin-bottom: 20px;
-   }
-   
-   .product-container {
-       display: flex;
-       width: 100%;
-   }
-   .left-side-product,
-   .right-side-product {
-       display: flex;
-       flex-direction: column;
-       justify-content: space-between;
-   }
-   
-   
-   .right-side-product {
-       width: 40%;
-       padding: 10px;
-   }
-    /* Product Image Gallery */
-    .left-side-product {
-        width: 55%;
-        padding: 10px;
+    /*  Darlin change   */
+ .Main-Product {
+        margin: auto;
+        width: 90%;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    
+    .Product {
         display: flex;
         flex-direction: row;
-        gap: 15px;
-        align-items: flex-start;
+        justify-content: space-between;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
     }
     
-    .thumbnail-bar {
-        width: 15%;
-        height: 100%;
+    .product-container {
+        display: flex;
+        width: 100%;
+    }
+    .left-side-product,
+    .right-side-product {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        overflow-y: auto;
-        padding-right: 10px;
+        justify-content: space-between;
     }
     
-    .thumbnail, .placeholder-thumb {
-        width: 100%;
-        height: auto;
-        border: 2px solid transparent;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
     
-    .thumbnail:hover, .placeholder-thumb:hover {
-        transform: scale(1.05);
-        border-color: #007BFF;
-    }
-    
-    .left-img {
-        flex: 1;
-        background-color: #f4f4f4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 8px;
-        overflow: hidden;
-        height: 100%;
-    }
-    
-    .img-css {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-    
-    /* Product Info Section */
     .right-side-product {
         width: 40%;
         padding: 10px;
     }
-    
-    .AddtoCart-Form {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .product-title {
-        font-size: 1.8rem;
-        color: #333;
-        margin-bottom: 10px;
-    }
-    
-    .product-id {
-        font-size: 1rem;
-        color: #555;
-    }
-    
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #333;
-    }
-    
-    select,
-   .AddtoCart-Form .BTN{
-       padding: 10px;
-       font-size: 1rem;
-       margin-bottom: 15px;
-       border-radius: 5px;
-       border: 1px solid #ccc;
-   }
-    
-    select {
-        width: 100%;
-        background-color: #fff;
-    }
-    
-    .product-price {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #e74c3c;
-    }
-    
-    .price-summary p {
-        margin: 0;
-    }
-    
-    .product-description {
-        font-size: 1rem;
-        color: #555;
-        line-height: 1.5;
-    }
-    
-    .product-amount {
-        font-size: 1rem;
-        color: #555;
-    }
-    
-    /* Reviews Section - Split Layout */
-    .Review-Section {
-        margin-top: 40px;
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        display: flex;
-        gap: 30px;
-    }
-    
-    .review-summary-container {
-        width: 35%;
-    }
-    
-    .review-list-container {
-        width: 65%;
-    }
-    
-    .review-title {
-        font-size: 1.5rem;
-        margin-bottom: 25px;
-        color: #333;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
-    }
-    
-    /* Rating Summary */
-    .rating-summary {
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 30px;
-    }
-    
-    .average-rating {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 5px;
-    }
-    
-    .total-reviews {
-        font-size: 0.9rem;
-        color: #777;
-        margin-bottom: 20px;
-    }
-    
-    .rating-distribution {
-        margin-top: 20px;
-    }
-    
-    .rating-bar {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-    
-    .rating-label {
-        width: 80px;
-        font-size: 0.9rem;
-    }
-    
-    .bar-container {
-        flex-grow: 1;
-        height: 10px;
-        background-color: #eee;
-        border-radius: 5px;
-        margin: 0 10px;
-    }
-    
-    .bar {
-        height: 100%;
-        background-color: #ffc107;
-        border-radius: 5px;
-    }
-    
-    /* Review Cards */
-    .review-card {
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    
-    .review-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-    
-    .review-stars {
-        display: flex;
-        gap: 3px;
-    }
-    
-    .star {
-        color: #ffc107;
-        font-size: 1.2rem;
-    }
-    
-    .empty-star {
-        color: #ddd;
-        font-size: 1.2rem;
-    }
-    
-    .review-meta {
-        font-size: 0.85rem;
-        color: #777;
-    }
-    
-    .review-author {
-        font-weight: bold;
-        color: #444;
-    }
-    
-    .review-text {
-        font-size: 1rem;
-        color: #555;
-        line-height: 1.6;
-        margin: 15px 0;
-    }
-    
-    .review-date {
-        font-size: 0.8rem;
-        color: #999;
-        text-align: right;
-    }
-    
-    .review-verified {
-        color: #28a745;
-        font-size: 0.8rem;
-        margin-left: 5px;
-    }
-    
-    /* Review Form */
-
-    .review-title-text {
-        margin-bottom: 25px;
-        font-size: 17px;
-        width: 100%;
-        border: #d5d5d5 solid 1px;
-        /* height: ; */
-        border-radius: 8px;
-        padding: 8px;
-    }
-    .write-review {
-        margin-top: 30px;
-        padding: 20px;
-        background-color: #f5f5f5;
-        border-radius: 8px;
-    }
-    
-    .review-form-title {
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-    }
-    
-    .rating-input {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 15px;
-    }
-    
-    .rating-input .star {
-        cursor: pointer;
-        transition: transform 0.2s;
-        color: #ddd;
-        font-size: 1.5rem;
-    }
-    
-    .rating-input .star.active {
-        color: #ffc107;
-    }
-    
-    .rating-input .star:hover {
-        transform: scale(1.2);
-    }
-    
-    textarea {
-        width: 100%;
+     /* Product Image Gallery */
+     .left-side-product {
+         width: 55%;
+         padding: 10px;
+         display: flex;
+         flex-direction: row;
+         gap: 15px;
+         align-items: flex-start;
+     }
+     
+     .thumbnail-bar {
+         width: 15%;
+         height: 680px;
+         display: flex;
+         flex-direction: column;
+         gap: 10px;
+         overflow-y: auto;
+         padding-right: 10px;
+     }
+     
+     .thumbnail, .placeholder-thumb {
+         width: 100%;
+         height: auto;
+         border: 2px solid transparent;
+         border-radius: 5px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+     }
+     
+     .thumbnail:hover, .placeholder-thumb:hover {
+         /* transform: scale(1.05); */
+         border-color: #007BFF;
+     }
+     
+     .left-img {
+         flex: 1;
+         background-color: #f4f4f4;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         border-radius: 8px;
+         overflow: hidden;
+         height: 100%;
+     }
+     
+     .img-css {
+         max-width: 100%;
+         max-height: 100%;
+         object-fit: contain;
+     }
+     
+     /* Product Info Section */
+     .right-side-product {
+         width: 40%;
+         padding: 10px;
+     }
+     
+     .AddtoCart-Form {
+         display: flex;
+         flex-direction: column;
+         gap: 15px;
+     }
+     
+     .product-title {
+         font-size: 1.8rem;
+         color: #333;
+         margin-bottom: 10px;
+     }
+     
+     .product-id {
+         font-size: 1rem;
+         color: #555;
+     }
+     
+     label {
+         font-weight: bold;
+         margin-bottom: 5px;
+         color: #333;
+     }
+     
+    #Colors,
+    .AddtoCart-Form .BTN{
         padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        min-height: 100px;
-        margin-bottom: 15px;
-        font-family: inherit;
-    }
-    
-    .submit-review {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
         font-size: 1rem;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
     }
-    
-    .submit-review:hover {
-        background-color: #0056b3;
-    }
-
-    .star {
-    color: #ffc107;  /* Gold color for filled stars */
-}
-
-.empty-star {
-    color: #ddd;  /* Gray color for empty stars */
-}
-
-.star.selected {
-    color: #ffc107;  /* Filled star with yellow color */
-}
-
-    
-    </style>
-    
-    {% extends 'GuestHomepage.html' %}
-    {% block body %}
-    <section class="Main-Product">
-        <!-- Product Display Section -->
-        <section class="Product">
-            <section class="product-container">
-                <section class="left-side-product">
-                    <div class="thumbnail-bar">
-                        <div class="thumbnail placeholder-thumb">
-                            <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
-                        </div>
-                        {% for img in images %}
-                            <div class="thumbnail placeholder-thumb">
-                                <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="left-img">
-                        <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
-                    </div>
-                </section>
-                
-              
-                      <section class="right-side-product">
-                       <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
-                           <h2 class="product-title">{{ product.title }}</h2>
-                           <input type="hidden" name="Title" value={{product.title}}>
-                           <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
-                      
-                           
-                           <!-- Color Dropdown -->
-                           <label for="Color">Colors:</label>
-                           <select name="Color" id="Colors" required onchange="InventoryUpdate('{{product.PID}}',this.value)">
-                               <option value="">Select Color</option>
-                               {% for item in inventory %}
-                                   <option value="{{ item.color }}">{{ item.color }}</option>
-                                   
-                               {% endfor %}
-                           </select>
-                        
-                        {% if product.discount_date and product.discount_date < CurDate %}
-                        <div class="product-price">
-                            <div class="price-summary">
-                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format(product.discounted_price |float ) }}</p>
-                                <p style="font-size: 14px;"><strong>Save:</strong> ${{'%0.2f' |format(product.saving_discount | float) }}</p>
-                                <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ '%0.2f' |format( product.price | float) }}</p></div>
-                                <input type="hidden" name="Price" value="{{product['discounted_price']}}">
-                            </div>
-                        </div>
-                    </div>
-                           {% else %}        
-                            {% if product %}
-                                <!-- safe access to product fields here -->
-                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' | format(product.price | float) }}</p>
-                            {% else %}
-                                <p style="color: red;"><strong>Product not found.</strong></p>
-                            {% endif %}
-                        {% endif %}
-                        
-                        
-                        <div class="product-description">
-                            <label for="description">Description:</label>
-                            <p id="description">{{ product.description }}</p>
-                        </div>
-    
-                        <div id ='inventory-amount'class="product-amount">
-                            <p><strong>Amount Available:</strong> 
-                                {{ inventory[0].amount if inventory else 'N/A' }}
-                            </p>
-                        </div>
-    
-                        <input class="BTN" type="submit" value="Add to Cart">
-                    </form>
-                </section>
-            </section>
-        </section>
-    
-        <!-- Reviews Section - Split Layout -->
-    <section class="Review-Section">
-        <!-- Left Side - Rating Summary and Form -->
-        <div class="review-summary-container">
-            <h2 class="review-title">Customer Reviews</h2>
-            
-            <div class="rating-summary">
-                <div class="average-rating">{{ Avg_Rating }}<span style="font-size: 1.5rem;">/5</span></div> 
-            
-                {% if Review_Count > 0 %}
-                    <div class="total-reviews">Based on {{ Review_Count }} reviews</div>
-                {% else %}
-                    <div class="total-reviews">Based on 0 reviews</div>
-                {% endif %}
-            
-                <div class="rating-distribution">
-                    {% for star in range(5, 0, -1) %}
-                        <div class="rating-bar">
-                            <span class="rating-label">{{ star }} <span class="star">★</span></span>
-                            <div class="bar-container">
-                                <div class="bar" style="width: {{ Rating_Percentages.get(star, 0) }}%"></div>
-                            </div>
-                            <span>{{ "%0.1f"|format(Rating_Percentages.get(star, 0)) }}%</span>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <!-- ############### -->
-            <!-- # Review Form # -->
-            <!-- ############### -->
-            <form class="write-review" method="POST" action="{{ url_for('Review') }}">
-                <input type="hidden" name="pid" value="{{ product.PID }}">
-                <input type="hidden" name="rating" id="rating-input">
-                <h3 class="review-form-title">Write a Review</h3>
-                <div class="rating-input">
-                    <span class="star" data-rating="1">★</span>
-                    <span class="star" data-rating="2">★</span>
-                    <span class="star" data-rating="3">★</span>
-                    <span class="star" data-rating="4">★</span>
-                    <span class="star" data-rating="5">★</span>
-                </div>
-                <input class="review-title-text" type="text" name="title" placeholder="Title" required>
-                <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
-                <button type="submit" class="submit-review">Submit Review</button>
-            </form>
-
-        </div>
-        
-        <!-- Right Side - Review List -->           
-        <div class="review-list-container">
-            {% for review in Reviews %}
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-stars">
-                        {% set rating = review['rating'] | int %}
-                        {% for i in range(5) %}
-                            {% if i < rating %}
-                                <span class="star selected">★</span> <!-- filled star -->
-                            {% else %}
-                                <span class="empty-star">★</span> <!-- empty star -->
-                            {% endif %}
-                        {% endfor %}
-                    </div>     
-                    <div class="review-meta">
-                        <span class="review-author">Customer ID: {{ review['CID'] }}</span>
-                        <span class="review-verified">✓ Verified Purchaser</span>
-                        <span>• Owned for < 1 week</span>
-                    </div>
-                </div>
-                <h3>{{ review['title'] }}</h3>
-                <p class="review-text">{{ review['description'] }}</p>
-                <p class="review-date">Posted {{ review['date'] }}</p>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-</section>
-
-<script>
-    // Update Inventory
-    function InventoryUpdate(PID,color){
-        if(!color) return;
-
-        fetch(`/api/inventory?PID=${PID}&color=${color}`)
-        .then(response => response.json())
-        .then(data => {document.getElementById('inventory-amount').innerHTML = 
-            `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
-        });
-    }
-
-    // Image Thumbnail Switcher
-    function changeImage(thumbnail) {
-        const mainImage = document.getElementById('main-image');
-        mainImage.src = thumbnail.src;
-    }
-
-    // Star Rating System
-    document.addEventListener('DOMContentLoaded', function() {
-        const stars = document.querySelectorAll('.rating-input .star');
-        const ratingInput = document.getElementById('rating-input');
-
-        // Add click event listeners to each star
-        stars.forEach(star => {
-            star.addEventListener('click', function() {
-                const rating = parseInt(star.getAttribute('data-rating'));
-
-                // Update the hidden input with the selected rating
-                ratingInput.value = rating;
-
-                // Update the star colors to visually reflect the selection
-                stars.forEach(starElement => {
-                    if (parseInt(starElement.getAttribute('data-rating')) <= rating) {
-                        starElement.classList.add('selected');
-                    } else {
-                        starElement.classList.remove('selected');
-                    }
-                });
-            });
-        });
-    });
-</script>
-
-    
-{% endblock body %}
+     
+     #Colors {
+         width: 100%;
+         background-color: #fff;
+     }
+     
+     .product-price {
+         font-size: 1.2rem;
+         font-weight: bold;
+         color: #e74c3c;
+     }
+     
+     .price-summary p {
+         margin: 0;
+     }
+     
+     .product-description {
+         font-size: 1rem;
+         color: #555;
+         line-height: 1.5;
+     }
+     
+     .product-amount {
+         font-size: 1rem;
+         color: #555;
+     }
+     
+     /* Reviews Section - Split Layout */
+     .Review-Section {
+         margin-top: 40px;
+         background-color: #ffffff;
+         padding: 30px;
+         border-radius: 8px;
+         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+         display: flex;
+         gap: 30px;
+     }
+     
+     .review-summary-container {
+         width: 35%;
+     }
+     
+     .review-list-container {
+         width: 65%;
+     }
+     
+     .review-title {
+         font-size: 1.5rem;
+         margin-bottom: 25px;
+         color: #333;
+         border-bottom: 1px solid #eee;
+         padding-bottom: 10px;
+     }
+     
+     /* Rating Summary */
+     .rating-summary {
+         background-color: #f9f9f9;
+         padding: 20px;
+         border-radius: 8px;
+         margin-bottom: 30px;
+     }
+     
+     .average-rating {
+         font-size: 2.5rem;
+         font-weight: bold;
+         color: #333;
+         margin-bottom: 5px;
+     }
+     
+     .total-reviews {
+         font-size: 0.9rem;
+         color: #777;
+         margin-bottom: 20px;
+     }
+     
+     .rating-distribution {
+         margin-top: 20px;
+     }
+     
+     .rating-bar {
+         display: flex;
+         align-items: center;
+         margin-bottom: 8px;
+     }
+     
+     .rating-label {
+         width: 80px;
+         font-size: 0.9rem;
+     }
+     
+     .bar-container {
+         flex-grow: 1;
+         height: 10px;
+         background-color: #eee;
+         border-radius: 5px;
+         margin: 0 10px;
+     }
+     
+     .bar {
+         height: 100%;
+         background-color: #ffc107;
+         border-radius: 5px;
+     }
+     
+     /* Review Cards */
+     .review-card {
+         background-color: #f9f9f9;
+         padding: 20px;
+         border-radius: 8px;
+         margin-bottom: 20px;
+     }
+     
+     .review-header {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         margin-bottom: 10px;
+     }
+     
+     .review-stars {
+         display: flex;
+         gap: 3px;
+     }
+     
+     .star {
+         color: #ffc107;
+         font-size: 1.2rem;
+     }
+     
+     .empty-star {
+         color: #ddd;
+         font-size: 1.2rem;
+     }
+     
+     .review-meta {
+         font-size: 0.85rem;
+         color: #777;
+     }
+     
+     .review-author {
+         font-weight: bold;
+         color: #444;
+     }
+     
+     .review-text {
+         font-size: 1rem;
+         color: #555;
+         line-height: 1.6;
+         margin: 15px 0;
+     }
+     
+     .review-date {
+         font-size: 0.8rem;
+         color: #999;
+         text-align: right;
+     }
+     
+     .review-verified {
+         color: #28a745;
+         font-size: 0.8rem;
+         margin-left: 5px;
+     }
+     
+     /* Review Form */
+ 
+     .review-title-text {
+         margin-bottom: 25px;
+         font-size: 17px;
+         width: 100%;
+         border: #d5d5d5 solid 1px;
+         /* height: ; */
+         border-radius: 8px;
+         padding: 8px;
+     }
+     .write-review {
+         margin-top: 30px;
+         padding: 20px;
+         background-color: #f5f5f5;
+         border-radius: 8px;
+     }
+     
+     .review-form-title {
+         font-size: 1.2rem;
+         margin-bottom: 15px;
+     }
+     
+     .rating-input {
+         display: flex;
+         gap: 5px;
+         margin-bottom: 15px;
+     }
+     
+     .rating-input .star {
+         cursor: pointer;
+         transition: transform 0.2s;
+         color: #ddd;
+         font-size: 1.5rem;
+     }
+     
+     .rating-input .star.active {
+         color: #ffc107;
+     }
+     
+     .rating-input .star:hover {
+         transform: scale(1.2);
+     }
+     
+     textarea {
+         width: 100%;
+         padding: 10px;
+         border-radius: 5px;
+         border: 1px solid #ddd;
+         min-height: 100px;
+         margin-bottom: 15px;
+         font-family: inherit;
+     }
+     
+     .submit-review {
+         background-color: #007bff;
+         color: white;
+         border: none;
+         padding: 10px 20px;
+         border-radius: 5px;
+         cursor: pointer;
+         transition: background-color 0.3s;
+         font-size: 1rem;
+     }
+     
+     .submit-review:hover {
+         background-color: #0056b3;
+     }
+ 
+     .star {
+     color: #ffc107;  /* Gold color for filled stars */
+ }
+ 
+ .empty-star {
+     color: #ddd;  /* Gray color for empty stars */
+ }
+ 
+ .star.selected {
+     color: #ffc107;  /* Filled star with yellow color */
+ }
+ 
+     
+     </style>
+     
+     {% extends 'GuestHomepage.html' %}
+     {% block body %}
+     <section class="Main-Product">
+         <!-- Product Display Section -->
+         <section class="Product">
+             <section class="product-container">
+                 <section class="left-side-product">
+                     <div class="thumbnail-bar">
+                         <div class="thumbnail placeholder-thumb">
+                             <img src="{{ product.image_url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+                         </div>
+                         {% for img in images %}
+                             <div class="thumbnail placeholder-thumb">
+                                 <img src="{{ img.image }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+                             </div>
+                         {% endfor %}
+                     </div>
+                     <div class="left-img">
+                         <img src="{{ product.image_url }}" alt="Main Image" class="img-css" id="main-image">
+                     </div>
+                 </section>
+                 
+               
+                       <section class="right-side-product">
+                        <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                            <h2 class="product-title">{{ product.title }}</h2>
+                            <input type="hidden" name="Title" value={{product.title}}>
+                            <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+                       
+                            
+                            <!-- Color Dropdown -->
+                            <label for="Color">Colors:</label>
+                            <select name="Color" id="Colors" required onchange="InventoryUpdate('{{product.PID}}',this.value)">
+                                <option value="">Select Color</option>
+                                {% for item in inventory %}
+                                    <option value="{{ item.color }}">{{ item.color }}</option>
+                                    
+                                {% endfor %}
+                            </select>
+                         
+                         {% if product.discount_date and product.discount_date < CurDate %}
+                         <div class="product-price">
+                             <div class="price-summary">
+                                 <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format(product.discounted_price |float ) }}</p>
+                                 <p style="font-size: 14px;"><strong>Save:</strong> ${{'%0.2f' |format(product.saving_discount | float) }}</p>
+                                 <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ '%0.2f' |format( product.price | float) }}</p></div>
+                                 <input type="hidden" name="Price" value="{{product['discounted_price']}}">
+                             </div>
+                         </div>
+                     </div>
+                            {% else %}        
+                             {% if product %}
+                                 <!-- safe access to product fields here -->
+                                 <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' | format(product.price | float) }}</p>
+                             {% else %}
+                                 <p style="color: red;"><strong>Product not found.</strong></p>
+                             {% endif %}
+                         {% endif %}
+                         
+                         
+                         <div class="product-description">
+                             <label for="description">Description:</label>
+                             <p id="description">{{ product.description }}</p>
+                         </div>
+     
+                         <div id ='inventory-amount'class="product-amount">
+                             <p><strong>Amount Available:</strong> 
+                                 {{ inventory[0].amount if inventory else 'N/A' }}
+                             </p>
+                         </div>
+     
+                         <input class="BTN" type="submit" value="Add to Cart">
+                     </form>
+                 </section>
+             </section>
+         </section>
+     
+         <!-- Reviews Section - Split Layout -->
+     <section class="Review-Section">
+         <!-- Left Side - Rating Summary and Form -->
+         <div class="review-summary-container">
+             <h2 class="review-title">Customer Reviews</h2>
+             
+             <div class="rating-summary">
+                 <div class="average-rating">{{ Avg_Rating }}<span style="font-size: 1.5rem;">/5</span></div> 
+             
+                 {% if Review_Count > 0 %}
+                     <div class="total-reviews">Based on {{ Review_Count }} reviews</div>
+                 {% else %}
+                     <div class="total-reviews">Based on 0 reviews</div>
+                 {% endif %}
+             
+                 <div class="rating-distribution">
+                     {% for star in range(5, 0, -1) %}
+                         <div class="rating-bar">
+                             <span class="rating-label">{{ star }} <span class="star">★</span></span>
+                             <div class="bar-container">
+                                 <div class="bar" style="width: {{ Rating_Percentages.get(star, 0) }}%"></div>
+                             </div>
+                             <span>{{ "%0.1f"|format(Rating_Percentages.get(star, 0)) }}%</span>
+                         </div>
+                     {% endfor %}
+                 </div>
+             </div>
+             <!-- ############### -->
+             <!-- # Review Form # -->
+             <!-- ############### -->
+             <form class="write-review" method="POST" action="{{ url_for('Review') }}">
+                 <input type="hidden" name="pid" value="{{ product.PID }}">
+                 <input type="hidden" name="rating" id="rating-input">
+                 <h3 class="review-form-title">Write a Review</h3>
+                 <div class="rating-input">
+                     <span class="star" data-rating="1">★</span>
+                     <span class="star" data-rating="2">★</span>
+                     <span class="star" data-rating="3">★</span>
+                     <span class="star" data-rating="4">★</span>
+                     <span class="star" data-rating="5">★</span>
+                 </div>
+                 <input class="review-title-text" type="text" name="title" placeholder="Title" required>
+                 <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
+                 <button type="submit" class="submit-review">Submit Review</button>
+             </form>
+ 
+         </div>
+         
+         <!-- Right Side - Review List -->           
+         <div class="review-list-container">
+             {% for review in Reviews %}
+             <div class="review-card">
+                 <div class="review-header">
+                     <div class="review-stars">
+                         {% set rating = review['rating'] | int %}
+                         {% for i in range(5) %}
+                             {% if i < rating %}
+                                 <span class="star selected">★</span> <!-- filled star -->
+                             {% else %}
+                                 <span class="empty-star">★</span> <!-- empty star -->
+                             {% endif %}
+                         {% endfor %}
+                     </div>     
+                     <div class="review-meta">
+                         <span class="review-author">Customer ID: {{ review['CID'] }}</span>
+                         <span class="review-verified">✓ Verified Purchaser</span>
+                         <span>• Owned for < 1 week</span>
+                     </div>
+                 </div>
+                 <h3>{{ review['title'] }}</h3>
+                 <p class="review-text">{{ review['description'] }}</p>
+                 <p class="review-date">Posted {{ review['date'] }}</p>
+             </div>
+             {% endfor %}
+         </div>
+     </section>
+ </section>
+ 
+ <script>
+     // Update Inventory
+     function InventoryUpdate(PID,color){
+         if(!color) return;
+ 
+         fetch(`/api/inventory?PID=${PID}&color=${color}`)
+         .then(response => response.json())
+         .then(data => {document.getElementById('inventory-amount').innerHTML = 
+             `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
+         });
+     }
+ 
+     // Image Thumbnail Switcher
+     function changeImage(thumbnail) {
+         const mainImage = document.getElementById('main-image');
+         mainImage.src = thumbnail.src;
+     }
+ 
+     // Star Rating System
+     document.addEventListener('DOMContentLoaded', function() {
+         const stars = document.querySelectorAll('.rating-input .star');
+         const ratingInput = document.getElementById('rating-input');
+ 
+         // Add click event listeners to each star
+         stars.forEach(star => {
+             star.addEventListener('click', function() {
+                 const rating = parseInt(star.getAttribute('data-rating'));
+ 
+                 // Update the hidden input with the selected rating
+                 ratingInput.value = rating;
+ 
+                 // Update the star colors to visually reflect the selection
+                 stars.forEach(starElement => {
+                     if (parseInt(starElement.getAttribute('data-rating')) <= rating) {
+                         starElement.classList.add('selected');
+                     } else {
+                         starElement.classList.remove('selected');
+                     }
+                 });
+             });
+         });
+     });
+ </script>
+ 
+     
+ {% endblock body %}

@@ -28,6 +28,20 @@
   .price-holder h4 {
     margin: 0;
   }
+  .Empty{
+    display: flex;
+    flex:1;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap:2em;
+  }
+  #EmpText{
+    font-size: xx-large;
+  }
+  #ShockedEm{
+    width:5rem;
+  }
 </style>
 <head>
   <meta charset="UTF-8">
@@ -50,11 +64,11 @@
           <img class="logo" src="{{url_for('static',filename='/images/Logo_fill.svg')}}">
         </div>
         <ul class="barItem">
-          <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li>
+          <li><button id="HomePage" data-href="{% if g.User %}{% if g.User['Role'] =='customer' %}{{url_for('customer_bp.CustomerHomePage')}}{% elif g.User['Role']=='vendor'%}{{url_for('vendor_bp.VendorHomePage')}}{% elif g.User['Role']=='admin' %}{{url_for('admin_bp.AdminHomePage')}}{% endif %}{% else %}{{url_for('start')}}{% endif %}">HOMEPAGE</button></li>
           {% if g.User['Role']=='admin' %}
-          <li><button onclick="window.location.href = '{{ url_for('admin.chat_bp.chat_view') }}'">CHAT</button></li>
-          <li><button>Pending Accounts</button></li>
-          <li><button>Settings</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('admin_bp.chat_bp.chat_view') }}'">CHAT</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('admin_bp.AdminViewAccounts') }}'">PENDING ACCOUNTS</button></li>
+          <li><button onclick="window.location.href = '{{ url_for('admin_bp.AdminViewProducts')}}'">VENDOR PRODUCTS</button></li>
           {% elif g.User['Role']=='vendor' %}
           <li><button onclick="window.location.href = '{{ url_for('vendor_bp.VendorViewProducts')}}'">SEE YOUR PRODUCTS</button></li>
           <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
@@ -63,8 +77,20 @@
           <li><button onclick="window.location.href = '{{ url_for('chat_bp.chat_view') }}'">CHAT</button></li>
           {% endif %}
         </ul>
-        <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="post">
-          <input type="search" name="Search" id="Search" placeholder="Search">
+        <form class="SearchForm" action="{{url_for('search_bp.searchedItem')}}" method="POST">
+          <div class="CustomSelect" >
+          <select id = "Category" name="Category">
+            <option value="" {% if not CategoryChoice or CategoryChoice =="" %}selected {%endif%}>All Departments</option>
+            <option value="Cell Phones" {% if CategoryChoice == 'Cell Phones'%}selected {%endif%}>Cell Phones</option>
+            <option value="Computers & Accessories" {% if CategoryChoice == 'Computers & Accessories'%}selected {%endif%}>Computers & Accessories</option>
+            <option value="Televisions" {% if CategoryChoice == 'Televisions'%}selected {%endif%}>Televisions</option>
+            <option value="Headphones" {% if CategoryChoice == 'Headphones'%}selected {%endif%}>Headphones</option>
+            <option value="Photography & Videography" {% if CategoryChoice == 'Photography & Videography'%}selected {%endif%}>Photography & Videography</option>
+            <option value="Wearable Tech" {% if CategoryChoice == 'Wearable Tech'%}selected {%endif%}>Wearable Tech</option>
+          </select>
+        </div>
+          <input type="text" name="Search" value='{{SearchedItem}}' id="Search" placeholder="Search products...">
+          <input type="hidden" name="Inv" value="{{InvChoice}}" />
           <input class="BTN" type="submit" value="Search">
         </form>
       </div>
@@ -72,7 +98,17 @@
       <div class="Right-side">
         {% if g.User %}
         <h4>Hello {{g.User["Name"].title()}}</h4>
-        <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
+        <form 
+        {% if g.User['Role'] == 'admin' %} action="{{ url_for('admin_bp.GetProfileInfo') }}"
+        {% elif g.User['Role'] == 'vendor' %} action="{{ url_for('vendor_bp.GetProfileInfo') }}"
+        {% elif g.User['Role'] == 'customer' %} action="{{ url_for('customer_bp.GetProfileInfo') }}"
+        {% endif %}
+        method="POST">
+
+        <button id="GoToProfile" type="submit">
+          <iconify-icon class="Profile" icon="mdi:account-circle"></iconify-icon>
+        </button>
+      </form>
           {% if g.User['Role']=='customer' %}
           <form action="{{ url_for('cart_bp.UserCart', username=g.User['Name'], _=range(1, 999999)|random) }}" method="GET">
             <button id='GotoCart' type="submit">
@@ -97,6 +133,7 @@
   {% endblock body %}
 
   <section class="product_container">
+    {% if products %}
     {% for product in products %}
       {% if product.PID %}
         <section class="product_card" onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ product.PID }}'">
@@ -121,6 +158,12 @@
         </section>
       {% endif %}
     {% endfor %}
+    {% else %}
+    <section class="Empty">
+      <h1 id = 'EmpText'>There are no products!</h1>
+      <img id ='ShockedEm' src="https://wallpapers.com/images/hd/surprised-emoji-expression-avxqgla4xh0x2gl7.jpg"  alt="SHocked" srcset="">
+    </section>
+    {% endif %}
   </section>
 
   <footer class="footer">

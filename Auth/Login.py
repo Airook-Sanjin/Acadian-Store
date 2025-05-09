@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request,session,g
 from Auth.Register import register_who
-from User.Admin.Admin import admin
+from User.Admin.Admin import admin_bp
 from User.Customer.Customer import customer_bp
 from User.Vendor.Vendor import vendor_bp
 
@@ -44,7 +44,7 @@ def Signin():
         elif role=='admin':
             print('INTO Admin')
             
-            return redirect(url_for('admin.AdminHomePage')) # * Takes you to admin page
+            return redirect(url_for('admin_bp.AdminHomePage')) # * Takes you to admin page
         
         elif role=='vendor': # * Looks through all Vendors and see if any match with the email
             
