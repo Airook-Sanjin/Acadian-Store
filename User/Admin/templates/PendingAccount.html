@@ -2,7 +2,9 @@
     .Main{
         display: flex;
         flex-direction: column;
+        /* margin-top: 3%; */
         justify-content: space-around;
+        background-color: bisque;
     }
     .Pending-Account {
         width: 100%;
@@ -11,32 +13,35 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: aquamarine;
+        /* background-color: aquamarine; */
     }
     .Pending-Account-Container{
         width: 80%;
         height: 100%;
-        background-color: blueviolet;
+        background-color: rgb(217, 197, 236);
+        border-radius: 6px;
     }
     .Pending-Grid-Container{
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(3, 1fr);
         width: 100%;
-        height: 88.4%;
-        background-color: brown;
+        height: 88.5%;
+        overflow-y: auto;
+        /* background-color: brown; */
     }
     .Pending-card {
         display: flex;
         flex-direction: column;
-        justify-content: center;   /* vertical centering */
-        align-items: center;       /* horizontal centering */
-        text-align: center;        /* center text inside */
+        justify-content: center;   
+        align-items: center;       
+        text-align: center;        
         margin: auto;
         padding: 20px 20px;
         border-radius: 5px;
         width: 80%;
-        height: 80%;
+        height: 90%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         background-color: cadetblue;
     }
 
@@ -48,18 +53,19 @@
 
 {% block body %} 
 <section class="Main">
-    <h1>Admin</h1>
+    <h1>Pending Accounts</h1>
 
     <section class="Pending-Account" style="margin-bottom: 3%;">
         <div class="Pending-Account-Container">
-            <h1>Admin</h1>
+            <h1>Admins</h1>
             <div class="Pending-Grid-Container">
                 {% for admin in UnAuthorizedAdmins %}
                 <div class="Pending-card">
-                    <form action="" method="POST">
+                    <form action="{{url_for('admin_bp.AdminChangeAccountsAuth')}}" method="POST">
+                        <input type="hidden" name="AID" value="{{ admin.AID }}">
                         <h1>Name: {{ admin.name }}</h1>
                         <h1>Email: {{ admin.email }}</h1>
-                        <h1>Authoritization: {{ admin.Authorization }}</h1>
+                        <h1>Authoritization: {{ admin.Authorization }}</h1> 
                         <input type="submit" value="Approve">
                     </form>
                 </div>
@@ -70,12 +76,17 @@
 
     <section class="Pending-Account">
         <div class="Pending-Account-Container">
-            <h1>Vendor</h1>
+            <h1>Vendors</h1>
             <div class="Pending-Grid-Container">
                 {% for vendor in UnAuthorizedVendor %}
                 <div class="Pending-card">
-                    <h1>{{ vendor.name }}</h1>
-                    <h1>{{ vendor.email }}</h1>
+                    <form action="{{url_for('admin_bp.AdminChangeAccountsAuth')}}" method="POST">
+                        <input type="hidden" name="VID" value="{{ vendor.VID }}">
+                        <h1>Name: {{ vendor.name }}</h1>
+                        <h1>Email: {{ vendor.email }}</h1>
+                        <h1>Authoritization: {{ vendor.Authorization }}</h1> 
+                        <input type="submit" value="Approve">
+                    </form>
                 </div>
                 {% endfor %}
             </div>

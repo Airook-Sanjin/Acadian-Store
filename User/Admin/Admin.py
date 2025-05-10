@@ -66,22 +66,45 @@ def AdminViewAccounts():
         """)).mappings().fetchall()
         
         UnAuthorizedVendor = conn.execute(text("""
-           SELECT 
-                *
-                FROM vendor
-                Where Authorization = 'denied' 
+           SELECT  
+                v.*,  
+                u.* 
+            FROM vendor AS v  
+            LEFT JOIN users AS u ON v.email = u.email  
+            WHERE v.Authorization = 'denied';
         """)).mappings().fetchall()
-
-        # inventory = conn.execute(text("""
-        #     SELECT color, amount
-        #     FROM product_inventory
-        # """)).mappings().fetchall()
 
         conn.commit()
         return render_template('PendingAccount.html', UnAuthorizedAdmins=UnAuthorizedAdmins, UnAuthorizedVendor=UnAuthorizedVendor)
     except Exception as e:
-        print(f"Error adding product: {e}")
+        print(f"Error viewing accounts: {e}")
         return render_template('PendingAccount.html')
+    
+@admin_bp.route('/AdminView', methods=["POST"])
+def AdminChangeAccountsAuth():
+    try:
+        conn = Connecttodb()
+        VID = request.form.get("VID")
+        AID = request.form.get("AID")
+        if VID:
+            print(VID)
+            changeVendorAuth = conn.execute(text("""
+               Update vendor 
+               SET Authorization = 'granted' 
+               WHERE VID = :VID;
+            """),{'VID':VID}) 
+        if AID:
+            print(AID)
+            changeAdminAuth = conn.execute(text("""
+               Update admin 
+               SET Authorization = 'granted' 
+               WHERE AID = :AID;
+            """),{'AID':AID})
+        conn.commit()
+        return redirect(url_for('admin_bp.AdminViewAccounts'))
+    except Exception as e:
+        print(f"Error Authorizing account: {e}")
+        return redirect(url_for('admin_bp.AdminViewAccounts'))
 
 
 
