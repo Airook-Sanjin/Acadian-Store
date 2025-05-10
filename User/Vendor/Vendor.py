@@ -5,6 +5,8 @@ from User.chat import chat_bp
 from globals import redirect, url_for
 
 
+
+
 vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
 
 vendor_bp.register_blueprint(chat_bp)
@@ -397,16 +399,61 @@ def VendorEditProductImages():
 @vendor_bp.route('/Profile',methods=["POST"])
 def GetProfileInfo():
     try:
-        return render_template('Vendorprofile.html')
-    except Exception as e:
-        print(f"Error: {e}")
-        return render_template('Vendorprofile.html')
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
 
+        return redirect(url_for('vendor_bp.ViewProfile'))
+    except Exception as e:
+        print(f"Error POST: {e}")
+        return redirect(url_for('vendor_bp.ViewProfile'))
 @vendor_bp.route('/Profile',methods=["GET"])
 def ViewProfile():
     try:
-        return render_template('Vendorprofile.html')
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+         
+        customer_data = conn.execute(text("""
+            SELECT u.email as Email,u.username as User,u.name as Name  FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
+            WHERE v.VID = :ID
+        """), {'ID': g.User['ID']}).mappings().first()
+        
+        PlacedOrders= conn.execute(text("""
+            select o.ORDER_ID as OID, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,
+            CASE
+            	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
+            	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
+            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID, v.email as CustEmail FROM cart AS ca 
+            LEFT JOIN orders as o on ca.ORDER_ID = o.ORDER_ID 
+            LEFT JOIN product as p on ca.PID =p.PID 
+            LEFT JOIN vendor as v on p.VID = v.VID
+            LEFT JOIN users as u on v.email = u.email
+            WHERE v.VID = :ID and o.ORDER_ID is Not Null
+            Order By o.ORDER_ID; """),{'ID': g.User['ID']}).mappings().fetchall()
+        GroupedOrders={} #* Dictionary to keep all the values of PlacedOrder
+        for row in PlacedOrders:
+            OrderId = row['OID'] #* Extracts order ID
+            if OrderId not in GroupedOrders:
+                GroupedOrders[OrderId]={
+                    "OrderId":OrderId,
+                    "OrderStatus":row['OrderStatus'],
+                    "Items":[]
+                }
+            # * 
+            GroupedOrders[OrderId]["Items"].append({
+                "ItemID":row['ItemID'],
+                "ItemTitle":row['Itemtitle'],
+                "ItemColor":row['ItemColor'],
+                "ItemPrice":row['ItemPrice'],
+                "ItemStatus":row['ItemStatus']
+                
+                })
+        GroupedOrdersList = list(GroupedOrders.values())
+        print(f"Grouped Orders: {GroupedOrdersList}")
+            
+        print(session)
+        print(g.User)
+        
+        return render_template('Vendorprofile.html',customer_data=customer_data,GroupedOrders=GroupedOrdersList)
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('Vendorprofile.html')
-    
+        return render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])

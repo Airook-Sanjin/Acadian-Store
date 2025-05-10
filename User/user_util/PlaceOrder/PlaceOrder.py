@@ -28,7 +28,7 @@ def placeOrder():
         # * Get ItemIDs without an ORDER_ID
         ItemIDTable = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,p.VID as VID,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
 					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
                     WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
@@ -66,14 +66,14 @@ def placeOrder():
         for item in list(ItemIDTable):
             conn.execute(text("""
                 Update vendor set balance = balance + :Price
-                Where VID = :VID;"""),{'VID':item['VID'],'Price':item['Price']})
+                Where VID = :VID"""),{'VID':item['VID'],'Price':item['Price']})
             
              # * UPDATES PRODUCT INV
         
             conn.execute(text("""
             update product_inventory
             SET amount = amount - :quantity
-            WHERE PID = :pid AND color = :color """),{'quantity':item['quantity'],'pid':item['PID'],'color': item['COLOR']})
+            WHERE PID = :pid AND color = :color """),{'quantity':item['quantity'],'pid':item['PID'],'color': item['color']})
         
         # * Updates Cart items
         conn.execute(text("""

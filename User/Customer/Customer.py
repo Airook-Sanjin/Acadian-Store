@@ -77,7 +77,7 @@ def ViewProfile():
         
         OrderHistory= conn.execute(text("""
             SELECT o.ORDER_ID as OID,o.amount as amount,o.total as total,o.status as status FROM cart AS ca Inner JOIN orders as o ON ca.ORDER_ID= o.ORDER_ID
-            Where CID = :ID Group by o.ORDER_ID,o.total,o.amount,o.status; """),{'ID': g.User['ID']})
+            Where ca.CID = :ID Group by o.ORDER_ID,o.total,o.amount,o.status; """),{'ID': g.User['ID']})
         print(session)
         print(g.User)
         
