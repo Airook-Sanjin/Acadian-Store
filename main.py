@@ -12,6 +12,7 @@ from User.chat import chat_bp
 from User.user_util.cart.cart import cart_bp
 from User.user_util.search.search import search_bp
 from User.user_util.PlaceOrder.PlaceOrder import OrderPlace_bp
+from jinja2 import Environment
 
 
 
@@ -21,6 +22,8 @@ app = Flask(__name__,template_folder='templates',static_folder='static') #* This
 app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key for session with the secrets module
 
 conn = Connecttodb()
+
+
 
 @app.before_request # Before each request it will look for the values below
 def load_user():
@@ -35,6 +38,7 @@ def load_user():
     else:
         g.User = None
         
+
 
  # Get database connection
 

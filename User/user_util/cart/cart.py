@@ -1,5 +1,6 @@
 from globals import Blueprint, render_template, request,g,session,redirect,url_for,Connecttodb,text
 from flask import make_response
+from jinja2 import Environment
 from urllib.parse import urlparse,parse_qs,urlencode,urlunparse
 cart_bp = Blueprint('cart_bp', __name__, url_prefix='/cart', template_folder='templates')
 
@@ -37,8 +38,8 @@ def UserCart(username):
                 SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
 					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
-                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
-	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
+                    WHEN p.discount IS NULL OR p.discount_date < curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL and p.discount_date > curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND (ca.ORDER_ID is Null OR ca.ORDER_ID = 0)"""),{'ID': g.User['ID']}).mappings().fetchall()
@@ -74,8 +75,8 @@ def RemoveFromCart(username):
                 SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
 					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
-                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
-	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
+                    WHEN p.discount IS NULL OR p.discount_date < curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL and p.discount_date > curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND ca.ORDER_ID is Null """),{'ID': g.User['ID']}).mappings().fetchall() #* Updated Cart List
@@ -232,11 +233,11 @@ def GotoCheckout(username):
         #             Select """))
         CartList = conn.execute(text(
             """
-                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,p.description as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
+                SELECT ca.ITEM_ID AS itemid, ca.title AS title, ca.color AS color,LEFT(p.description, 18) as description,p.image_url,ca.quantity as quantity, ca.PID as PID,ca.ORDER_ID,(Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) as Inventory,
                 CASE
 					WHEN (Select amount from product_inventory WHERE PID = ca.PID and color = ca.color ) = 0 THEN 'OUT OF STOCK'
-                    WHEN p.discount IS NULL OR p.discount_date > curdate() then p.price * ca.quantity
-	                WHEN p.discount IS NOT NULL OR p.discount_date < curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
+                    WHEN p.discount IS NULL OR p.discount_date < curdate() then p.price * ca.quantity
+	                WHEN p.discount IS NOT NULL OR p.discount_date > curdate() then (p.price - (p.price * p.discount)) * ca.quantity 
                 END as Price
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND ca.ORDER_ID is Null"""),{'ID': g.User['ID']}).mappings().fetchall()

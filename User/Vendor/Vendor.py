@@ -406,14 +406,44 @@ def GetProfileInfo():
     except Exception as e:
         print(f"Error POST: {e}")
         return redirect(url_for('vendor_bp.ViewProfile'))
+
+@vendor_bp.route('/Shippingitem',methods=['POST'])
+def ShipItem():
+    try:
+        ITEMID = request.form.get('ItemID')
+        # updating Cart.ItemStatus
+        conn.execute(text("""UPDATE cart 
+            SET ItemStatus = 'Shipped',DateShipped = Curdate()
+            WHERE item_ID = :ItemID"""),{'ItemID':ITEMID})
+        return redirect(request.referrer)
+    except Exception as e :
+        print(f"ERROR :{e}")
+        
+        return redirect(request.referrer) or render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])
+        
+@vendor_bp.route('/Rejectingitem',methods=['POST'])
+def RejectItem():
+    try:
+        ITEMID = request.form.get('ItemID')
+        # updating Cart.ItemStatus
+        conn.execute(text("""UPDATE cart 
+            SET ItemStatus = 'Rejected'
+            WHERE item_ID = :ItemID"""),{'ItemID':ITEMID})
+        return redirect(request.referrer)
+    except Exception as e :
+        print(f"ERROR :{e}")
+        
+        return redirect(request.referrer) or render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])
+
 @vendor_bp.route('/Profile',methods=["GET"])
 def ViewProfile():
     try:
+        conn.commit()
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-         
+        
         customer_data = conn.execute(text("""
-            SELECT u.email as Email,u.username as User,u.name as Name  FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
+            SELECT u.email as Email,u.username as User,u.name as Name FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
             WHERE v.VID = :ID
         """), {'ID': g.User['ID']}).mappings().first()
         
@@ -422,7 +452,7 @@ def ViewProfile():
             CASE
             	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
             	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
-            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID, v.email as CustEmail FROM cart AS ca 
+            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID,Date(ca.DateShipped) as DateShipped, v.email as CustEmail FROM cart AS ca 
             LEFT JOIN orders as o on ca.ORDER_ID = o.ORDER_ID 
             LEFT JOIN product as p on ca.PID =p.PID 
             LEFT JOIN vendor as v on p.VID = v.VID
@@ -444,7 +474,8 @@ def ViewProfile():
                 "ItemTitle":row['Itemtitle'],
                 "ItemColor":row['ItemColor'],
                 "ItemPrice":row['ItemPrice'],
-                "ItemStatus":row['ItemStatus']
+                "ItemStatus":row['ItemStatus'],
+                "DateShipped":row['DateShipped']
                 
                 })
         GroupedOrdersList = list(GroupedOrders.values())

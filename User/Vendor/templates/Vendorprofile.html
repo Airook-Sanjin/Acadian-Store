@@ -1,5 +1,5 @@
 <style>
-  .product_container{
+  .product_container {
     display: none !important;
   }
   .ProfileInfo {
@@ -39,17 +39,25 @@
     width: 100%;
     max-width: 100%;
     max-height: 40.112vh;
-    background-color: var(--Primary);
+    background-color: var(--Quad);
     padding: 2em;
     border-radius: 20px;
     justify-content: space-evenly;
     box-shadow: var(--BoxShadow);
   }
-  .itemCard{
+  .itemCard {
     display: flex;
     flex-direction: row;
-    gap: .5em;
-    background-color: aqua;
+    gap: 0.5em;
+    border-radius: 20px;
+    
+    /* box-shadow: var(--BoxShadow); */
+    /* background-color: var(--Quad); */
+    align-items: center;
+  }
+  .item-info.Heading {
+    text-decoration: underline;
+    border-bottom: none;
   }
   .item-info {
     display: flex;
@@ -57,11 +65,22 @@
     gap: 1em;
     width: 60%;
     align-items: center;
+    justify-content: space-around;
+    border-bottom: 0.5px solid black;
+  }
+  #shipped{
+  color:var(--Primary);
+  }
+  .BTN.Reject{
+    background-color: brown;
+  }
+  #rejected{
+    color: brown;
   }
 </style>
 {% extends 'VendorHomepage.html'%} {% block body%}
 <section class="Main">
-  <h1>{{customer_data['User'].title()}}'s Profile</h1>
+  <h1>{{customer_data['Name'].title()}}'s Profile</h1>
 </section>
 <section class="ProfileInfo">
   <h2>Name:</h2>
@@ -76,22 +95,44 @@
   <h1>Products bought</h1>
   <section class="OrderContainter">
     {% for order in GroupedOrders %}
-    <section
-      class="OrderCard"
-      onclick="window.location.href='{{ url_for('OrderPlace_bp.ShowOrder') }}?ORDER_ID={{ order.OID }}'"
-    >
+    <section class="OrderCard">
       <h2>Order Number: {{order['OrderId']}}</h2>
+      <section class="itemCard Heading">
+        <section class="item-info Heading">
+          <h3>Title</h3>
+          <h3>Color</h3>
+          <h3>Price</h3>
+          <h3>Status</h3>
+        </section>
+      </section>
       {% for item in order['Items'] %}
       <section class="itemCard">
         <section class="item-info">
-      <h3>{{item['ItemTitle']}}</h3>
-      <p>{{item['ItemColor']}}</p>
-      <p>{{item['ItemPrice']}}</p>
-      <p>{{item['ItemStatus']}}</p>
-    </section>
-    </section>
+          <h3>{{item['ItemTitle']}}</h3>
+          <p>{{item['ItemColor']}}</p>
+          <p>{{item['ItemPrice']}}</p>
+          <p>{{item['ItemStatus']}}</p>
+        </section>
+        <section class="itemFun">
+          {% if item['ItemStatus'] == 'Pending'  %}
+          <form id="Ship Order" action="{{url_for('vendor_bp.ShipItem')}}" method="POST">
+            
+            <input type="hidden" name="ItemID" value="{{item['ItemID']}}" />
+            <input class="BTN Ship"type="submit" value="Ready to ship" />
+          </form>
+          <form id="Ship Order" action="{{url_for('vendor_bp.RejectItem')}}" method="POST">
+            
+            <input type="hidden" name="ItemID" value="{{item['ItemID']}}" />
+            <input class="BTN Reject"type="submit" value="RejectItem" />
+          </form>
+          {% elif item['ItemStatus'] == 'Rejected' %}
+          <h3 id = "rejected">ITEM WAS REJECTED</h3>
+          {% else %}
+          <h3 id="shipped">ITEM WAS SHIPPED on {{item['DateShipped']}}</h3>
+          {% endif %}
+        </section>
+      </section>
       {% endfor %}
-      
     </section>
 
     {% endfor %}
