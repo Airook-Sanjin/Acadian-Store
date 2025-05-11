@@ -1,5 +1,5 @@
 
-from globals import Blueprint, render_template,redirect,url_for,session,g,text,Connecttodb
+from globals import Blueprint, render_template,redirect,url_for,session,g,text,Connecttodb,checkAndUpdateOrder
 from datetime import datetime
 from User.chat import chat_bp
 
@@ -14,7 +14,7 @@ conn=Connecttodb() # Connects to DB
 
 @customer_bp.before_request # Before each request it will look for the values below
 def load_user():
-        
+    checkAndUpdateOrder()
     if "User" in session:
         g.User = session["User"]
     else:
@@ -55,6 +55,7 @@ def CustomerHomePage():
 
 @customer_bp.route('/Profile',methods=["POST"])
 def GetProfileInfo():
+    conn.commit()
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
@@ -66,6 +67,7 @@ def GetProfileInfo():
 
 @customer_bp.route('/Profile',methods=["GET"])
 def ViewProfile():
+    
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
@@ -75,15 +77,46 @@ def ViewProfile():
             WHERE c.CID = :ID
         """), {'ID': g.User['ID']}).mappings().first()
         
-        OrderHistory= conn.execute(text("""
-            SELECT o.ORDER_ID as OID,o.amount as amount,o.total as total,o.status as status FROM cart AS ca Inner JOIN orders as o ON ca.ORDER_ID= o.ORDER_ID
-            Where ca.CID = :ID Group by o.ORDER_ID,o.total,o.amount,o.status; """),{'ID': g.User['ID']})
         print(session)
         print(g.User)
         
-        return render_template('Custprofile.html', customer_data=customer_data,OrderHistory=OrderHistory)
+        return render_template('Custprofile.html', customer_data=customer_data)
         
         
     except Exception as e:
         print(f"Error GET: {e}")
         return render_template('Custprofile.html',customer_data=[],OrderHistory=[])
+    
+@customer_bp.route('/OrderHistory',methods=["POST"])
+def GetProfileOrderHistory():
+    conn.commit()
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        
+        return redirect(url_for('customer_bp.ViewOrderHistory'))
+    except Exception as e:
+        print(f"Error POST: {e}")
+        return redirect(url_for('customer_bp.ViewOrderHistory'))
+
+@customer_bp.route('/OrderHistory',methods=["GET"])
+def ViewOrderHistory():
+    
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+         
+        
+        
+        OrderHistory= conn.execute(text("""
+            SELECT o.ORDER_ID as OID,o.amount as amount,o.total as total,o.status as status FROM cart AS ca Inner JOIN orders as o ON ca.ORDER_ID= o.ORDER_ID
+            Where ca.CID = :ID Group by o.ORDER_ID,o.total,o.amount,o.status; """),{'ID': g.User['ID']}).mappings().fetchall()
+        print(session)
+        print(g.User)
+        
+        return render_template('CustOrderHistory.html', OrderHistory=OrderHistory)
+        
+        
+    except Exception as e:
+        print(f"Error GET: {e}")
+        return render_template('CustOrderHistory.html',OrderHistory=[])

@@ -1,4 +1,4 @@
-from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify
+from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify,checkAndUpdateOrder
 
 import secrets
 from datetime import datetime
@@ -28,6 +28,7 @@ conn = Connecttodb()
 @app.before_request # Before each request it will look for the values below
 def load_user():
     try:
+        checkAndUpdateOrder()
         conn.execute(text('SELECT 1')).fetchone()
     except Exception:
         print("Reconnecting to DB....")

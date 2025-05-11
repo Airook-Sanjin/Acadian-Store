@@ -1,5 +1,5 @@
 
-from globals import Blueprint,render_template,g,session,Connecttodb,text,request
+from globals import Blueprint,render_template,g,session,Connecttodb,text,request,checkAndUpdateOrder
 from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
@@ -9,7 +9,7 @@ admin_bp.register_blueprint(chat_bp)
 conn= Connecttodb()
 @admin_bp.before_request # Before each request it will look for the values below
 def load_user():
-        
+    checkAndUpdateOrder()    
     if "User" in session:
         g.User = session["User"]
     else:

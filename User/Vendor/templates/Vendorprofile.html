@@ -25,7 +25,7 @@
   .OrderContainter {
     display: grid;
     height: 70vh;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fit,minmax(min(50vw,100%), 1fr));
     /* grid-template-rows: repeat(3, auto) ; */
     /* background-color: var(--Primary); */
     padding: 2em;
@@ -44,6 +44,12 @@
     border-radius: 20px;
     justify-content: space-evenly;
     box-shadow: var(--BoxShadow);
+  }
+  .OrderInfo{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:4em;
   }
   .ItemTable {
     display: table;
@@ -95,7 +101,12 @@
   <section class="OrderContainter">
     {% for order in GroupedOrders %}
     <section class="OrderCard">
-      <h2>Order Number: {{order['OrderId']}}</h2>
+      <section class="OrderInfo">
+        <h2>Order Number: {{order['OrderId']}}</h2>
+        <h3>Status: {{order['OrderStatus']}}</h3>
+        <h3>Total: ${{order['OrderTotal']}}</h3>
+      </section>
+      
        <table class="ItemTable">
         <thead>
         <tr>

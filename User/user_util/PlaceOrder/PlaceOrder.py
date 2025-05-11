@@ -64,9 +64,9 @@ def placeOrder():
         conn.commit()
         #* Sends money to the proper Vendor
         for item in list(ItemIDTable):
-            conn.execute(text("""
-                Update vendor set balance = balance + :Price
-                Where VID = :VID"""),{'VID':item['VID'],'Price':item['Price']})
+            # conn.execute(text("""
+            #     Update vendor set balance = balance + :Price
+            #     Where VID = :VID"""),{'VID':item['VID'],'Price':item['Price']})
             
              # * UPDATES PRODUCT INV
         

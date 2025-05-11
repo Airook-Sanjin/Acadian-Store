@@ -1,5 +1,5 @@
 
-from globals import Blueprint, render_template, request,g,session,Connecttodb,text
+from globals import Blueprint, render_template, request,g,session,Connecttodb,text,checkAndUpdateOrder
 from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
@@ -17,7 +17,7 @@ conn = Connecttodb()
 
 @vendor_bp.before_request # Before each request it will look for the values below
 def load_user():
-        
+    checkAndUpdateOrder()    
     if "User" in session:
         g.User = session["User"]
     else:
@@ -415,7 +415,7 @@ def ShipItem():
         ITEMID = request.form.get('ItemID')
         # updating Cart.ItemStatus
         conn.execute(text("""UPDATE cart 
-            SET ItemStatus = 'Shipped',DateShipped = Curdate()
+            SET ItemStatus = 'Shipping',DateShipped = Curdate()
             WHERE item_ID = :ItemID"""),{'ItemID':ITEMID})
         return redirect(request.referrer)
     except Exception as e :
@@ -450,7 +450,7 @@ def ViewProfile():
         """), {'ID': g.User['ID']}).mappings().first()
         
         PlacedOrders= conn.execute(text("""
-            select o.ORDER_ID as OID, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
+            select o.ORDER_ID as OID,o.total as total, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
             CASE
             	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
             	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
@@ -468,6 +468,7 @@ def ViewProfile():
                 GroupedOrders[OrderId]={
                     "OrderId":OrderId,
                     "OrderStatus":row['OrderStatus'],
+                    "OrderTotal":row['total'],
                     "Items":[]
                 }
             # * 
