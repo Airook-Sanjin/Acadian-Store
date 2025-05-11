@@ -10,14 +10,10 @@ def register_who():
     reg_type = request.args.get('type', 'customer')  # Default to 'customer' if no type is provided
     return render_template('Register.html', reg_type=reg_type)
 
-###########################################################
-# IF YOU DO NOT SEE IN DATABASE BECAUSE I HAVE NO COMMITS #
-###########################################################
-
 @register_bp.route('/register/customer', methods=["POST"])
 def register_view_customer():
     try:
-        # Get database connection
+
         conn = Connecttodb()
 
         EMAIL = request.form.get("email")
@@ -25,11 +21,9 @@ def register_view_customer():
         FULL_NAME = request.form.get("full_name")
         PASSWORD = request.form.get("password")
 
-        # Validate input fields
         if not EMAIL or not USERNAME or not FULL_NAME or not PASSWORD:
             return render_template('Register.html', message="All fields are required.", success=False)
 
-        # Check if email already exists
         existing_user = conn.execute(text("SELECT * FROM users WHERE email = :email"), {'email': EMAIL}).fetchone()
         if existing_user:
             return render_template('Register.html', message="Email is already registered.", success=False)
@@ -41,6 +35,8 @@ def register_view_customer():
         
         conn.execute(text("""INSERT INTO customer (email) 
                               VALUES (:email)"""), {'email': EMAIL})
+        
+        conn.commit()
         
         return render_template('Register.html', message="Registered successfully!", success=True)
     except Exception as e:
@@ -56,7 +52,7 @@ def register_view_customer():
 @register_bp.route('/register/vendor', methods=["POST"])
 def register_view_vendor():
     try:
-        # Get database connection
+
         conn = Connecttodb()
 
         EMAIL = request.form.get("email")
@@ -78,6 +74,8 @@ def register_view_vendor():
         conn.execute(text("""INSERT INTO vendor (email) 
                               VALUES (:email)"""), {'email': EMAIL})
         
+        conn.commit()
+        
         return render_template('Register.html', message="Registered successfully!", success=True)
     except Exception as e:
         error_message = str(e)
@@ -92,7 +90,7 @@ def register_view_vendor():
 @register_bp.route('/register/admin', methods=["POST"])
 def register_view_admin():
     try:
-        # Get database connection
+
         conn = Connecttodb()
 
         EMAIL = request.form.get("email")
@@ -103,18 +101,20 @@ def register_view_admin():
         if not EMAIL or not USERNAME or not FULL_NAME or not PASSWORD:
             return render_template('Register.html', message="All fields are required.", success=False)
 
-        # Check if email already exists
+        
         existing_user = conn.execute(text("SELECT * FROM users WHERE email = :email"), {'email': EMAIL}).fetchone()
         if existing_user:
             return render_template('Register.html', message="Email is already registered.", success=False)
 
-        # Insert into users and admin tables
+
         conn.execute(text("""INSERT INTO users (email, username, name, password) 
                               VALUES (:email, :username, :name, :password)"""),
                      {'email': EMAIL, 'username': USERNAME, 'name': FULL_NAME, 'password': PASSWORD})
         
         conn.execute(text("""INSERT INTO admin (email) 
                               VALUES (:email)"""), {'email': EMAIL})
+        
+        conn.commit()
         
         return render_template('Register.html', message="Registered successfully.", success=True)
     except Exception as e:

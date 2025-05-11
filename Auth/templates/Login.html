@@ -5,23 +5,29 @@
     <link rel="stylesheet" href="{{ url_for('register_bp.static', filename='style/Auth.css') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
   </head>
-  <body class="{% if reg_type %} body-Signup {% endif %}">
+  <body>
     {% block body %}
-    
-    <section class="log-in-page">
-      <h1 id="Login">Log In</h1>
-      <form class="form-css" method="POST" action="{{ url_for('login_bp.Signin') }}">
-        {% if message %}
-          <p style="color: red;">{{ message }}</p>
-        {% endif %}
-        <input class="form-input" type="email" name="Email" id="Email" placeholder="Email" />
-        <input class="form-input" type="password" name="Pass" id="Pass" placeholder="Password" />
-        <input class="form-sub" type="submit" value="Log In">
-      </form>
-      <div class="other-options">
-        <button class="form-sub" onclick="window.location.href='{{ url_for('register_bp.register_who') }}'"> Sign Up</button>
-      </div>
+    <section class="container" style="justify-content: flex-end;">
+      <section class="log-in-page">
+        <h1 id="Login">Log In</h1>
+        <form class="form-css" method="POST" action="{{ url_for('login_bp.Signin') }}">
+          {% if message %}
+            <p style="color: red;">{{ message }}</p>
+          {% endif %}
+          <input class="form-input" type="email" name="Email" id="Email" placeholder="Email"/>
+          <input class="form-input" type="password" name="Pass" id="Pass" placeholder="Password"/>
+          <input class="form-sub" type="submit" value="Log In">
+        </form>
+        <div class="other-options">
+          <button class="form-sub" onclick="window.location.href='{{ url_for('register_bp.register_who') }}'"> Sign Up</button>
+        </div>
+      </section>
     </section>
     {% endblock %}
   </body>
