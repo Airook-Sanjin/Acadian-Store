@@ -173,6 +173,8 @@ def editInventory():
         Color = request.form.get("Color")
         Amount = request.form.get("Amount")
 
+        PID = int(PID)
+        
         conn = Connecttodb()
         print(PID)
         is_main = IMG_ID == 'main'
@@ -448,7 +450,7 @@ def ViewProfile():
         """), {'ID': g.User['ID']}).mappings().first()
         
         PlacedOrders= conn.execute(text("""
-            select o.ORDER_ID as OID, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,
+            select o.ORDER_ID as OID, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
             CASE
             	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
             	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
@@ -473,6 +475,7 @@ def ViewProfile():
                 "ItemID":row['ItemID'],
                 "ItemTitle":row['Itemtitle'],
                 "ItemColor":row['ItemColor'],
+                "ItemQuantity":row['ItemQuantity'],
                 "ItemPrice":row['ItemPrice'],
                 "ItemStatus":row['ItemStatus'],
                 "DateShipped":row['DateShipped']

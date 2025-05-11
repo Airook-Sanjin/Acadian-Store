@@ -1134,7 +1134,13 @@
             currentPID = PID || currentPID;
             const modal = document.querySelector("#EditInventoryModal");
             modal.setAttribute("data-pid", currentPID);
+            // #!------------------------------ Erick's Change--------------------
+            document.getElementById("edit-inventory-pid").value = currentPID
+            document.getElementById("edit-inventory-image-id").value = 'main';  
+
             document.getElementById("edit-inv-modal-PID-input").textContent = currentPID;
+            document.getElementById("pi-img-id-edit-inv").textContent = 'main'; 
+            // #! -----------------------------
             document.querySelectorAll('.product-images-group-edit-inv').forEach(g => g.style.display = 'none');
             const selectedGroup = document.querySelector(`.product-images-group-edit-inv[data-pid="${currentPID}"]`);
             if (selectedGroup) selectedGroup.style.display = 'block';
@@ -1223,6 +1229,8 @@
         function changeModalImageEditInv(imageUrl, productId, imageId, color = '', amount = 0) {
             const mainImg = document.getElementById(`main-modal-image-edit-inv-${productId}`);
             if (mainImg) mainImg.src = imageUrl;
+
+            const validImageId = imageId || 'main';
             
             document.getElementById('edit-inventory-pid').value = productId;
             document.getElementById('edit-inventory-image-id').value = imageId;

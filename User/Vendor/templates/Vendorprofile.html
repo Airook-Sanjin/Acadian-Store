@@ -39,37 +39,36 @@
     width: 100%;
     max-width: 100%;
     max-height: 40.112vh;
-    background-color: var(--Quad);
+    background-color: hsl(0, 0%, 89%);
     padding: 2em;
     border-radius: 20px;
     justify-content: space-evenly;
     box-shadow: var(--BoxShadow);
   }
-  .itemCard {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5em;
+  .ItemTable {
+    display: table;
+    table-layout: fixed;
+    border-collapse: collapse;
     border-radius: 20px;
-    
-    /* box-shadow: var(--BoxShadow); */
-    /* background-color: var(--Quad); */
-    align-items: center;
+    background-color: #F8F2F4;
   }
-  .item-info.Heading {
-    text-decoration: underline;
-    border-bottom: none;
+  
+  
+  .ItemTable tbody{
+    text-align: center;
   }
-  .item-info {
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-    width: 60%;
-    align-items: center;
-    justify-content: space-around;
-    border-bottom: 0.5px solid black;
+  .ItemTable th,.ItemTable td{
+    padding: 10px 20px;
   }
+  
   #shipped{
   color:var(--Primary);
+  }
+  .ItemFun{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-wrap: wrap;
   }
   .BTN.Reject{
     background-color: brown;
@@ -97,23 +96,26 @@
     {% for order in GroupedOrders %}
     <section class="OrderCard">
       <h2>Order Number: {{order['OrderId']}}</h2>
-      <section class="itemCard Heading">
-        <section class="item-info Heading">
-          <h3>Title</h3>
-          <h3>Color</h3>
-          <h3>Price</h3>
-          <h3>Status</h3>
-        </section>
-      </section>
+       <table class="ItemTable">
+        <thead>
+        <tr>
+        <th>Title</th>
+        <th>Color</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        
+      <tbody>
       {% for item in order['Items'] %}
-      <section class="itemCard">
-        <section class="item-info">
-          <h3>{{item['ItemTitle']}}</h3>
-          <p>{{item['ItemColor']}}</p>
-          <p>{{item['ItemPrice']}}</p>
-          <p>{{item['ItemStatus']}}</p>
-        </section>
-        <section class="itemFun">
+     <tr >
+      <td>{{item['ItemTitle']}}</td>
+      <td>{{item['ItemColor']}}</td>
+      <td>{{item['ItemQuantity']}}</td>
+      <td>${{item['ItemPrice']}}</td>
+      <td>{{item['ItemStatus']}}</td>
+      <td><section class="ItemFun">
           {% if item['ItemStatus'] == 'Pending'  %}
           <form id="Ship Order" action="{{url_for('vendor_bp.ShipItem')}}" method="POST">
             
@@ -130,9 +132,14 @@
           {% else %}
           <h3 id="shipped">ITEM WAS SHIPPED on {{item['DateShipped']}}</h3>
           {% endif %}
-        </section>
+        </section></td>
+     </tr>
+     
+        
       </section>
       {% endfor %}
+      </tbody>
+      </table>
     </section>
 
     {% endfor %}
