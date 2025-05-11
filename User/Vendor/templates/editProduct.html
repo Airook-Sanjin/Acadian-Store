@@ -1223,7 +1223,7 @@
         function changeModalImageEditInv(imageUrl, productId, imageId, color = '', amount = 0) {
             const mainImg = document.getElementById(`main-modal-image-edit-inv-${productId}`);
             if (mainImg) mainImg.src = imageUrl;
-    
+            
             document.getElementById('edit-inventory-pid').value = productId;
             document.getElementById('edit-inventory-image-id').value = imageId;
             document.getElementById('edit-inventory-image-url').value = imageUrl;

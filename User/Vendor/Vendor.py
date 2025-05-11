@@ -174,7 +174,7 @@ def editInventory():
         Amount = request.form.get("Amount")
 
         conn = Connecttodb()
-
+        print(PID)
         is_main = IMG_ID == 'main'
 
         # Check if inventory exists
