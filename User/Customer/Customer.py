@@ -26,6 +26,7 @@ def CustomerHomePage():
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
         checkAndUpdateOrder()
+        conn.commit()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
