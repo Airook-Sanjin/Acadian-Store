@@ -75,6 +75,7 @@ def VendorViewProducts():
                 p.VID,
                 p.AID,
                 p.image_url,
+                p.category,
                 GROUP_CONCAT(DISTINCT pi.image ORDER BY pi.IMG_ID SEPARATOR '|') AS additional_images,
                 GROUP_CONCAT(DISTINCT pi.IMG_ID ORDER BY pi.IMG_ID SEPARATOR '|') AS image_ids,
                 inv_summary.color,
@@ -93,7 +94,7 @@ def VendorViewProducts():
             GROUP BY 
                 p.PID, p.title, p.price, p.discount, p.description, 
                 p.warranty, p.discount_date, p.availability, p.VID, 
-                p.AID, p.image_url, inv_summary.color, inv_summary.amount;
+                p.AID, p.image_url,p.category, inv_summary.color, inv_summary.amount;
         """),{'vid': vid}).mappings().fetchall()
 
         AllProducts = [dict(product) for product in AllProducts]
@@ -130,6 +131,7 @@ def VendorAddProduct():
         DISCOUNT = request.form.get("discount")
         DISCOUNT_DATE = request.form.get("discount_date")
         AVAILABILITY = request.form.get("availability")
+        CATEGORY = request.form.get("category")
         VID = g.User['ID']
         IMAGE = request.form.get("URL")
 
@@ -140,8 +142,8 @@ def VendorAddProduct():
 
         # Insert product into the database
         conn.execute(text("""
-            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url)
-            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :VID, :image_url)
+            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url, category)
+            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :VID, :image_url, :category)
         """), {
             'title': TITLE,
             'price': PRICE,
@@ -150,6 +152,7 @@ def VendorAddProduct():
             'discount': DISCOUNT,
             'discount_date': DISCOUNT_DATE,
             'availability': AVAILABILITY,
+            'category': CATEGORY,
             'VID': VID,
             'image_url': IMAGE
         })
