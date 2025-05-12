@@ -245,9 +245,32 @@
                     <option value="Vendor">Vendor</option>
                     <option value="Admin">Admin</option>
                 </select>
-                <input type="text" id="id_input" name="vendor_id" placeholder="Vendor ID" required autocomplete="off">
-                <input type="text" id="product_id" name="product_id" placeholder="Product ID" required autocomplete="off">
+
+                <select id="vendor_dropdown" style="margin: 0 10px;">
+                    <option value="">Select Vendor</option>
+                    {% for vendor in vendors %}
+                        <option value="{{ vendor.VID }}">{{ vendor.username.title() }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="admin_dropdown" style="margin: 0 10px; display: none;">
+                    <option value="">Select Admin</option>
+                    {% for admin in admins %}
+                        <option value="{{ admin.AID }}">{{ admin.username.title() }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="product_id" name="product_id" required>
+                    <option value="">Select Product</option>
+                    {% for product in all_products %}
+                        <option value="{{ product.PID }}">{{ product.title }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="hidden" id="vendor_id" name="vendor_id">
+                <input type="hidden" id="admin_id" name="admin_id">
             </div>
+            
             <button type="submit" name="action" value="WARRANTY CLAIM">WARRANTY CLAIM</button>
             <button type="submit" name="action" value="REFUND">REFUND</button>
             <button type="submit" name="action" value="RETURN">RETURN</button>
@@ -438,12 +461,12 @@
                 <div class="etc_info">
                     <p style="text-align: center;"><strong>Chat ID:</strong> {{ selected_chat.CHAT_ID if selected_chat else "N/A" }}</p>
                     {% if selected_chat and selected_chat.chat_type == 'admin' %}
-                        <p style="text-align: center;"><strong>Admin ID:</strong> {{ selected_chat.AID if selected_chat.AID else "N/A" }}</p>
+                        <p><strong>Admin:</strong> {{ partner_username.title() if partner_username else "N/A" }}</p>
                     {% else %}
-                        <p style="text-align: center;"><strong>Vendor ID:</strong> {{ selected_chat.VID if selected_chat.VID else "N/A" }}</p>
+                        <p><strong>Vendor:</strong> {{ partner_username.title() if partner_username else "N/A" }}</p>
                     {% endif %}
-                    <p style="text-align: center;"><strong>Customer ID:</strong> {{ selected_chat.CID if selected_chat and selected_chat.CID else "N/A" }}</p>
-                    <p style="text-align: center;"><strong>Product ID:</strong> {{ selected_chat.PID if selected_chat and selected_chat.PID else "N/A" }}</p>
+                    <p><strong>Customer:</strong> {{ customer_name.title() if customer_name else "N/A" }}</p>
+                    <p><strong>Product:</strong> {{ product_title.title() if product_title else "N/A" }}</p>
                 </div>
             </div>
         </div>
@@ -451,25 +474,61 @@
     </div>
 
 <script>
-    // Switch between Vendor ID and Admin ID based on form selection
     document.addEventListener('DOMContentLoaded', function(){
-    function updateIdInput(){
-        let userType = document.getElementById('user_type').value;
-        let idInput = document.getElementById('id_input');
-        if(userType === 'Admin'){
-            idInput.placeholder = 'Admin ID';
-            idInput.name = 'admin_id';
-        }
-        else{
-            idInput.placeholder = 'Vendor ID';
-            idInput.name = 'vendor_id';
-        }
-    }
-    updateIdInput();
-    document.getElementById('user_type').addEventListener('change', updateIdInput);
-});
+        let userTypeSelect = document.getElementById('user_type');
+        let vendorDropdown = document.getElementById('id_input');
+        let adminDropdown = document.getElementById('id_input_admin');
 
-    // Image popup functionality
+        function toggleDropdowns(){
+            if(userTypeSelect.value==='Admin'){
+                vendorDropdown.style.display = 'none';
+                vendorDropdown.removeAttribute('name');
+                adminDropdown.style.display = 'inline-block';
+                adminDropdown.setAttribute('name', 'admin_id');
+            }
+            else{
+                adminDropdown.style.display = 'none';
+                adminDropdown.removeAttribute('name');
+                vendorDropdown.style.display = 'inline-block';
+                vendorDropdown.setAttribute('name', 'vendor_id');
+            }
+        }
+        toggleDropdowns();
+        userTypeSelect.addEventListener('change', toggleDropdowns);
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+        let userTypeSelect = document.getElementById('user_type');
+        let vendorDropdown = document.getElementById('vendor_dropdown');
+        let adminDropdown = document.getElementById('admin_dropdown');
+        let hiddenVendorId = document.getElementById('vendor_id');
+        let hiddenAdminId = document.getElementById('admin_id');
+        let form = document.getElementById('chat-options-form');
+
+        function toggleDropdowns(){
+            if(userTypeSelect.value==='Admin'){
+                vendorDropdown.style.display = 'none';
+                adminDropdown.style.display = 'inline-block';
+            }
+            else{
+                adminDropdown.style.display = 'none';
+                vendorDropdown.style.display = 'inline-block';
+            }
+        }
+        form.addEventListener('submit', function(){
+            if(userTypeSelect.value=== 'Vendor'){
+                hiddenVendorId.value = vendorDropdown.value;
+                hiddenAdminId.value = '';
+            }
+            else if(userTypeSelect.value === 'Admin'){
+                hiddenAdminId.value = adminDropdown.value;
+                hiddenVendorId.value = '';
+            }
+        });
+        toggleDropdowns();
+        userTypeSelect.addEventListener('change', toggleDropdowns);
+    });
+
     document.addEventListener('DOMContentLoaded', function(){
         const images = document.querySelectorAll('.chat-image');
         const popup = document.getElementById('image-popup');
