@@ -14,171 +14,203 @@ def load_user():
 
 @chat_bp.route('/chat', methods=["GET", "POST"])
 def chat_view():
+    if request.method == "POST":
+        try:
+            action = request.form.get("action")
+            if action:
+                user_type = request.form.get("user_type")
+                vendor_id = request.form.get("vendor_id")
+                admin_id = request.form.get("admin_id")
+                product_id = request.form.get("product_id")
+                message_text = request.form.get("message")
+                image_url = request.form.get("image_url")
+                user_email = g.User["Email"]
+                user_role = g.User["Role"]
+
+                if not product_id or (user_type == "Vendor" and not vendor_id) or (user_type == "Admin" and not admin_id):
+                    return render_template("chat.html", message="Please select a product and user.", previous_chats=[], selected_chat=None)
+
+                try:
+                    product_id = int(product_id)
+                except (TypeError, ValueError):
+                    return render_template("chat.html", message="Invalid product ID.", previous_chats=[], selected_chat=None)
+
+                if user_role == "customer":
+                    user_id = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).scalar()
+                else:
+                    message = "Only customers can initiate chats."
+                    return render_template("chat.html", message=message, previous_chats=[], selected_chat=None)
+
+                result = conn.execute(text("INSERT INTO chat () VALUES ()"))
+                conn.commit()
+                chat_id = result.lastrowid
+
+                returns = 'YES' if action == "RETURN" else 'NO'
+                refund = 'YES' if action == "REFUND" else 'NO'
+                warranty_claim = 'YES' if action == "WARRANTY CLAIM" else 'NO'
+
+                if user_type == "Vendor":
+                    conn.execute(text("""INSERT INTO chatroom_vendor (CHAT_ID, CID, VID, PID, images, message, returns, refund, warranty_claim, timestamp) VALUES (:chat_id, :cid, :vid, :pid, :images, '* * Start of Chat * *', :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)
+                    """), {
+                        "chat_id": chat_id,
+                        "cid": user_id,
+                        "vid": vendor_id,
+                        "pid": product_id,
+                        "images": image_url,
+                        "message": message_text,
+                        "returns": returns,
+                        "refund": refund,
+                        "warranty_claim": warranty_claim
+                    })
+                elif user_type == "Admin":
+                    conn.execute(text("""INSERT INTO chatroom_admin (CHAT_ID, CID, AID, PID, images, message, returns, refund, warranty_claim, timestamp) VALUES (:chat_id, :cid, :aid, :pid, :images, '* * Start of Chat * *', :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)
+                    """), {
+                        "chat_id": chat_id,
+                        "cid": user_id,
+                        "aid": admin_id,
+                        "pid": product_id,
+                        "images": image_url,
+                        "message": message_text,
+                        "returns": returns,
+                        "refund": refund,
+                        "warranty_claim": warranty_claim
+                    })
+                conn.commit()
+                return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
+
+            else:
+                chat_id = request.form.get("chat_id")
+                chat_type = request.form.get("chat_type")
+                message_text = request.form.get("message")
+                image_url = request.form.get("image_url")
+
+                if not chat_id or not chat_type:
+                    return render_template("chat.html", message="Invalid chat context.", previous_chats=[], selected_chat=None)
+
+                user_email = g.User["Email"]
+                user_role = g.User["Role"]
+
+                if user_role == "customer":
+                    user_id = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).scalar()
+                elif user_role == "vendor":
+                    user_id = conn.execute(text("SELECT VID FROM vendor WHERE email = :email"), {"email": user_email}).scalar()
+                elif user_role == "admin":
+                    user_id = conn.execute(text("SELECT AID FROM admin WHERE email = :email"), {"email": user_email}).scalar()
+                else:
+                    return render_template("chat.html", message="Invalid user role.", previous_chats=[], selected_chat=None)
+
+                if chat_type == "vendor":
+                    flag_query = text("SELECT returns, refund, warranty_claim FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC LIMIT 1")
+                elif chat_type == "admin":
+                    flag_query = text("SELECT returns, refund, warranty_claim FROM chatroom_admin WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC LIMIT 1")
+                else:
+                    return render_template("chat.html", message="Invalid chat type.", previous_chats=[], selected_chat=None)
+
+                flags = conn.execute(flag_query, {"chat_id": chat_id}).mappings().first()
+                returns = flags["returns"] if flags else "NO"
+                refund = flags["refund"] if flags else "NO"
+                warranty_claim = flags["warranty_claim"] if flags else "NO"
+
+                values ={
+                    "chat_id": chat_id,
+                    "images": image_url,
+                    "message": message_text,
+                    "returns": returns,
+                    "refund": refund,
+                    "warranty_claim": warranty_claim}
+
+                if chat_type == "vendor":
+                    if user_role == "customer":
+                        values["cid"] = user_id
+                        sql = "INSERT INTO chatroom_vendor (CHAT_ID, CID, images, message, returns, refund, warranty_claim, timestamp) VALUES (:chat_id, :cid, :images, :message, :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)"
+                    elif user_role == "vendor":
+                        values["vid"] = user_id
+                        sql = "INSERT INTO chatroom_vendor (CHAT_ID, VID, images, message, returns, refund, warranty_claim, timestamp) VALUES (:chat_id, :vid, :images, :message, :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)"
+                elif chat_type == "admin":
+                    if user_role == "customer":
+                        values["cid"] = user_id
+                        sql = "INSERT INTO chatroom_admin (CHAT_ID, CID, images, message, returns, refund, warranty_claim, timestamp) VALUES (:chat_id, :cid, :images, :message, :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)"
+                    elif user_role == "admin":
+                        values["aid"] = user_id
+                        sql = "INSERT INTO chatroom_admin (CHAT_ID, AID, images, message, returns, refund, warranty_claim, timestamp) VALUES (:chat_id, :aid, :images, :message, :returns, :refund, :warranty_claim, CURRENT_TIMESTAMP)"
+                conn.execute(text(sql), values)
+                conn.commit()
+                return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
+
+        except Exception as e:
+            print(f"Error in POST chat handler: {e}")
+            return render_template("chat.html", message="An error occurred.", previous_chats=[], selected_chat=None)
+
     user_email = g.User["Email"]
     user_role = g.User["Role"]
+    partner_username = None
+    customer_name = None
+    product_title = None
+    vendors = conn.execute(text("SELECT vendor.VID, users.username FROM vendor JOIN users ON vendor.email = users.email")).mappings().all()
+    admins = conn.execute(text("SELECT admin.AID, users.username FROM admin JOIN users ON admin.email = users.email")).mappings().all()
+    all_products = conn.execute(text("SELECT PID, title FROM product")).mappings().all()
 
-# Defining user role and ID
-    # Customer role
     if user_role == "customer":
-        try:
-            customer_result = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).fetchone()
-            if not customer_result:
-                message = "Customer not found."
-                return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-            user_id = customer_result.CID
-            user_type = "CID"
-        except:
-            message = "Error fetching customer ID"
-            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-
+        customer_result = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).fetchone()
+        if not customer_result:
+            return render_template("chat.html", message="Customer not found.", messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
+        user_id = customer_result.CID
+        user_type = "CID"
         vendor_chats = conn.execute(text("SELECT CHAT_ID, VID, PID, 'vendor' AS chat_type FROM chatroom_vendor WHERE CID = :cid"), {"cid": user_id}).mappings().all()
         admin_chats = conn.execute(text("SELECT CHAT_ID, AID AS VID, PID, 'admin' AS chat_type FROM chatroom_admin WHERE CID = :cid"), {"cid": user_id}).mappings().all()
         chats = {chat["CHAT_ID"]: chat for chat in (vendor_chats + admin_chats)}.values()
-    # Vendor role
+
     elif user_role == "vendor":
-        try:
-            vendor_result = conn.execute(text("SELECT VID FROM vendor WHERE email = :email"), {"email": user_email}).fetchone()
-            if not vendor_result:
-                message = "Vendor not found."
-                return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-            user_id = vendor_result.VID
-            user_type = "VID"
-        except:
-            message = "Error fetching vendor ID."
-            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-
+        vendor_result = conn.execute(text("SELECT VID FROM vendor WHERE email = :email"), {"email": user_email}).fetchone()
+        if not vendor_result:
+            return render_template("chat.html", message="Vendor not found.", messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
+        user_id = vendor_result.VID
+        user_type = "VID"
         chats = conn.execute(text("SELECT DISTINCT CHAT_ID, CID, PID, 'vendor' AS chat_type FROM chatroom_vendor WHERE VID = :vid"), {"vid": user_id}).mappings().all()
-    # Admin role
-    elif user_role == "admin":
-        try:
-            admin_result = conn.execute(text("SELECT AID FROM admin WHERE email = :email"), {"email": user_email}).fetchone()
-            if not admin_result:
-                message = "Admin not found."
-                return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-            user_id = admin_result.AID
-            user_type = "AID"
-        except:
-            message = "Error fetching admin ID."
-            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
 
+    elif user_role == "admin":
+        admin_result = conn.execute(text("SELECT AID FROM admin WHERE email = :email"), {"email": user_email}).fetchone()
+        if not admin_result:
+            return render_template("chat.html", message="Admin not found.", messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
+        user_id = admin_result.AID
+        user_type = "AID"
         chats = conn.execute(text("SELECT DISTINCT CHAT_ID, CID, PID, 'admin' AS chat_type FROM chatroom_admin WHERE AID = :aid"), {"aid": user_id}).mappings().all()
-    # Invalid role
+
     else:
         message = "Invalid user role."
-        return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
+        return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
 
-    # Check for chats
     if not chats:
         message = "No chats found."
-        return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
-    chat_id = request.args.get("chat_id")
-    # If there's no chat_id, use the first chat in the list
-    if not chat_id and chats:
+        return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
+
+    chat_id = request.form.get("chat_id") or request.args.get("chat_id")
+    if not chat_id:
         try:
             chat_id = list(chats)[0]["CHAT_ID"]
         except:
             message = "No chat ID found."
-            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
+            return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
+    chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID, images, message, returns, refund, warranty_claim FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+    chat_type = "vendor"
+    if not chat_details:
+        chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID, images, message, returns, refund, warranty_claim FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+        chat_type = "admin" if chat_details else None
 
-    try:
-        if request.method == "POST":
-            # Get information from sending messages + creating new chats
-            user_type_selected = request.form.get("user_type")
-            admin_id = request.form.get("admin_id")
-            vendor_id = request.form.get("vendor_id")
-            product_id = request.form.get("product_id")
-            message_content = request.form.get("message")
-            image_url = request.form.get("image_url")
-            error_message = None
-            new_chat_id = None
+    if not chat_details:
+        message = "Chat not found."
+        return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
 
-            # Checks for image URL
-            if image_url:
-                valid_extensions = (".jpg", ".jpeg", ".png", ".gif")
-                if not image_url.lower().endswith(valid_extensions):
-                    error_message = "Image URL is not valid."
-                    image_url = None
+    selected_chat = dict(chat_details)
+    selected_chat['chat_type'] = chat_type
 
-            # Creating a new admin chat
-            if user_type_selected == "Admin" and admin_id and product_id:
-                new_chat_id = conn.execute(text("SELECT MAX(CHAT_ID) + 1 AS new_chat_id FROM chat")).scalar()
-                if not new_chat_id or new_chat_id is None:
-                    new_chat_id = 1
+    messages = conn.execute(text(f"SELECT * FROM chatroom_{chat_type} WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
+    product_title = conn.execute(text("SELECT title FROM product WHERE PID = :pid"), {"pid": selected_chat["PID"]}).scalar()
+    customer_name = conn.execute(text("SELECT users.name FROM customer JOIN users ON customer.email = users.email WHERE CID = :cid"), {"cid": selected_chat["CID"]}).scalar()
+    if chat_type == "vendor":
+        partner_username = conn.execute(text("SELECT users.username FROM vendor JOIN users ON vendor.email = users.email WHERE VID = :vid"), {"vid": selected_chat["VID"]}).scalar()
+    elif chat_type == "admin":
+        partner_username = conn.execute(text("SELECT users.username FROM admin JOIN users ON admin.email = users.email WHERE AID = :aid"), {"aid": selected_chat["AID"]}).scalar()
 
-                conn.execute(text("INSERT INTO chat (CHAT_ID) VALUES (:chat_id)"), {"chat_id": new_chat_id})
-                conn.execute(text("INSERT INTO chatroom_admin (CHAT_ID, CID, AID, PID, message, timestamp) VALUES (:chat_id, :cid, :aid, :pid, :message, CURRENT_TIMESTAMP)"),
-                            {"chat_id": new_chat_id, "cid": user_id, "aid": admin_id, "pid": product_id, "message": "* * Start of Chat * *"})
-                conn.commit()
-                return redirect(url_for("chat_bp.chat_view", chat_id=new_chat_id))
-            # Creating a new vendor chat
-            elif user_type_selected == "Vendor" and vendor_id and product_id:
-                new_chat_id = conn.execute(text("SELECT MAX(CHAT_ID) + 1 AS new_chat_id FROM chat")).scalar()
-                if not new_chat_id or new_chat_id is None:
-                    new_chat_id = 1
-
-                conn.execute(text("INSERT INTO chat (CHAT_ID) VALUES (:chat_id)"), {"chat_id": new_chat_id})
-                conn.execute(text("INSERT INTO chatroom_vendor (CHAT_ID, CID, VID, PID, message, timestamp) VALUES (:chat_id, :cid, :vid, :pid, :message, CURRENT_TIMESTAMP)"),
-                            {"chat_id": new_chat_id, "cid": user_id, "vid": vendor_id, "pid": product_id, "message": "* * Start of Chat * *"})
-                conn.commit()
-                return redirect(url_for("chat_bp.chat_view", chat_id=new_chat_id))
-            # Sending messages in existing chats
-            elif message_content:
-                chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
-                chat_type = "vendor"
-                if not chat_details:
-                    chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
-                    chat_type = "admin" if chat_details else None
-
-                # Check if chat exists
-                if not chat_details:
-                    message = "Chat not found."
-                    return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
-
-                # Get chat details
-                if chat_type == "vendor":
-                    conn.execute(text(f"INSERT INTO chatroom_vendor (CHAT_ID, {user_type}, PID, message, images, timestamp) VALUES (:chat_id, :user_id, :pid, :message, :images, CURRENT_TIMESTAMP)"),
-                                {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content, "images": image_url})
-                elif chat_type == "admin":
-                    conn.execute(text(f"INSERT INTO chatroom_admin (CHAT_ID, {user_type}, PID, message, images, timestamp) VALUES (:chat_id, :user_id, :pid, :message, :images, CURRENT_TIMESTAMP)"),
-                                {"chat_id": chat_id, "user_id": user_id, "pid": chat_details["PID"], "message": message_content, "images": image_url})
-                conn.commit()
-                return redirect(url_for("chat_bp.chat_view", chat_id=chat_id, message=error_message))
-            # If no message content is provided, return an error message
-            else:
-                message = "No message content provided."
-                return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
-
-        chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
-        chat_type = "vendor"
-        if not chat_details:
-            chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
-            chat_type = "admin" if chat_details else None
-
-        # Check if chat exists
-        if not chat_details:
-            message = "Chat not found."
-            return render_template("chat.html", message=message, messages=[], previous_chats=chats, selected_chat=None)
-
-        # Selecting chat type and details
-        selected_chat = dict(chat_details)
-        selected_chat['chat_type'] = chat_type
-        if chat_type == "admin":
-            selected_chat['AID'] = chat_details.get('AID')
-        elif chat_type == "vendor":
-            selected_chat['VID'] = chat_details.get('VID')
-        else:
-            selected_chat['VID'] = None
-            selected_chat['AID'] = None
-
-        # Getting messages for the selected chat and chat type
-        if chat_type == "vendor":
-            messages = conn.execute(text("SELECT * FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
-        elif chat_type == "admin":
-            messages = conn.execute(text("SELECT * FROM chatroom_admin WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC"), {"chat_id": chat_id}).mappings().all()
-        else:
-            messages = []
-
-        return render_template("chat.html", messages=messages, previous_chats=chats, selected_chat=selected_chat, message=None)
-    except Exception as e:
-        message = f"An error occurred: {e}"
-        return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None)
+    return render_template("chat.html", messages=messages, selected_chat=selected_chat, previous_chats=chats, message=None, vendors=vendors, admins=admins, all_products=all_products,
+        product_title=product_title if product_title else "N/A", customer_name=customer_name if customer_name else "N/A", partner_username=partner_username if partner_username else "N/A")
