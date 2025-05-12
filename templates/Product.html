@@ -1,4 +1,7 @@
 <style>
+    .product_container{
+    display: none !important;
+  }
     /*  Darlin change   */
  .Main-Product {
         margin: auto;
@@ -122,6 +125,28 @@
         border-radius: 5px;
         border: 1px solid #ccc;
     }
+       .OoS{
+  cursor:pointer;
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  padding: 10px;
+  font-size: 1rem;
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-left: 10px;
+  margin-bottom: 15px;
+  color:hsl(174, 5%, 24%) ;
+  background-color: hsl(55, 10%, 68%);
+  box-shadow: var(--BoxShadow);
+  text-decoration: line-through;
+  
+}
+.Oos:hover{
+    background-color: hsl(0, 17%, 44%);
+    transition: .2s ease-in-out;
+}
      
      #Colors {
          width: 100%;
@@ -393,56 +418,63 @@
                  
                
                        <section class="right-side-product">
-                        <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
-                            <h2 class="product-title">{{ product.title }}</h2>
-                            <input type="hidden" name="Title" value={{product.title}}>
-                            <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
-                       
-                            
-                            <!-- Color Dropdown -->
-                            <label for="Color">Colors:</label>
-                            <select name="Color" id="Colors" required onchange="InventoryUpdate('{{product.PID}}',this.value)">
-                                <option value="">Select Color</option>
-                                {% for item in inventory %}
-                                    <option value="{{ item.color }}">{{ item.color }}</option>
-                                    
-                                {% endfor %}
-                            </select>
-                         
-                         {% if product.discount_date and product.discount_date < CurDate %}
-                         <div class="product-price">
-                             <div class="price-summary">
-                                 <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format(product.discounted_price |float ) }}</p>
-                                 <p style="font-size: 14px;"><strong>Save:</strong> ${{'%0.2f' |format(product.saving_discount | float) }}</p>
-                                 <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ '%0.2f' |format( product.price | float) }}</p></div>
-                                 <input type="hidden" name="Price" value="{{product['discounted_price']}}">
-                             </div>
-                         </div>
-                     </div>
-                            {% else %}        
-                             {% if product %}
-                                 <!-- safe access to product fields here -->
-                                 <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' | format(product.price | float) }}</p>
-                             {% else %}
-                                 <p style="color: red;"><strong>Product not found.</strong></p>
-                             {% endif %}
-                         {% endif %}
-                         
-                         
-                         <div class="product-description">
-                             <label for="description">Description:</label>
-                             <p id="description">{{ product.description }}</p>
-                         </div>
-     
-                         <div id ='inventory-amount'class="product-amount">
-                             <p><strong>Amount Available:</strong> 
-                                 {{ inventory[0].amount if inventory else 'N/A' }}
-                             </p>
-                         </div>
-     
-                         <input class="BTN" type="submit" value="Add to Cart">
-                     </form>
-                 </section>
+                       <form class="AddtoCart-Form" action="{{url_for('cart_bp.addToCart',PID=product['PID']) }}" method="POST">
+                           <h2 class="product-title">{{ product.title }}</h2>
+                           <input type="hidden" name="Title" value={{product.title}}>
+                           <p class="product-id"><strong>Product ID:</strong> {{ product.PID }}</p>
+                      
+                           
+                           <!-- Color Dropdown -->
+                           <label for="Color">Colors:</label>
+                           <select name="Color" id="Colors" required onchange="InventoryUpdate('{{product.PID}}',this.value)">
+                               <option value="">Select Color</option>
+                               {% for item in inventory %}
+                                   <option value="{{ item.color }}">{{ item.color }}</option>
+                                   
+                               {% endfor %}
+                           </select>
+                        
+                        {% if product.discount_date and product.discount_date > CurDate %}
+                        <div class="product-price">
+                            <div class="price-summary">
+                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' |format(product.discounted_price |float ) }}</p>
+                                <p style="font-size: 14px;"><strong>Save:</strong> ${{'%0.2f' |format(product.saving_discount | float) }}</p>
+                                <p style="color: rgb(97, 97, 97); font-size: 13px;"><strong>Comp Val:</strong> ${{ '%0.2f' |format( product.price | float) }}</p></div>
+                                <input type="hidden" name="Price" value="{{product['discounted_price']}}">
+                            </div>
+                        </div>
+                    </div>
+                           {% else %}        
+                            {% if product %}
+                                <!-- safe access to product fields here -->
+                                <p style="color: rgb(0, 0, 0);"><strong>Price:</strong> ${{ '%0.2f' | format(product.price | float) }}</p>
+                            {% else %}
+                                <p style="color: red;"><strong>Product not found.</strong></p>
+                            {% endif %}
+                        {% endif %}
+                        
+                        
+                        <div class="product-description">
+                            <label for="description">Description:</label>
+                            <p id="description">{{ product.description }}</p>
+                        </div>
+    
+                        <div id ='inventory-amount'class="product-amount">
+                            <p><strong>Amount Available:</strong> 
+                                {{ inventory[0].amount if inventory else 'Out of Stock' }}
+                                <input id="inv" type="hidden" name="inv" value="">
+                            </p>
+                        </div>
+                            {% if inventory[0] and inventory[0].amount > 0%}
+                        <input id = 'AddtoCartBtn' class="BTN" type="submit" value="Add to Cart">
+                        <p>{{inventory[0] and status}}</p>
+                        {% else %}
+                        <p>{{status}}</p>
+                        <input id = 'AddtoCartBtn' class="OoS" type="button" disabled value="OUT OF STOCK">
+                        {% endif %}
+
+                    </form>
+                </section>
              </section>
          </section>
      
@@ -526,15 +558,38 @@
  
  <script>
      // Update Inventory
-     function InventoryUpdate(PID,color){
-         if(!color) return;
- 
-         fetch(`/api/inventory?PID=${PID}&color=${color}`)
-         .then(response => response.json())
-         .then(data => {document.getElementById('inventory-amount').innerHTML = 
-             `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
-         });
-     }
+    function InventoryUpdate(PID,color){
+        if(!color) return;
+
+        fetch(`/api/inventory?PID=${PID}&color=${color}`)
+        .then(response => response.json())
+        .then(data => {document.getElementById('inventory-amount').innerHTML = 
+            `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
+
+            let Amount = data.amount
+            console.log(Amount)
+            document.getElementById('inv').value = Amount;
+            console.log(Amount)
+            // Activates and Deactivates button based on amount
+            if (Amount === 'Out of Stock'){
+                
+                document.getElementById('AddtoCartBtn').value = 'OUT OF STOCK';
+                document.getElementById('AddtoCartBtn').className = 'OoS';
+                document.getElementById('AddtoCartBtn').type='button';
+                document.getElementById('AddtoCartBtn').disabled=true;
+            }
+            else{
+
+                document.getElementById('AddtoCartBtn').value = 'Add to Cart'
+                document.getElementById('AddtoCartBtn').className = 'BTN'
+                document.getElementById('AddtoCartBtn').type='submit';
+                document.getElementById('AddtoCartBtn').disabled=false;
+            }
+            
+
+        });
+        
+    }
  
      // Image Thumbnail Switcher
      function changeImage(thumbnail) {

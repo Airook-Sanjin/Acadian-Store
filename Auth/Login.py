@@ -13,6 +13,7 @@ conn = Connecttodb()
 
 @login_bp.route('/Login',methods = ["GET"])
 def Login():
+    conn.commit() #* Added so that the app stays updated with the database
     print('in Login')
     return render_template('login.html')
 

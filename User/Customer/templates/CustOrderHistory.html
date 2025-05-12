@@ -1,0 +1,56 @@
+<head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
+<style>
+.OrderHistory{
+    width:60vw;
+}
+
+
+  .OrderContainter {
+    display: grid;
+    height: 70vh;
+    grid-template-columns: repeat(auto-fit, minmax(500px,1fr));
+    padding: 2em;
+    gap: 3em;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+  .OrderCard {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 100%;
+    max-height: 40.112vh;
+    background-color: var(--Primary);
+    padding: 2em;
+    border-radius: 20px;
+    justify-content: space-evenly;
+    box-shadow: var(--BoxShadow);
+  }
+</style>
+{% extends 'CustomerHomepage.html' %}
+{% block body %}
+<section class="Main">
+  <h1>{{g.User['Name'].title()}}'s Order History</h1>
+</section>
+<section class="ProPageContainer">
+  <section class="ProSideNav">
+<ul class="ProPageNav">
+  <li onclick="window.location.href='{{url_for('customer_bp.ViewOrderHistory')}}'"><span id="Current">Order History</span></li>
+  <li onclick="window.location.href='{{url_for('customer_bp.ViewProfile')}}'">Profile Information</li>
+</ul>
+</section>
+<section class="OrderHistory">
+  <section class="OrderContainter">
+    {% for Order in OrderHistory %}
+    <section class="OrderCard" onclick="window.location.href='{{ url_for('OrderPlace_bp.ShowOrder') }}?ORDER_ID={{ Order.OID }}'">
+      <h2>Order Number: {{Order['OID']}}</h2>
+      <h2>Items: {{Order['amount']}}</h2>
+      <h2>Total: {{'%0.2f' | format(Order['total']|float)}}</h2>
+      <h4>Status: {{Order['status']}}</h4>
+    </section>
+
+    {% endfor %}
+  </section>
+</section>
+</section>
+{% endblock body %}

@@ -1,5 +1,5 @@
 
-from globals import Blueprint, render_template, request,g,session,Connecttodb,text
+from globals import Blueprint, render_template, request,g,session,Connecttodb,text,checkAndUpdateOrder
 from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
@@ -7,7 +7,7 @@ from globals import redirect, url_for
 
 
 
-vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
+vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates',static_folder='static',static_url_path='/static')
 
 vendor_bp.register_blueprint(chat_bp)
 
@@ -17,7 +17,7 @@ conn = Connecttodb()
 
 @vendor_bp.before_request # Before each request it will look for the values below
 def load_user():
-        
+    
     if "User" in session:
         g.User = session["User"]
     else:
@@ -176,8 +176,10 @@ def editInventory():
         Color = request.form.get("Color")
         Amount = request.form.get("Amount")
 
+        PID = int(PID)
+        
         conn = Connecttodb()
-
+        print(PID)
         is_main = IMG_ID == 'main'
 
         # Check if inventory exists
@@ -409,23 +411,81 @@ def GetProfileInfo():
     except Exception as e:
         print(f"Error POST: {e}")
         return redirect(url_for('vendor_bp.ViewProfile'))
+
+@vendor_bp.route('/Shippingitem',methods=['POST'])
+def ShipItem():
+    try:
+        ITEMID = request.form.get('ItemID')
+        # updating Cart.ItemStatus
+        conn.execute(text("""UPDATE cart 
+            SET ItemStatus = 'Shipping',DateShipped = Curdate()
+            WHERE item_ID = :ItemID"""),{'ItemID':ITEMID})
+        return redirect(request.referrer)
+    except Exception as e :
+        print(f"ERROR :{e}")
+        
+        return redirect(request.referrer) or render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])
+        
+@vendor_bp.route('/Rejectingitem',methods=['POST'])
+def RejectItem():
+    try:
+        ITEMID = request.form.get('ItemID')
+        # updating Cart.ItemStatus
+        conn.execute(text("""UPDATE cart 
+            SET ItemStatus = 'Rejected'
+            WHERE item_ID = :ItemID"""),{'ItemID':ITEMID})
+        return redirect(request.referrer)
+    except Exception as e :
+        print(f"ERROR :{e}")
+        
+        return redirect(request.referrer) or render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])
+
 @vendor_bp.route('/Profile',methods=["GET"])
 def ViewProfile():
     try:
+        conn.commit()
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-         
+        checkAndUpdateOrder()
         customer_data = conn.execute(text("""
-            SELECT u.email as Email,u.username as User,u.name as Name  FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
+            SELECT u.email as Email,u.username as User,u.name as Name FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
             WHERE v.VID = :ID
         """), {'ID': g.User['ID']}).mappings().first()
         
+       
+        print(session)
+        print(g.User)
+        
+        return render_template('Vendorprofile.html',customer_data=customer_data)
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template('Vendorprofile.html',customer_data=[])
+    
+@vendor_bp.route('/RecievedOrder',methods=["POST"])
+def GetProfileOrderHistory():
+    conn.commit()
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        checkAndUpdateOrder()
+        return redirect(url_for('vendor_bp.VendRecievedOrders'))
+    except Exception as e:
+        print(f"Error POST: {e}")
+        return redirect(url_for('vendor_bp.VendRecievedOrders'))
+
+@vendor_bp.route('/RecievedHistory',methods=["GET"])
+def VendRecievedOrders():
+    
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        
         PlacedOrders= conn.execute(text("""
-            select o.ORDER_ID as OID, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,
+            select o.ORDER_ID as OID,o.total as total, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
             CASE
             	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
             	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
-            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID, v.email as CustEmail FROM cart AS ca 
+            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID,Date(ca.DateShipped) as DateShipped, v.email as CustEmail FROM cart AS ca 
             LEFT JOIN orders as o on ca.ORDER_ID = o.ORDER_ID 
             LEFT JOIN product as p on ca.PID =p.PID 
             LEFT JOIN vendor as v on p.VID = v.VID
@@ -439,6 +499,7 @@ def ViewProfile():
                 GroupedOrders[OrderId]={
                     "OrderId":OrderId,
                     "OrderStatus":row['OrderStatus'],
+                    "OrderTotal":row['total'],
                     "Items":[]
                 }
             # * 
@@ -446,17 +507,19 @@ def ViewProfile():
                 "ItemID":row['ItemID'],
                 "ItemTitle":row['Itemtitle'],
                 "ItemColor":row['ItemColor'],
+                "ItemQuantity":row['ItemQuantity'],
                 "ItemPrice":row['ItemPrice'],
-                "ItemStatus":row['ItemStatus']
+                "ItemStatus":row['ItemStatus'],
+                "DateShipped":row['DateShipped']
                 
                 })
         GroupedOrdersList = list(GroupedOrders.values())
         print(f"Grouped Orders: {GroupedOrdersList}")
             
-        print(session)
-        print(g.User)
         
-        return render_template('Vendorprofile.html',customer_data=customer_data,GroupedOrders=GroupedOrdersList)
+        return render_template('VendRecievedOrders.html', GroupedOrders=GroupedOrdersList)
+        
+        
     except Exception as e:
-        print(f"Error: {e}")
-        return render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])
+        print(f"Error GET: {e}")
+        return render_template('VendRecievedOrders.html',GroupedOrders=[])
