@@ -17,7 +17,7 @@ conn = Connecttodb()
 
 @vendor_bp.before_request # Before each request it will look for the values below
 def load_user():
-    checkAndUpdateOrder()    
+    
     if "User" in session:
         g.User = session["User"]
     else:
@@ -443,7 +443,7 @@ def ViewProfile():
         conn.commit()
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-        
+        checkAndUpdateOrder()
         customer_data = conn.execute(text("""
             SELECT u.email as Email,u.username as User,u.name as Name FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
             WHERE v.VID = :ID
@@ -464,7 +464,7 @@ def GetProfileOrderHistory():
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-        
+        checkAndUpdateOrder()
         return redirect(url_for('vendor_bp.VendRecievedOrders'))
     except Exception as e:
         print(f"Error POST: {e}")

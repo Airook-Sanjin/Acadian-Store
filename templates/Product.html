@@ -1,4 +1,7 @@
 <style>
+    .product_container{
+    display: none !important;
+  }
     /*  Darlin change   */
  .Main-Product {
         margin: auto;
@@ -462,12 +465,12 @@
                                 <input id="inv" type="hidden" name="inv" value="">
                             </p>
                         </div>
-                            {% if inventory[0] != 0 %}
+                            {% if inventory[0] and inventory[0].amount > 0%}
                         <input id = 'AddtoCartBtn' class="BTN" type="submit" value="Add to Cart">
                         <p>{{inventory[0] and status}}</p>
                         {% else %}
                         <p>{{status}}</p>
-                        <input class="OoS" type="submit" disabled value="OUT OF STOCK">
+                        <input id = 'AddtoCartBtn' class="OoS" type="button" disabled value="OUT OF STOCK">
                         {% endif %}
 
                     </form>
@@ -564,18 +567,22 @@
             `<p><strong>Amount Available:</strong> ${data.amount}</p>`;
 
             let Amount = data.amount
-            document.getElementById('inv').value = data.amount;
+            console.log(Amount)
+            document.getElementById('inv').value = Amount;
             console.log(Amount)
             // Activates and Deactivates button based on amount
-            if (Amount == 'Out of Stock'){
+            if (Amount === 'Out of Stock'){
                 
+                document.getElementById('AddtoCartBtn').value = 'OUT OF STOCK';
                 document.getElementById('AddtoCartBtn').className = 'OoS';
                 document.getElementById('AddtoCartBtn').type='button';
                 document.getElementById('AddtoCartBtn').disabled=true;
             }
             else{
+
+                document.getElementById('AddtoCartBtn').value = 'Add to Cart'
                 document.getElementById('AddtoCartBtn').className = 'BTN'
-                ocument.getElementById('AddtoCartBtn').type='submit';
+                document.getElementById('AddtoCartBtn').type='submit';
                 document.getElementById('AddtoCartBtn').disabled=false;
             }
             

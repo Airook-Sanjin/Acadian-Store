@@ -14,7 +14,7 @@ conn=Connecttodb() # Connects to DB
 
 @customer_bp.before_request # Before each request it will look for the values below
 def load_user():
-    checkAndUpdateOrder()
+   
     if "User" in session:
         g.User = session["User"]
     else:
@@ -25,7 +25,7 @@ def CustomerHomePage():
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-        
+        checkAndUpdateOrder()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 

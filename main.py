@@ -28,7 +28,7 @@ conn = Connecttodb()
 @app.before_request # Before each request it will look for the values below
 def load_user():
     try:
-        checkAndUpdateOrder()
+        
         conn.execute(text('SELECT 1')).fetchone()
     except Exception:
         print("Reconnecting to DB....")
@@ -62,6 +62,7 @@ app.register_blueprint(vendor_bp)
 @app.route('/', methods=["GET"])
 def start():
     try:
+        checkAndUpdateOrder()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 

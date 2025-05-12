@@ -9,7 +9,7 @@ admin_bp.register_blueprint(chat_bp)
 conn= Connecttodb()
 @admin_bp.before_request # Before each request it will look for the values below
 def load_user():
-    checkAndUpdateOrder()    
+   
     if "User" in session:
         g.User = session["User"]
     else:
@@ -19,6 +19,7 @@ def load_user():
 @admin_bp.route('/Home')
 def AdminHomePage():
     try:
+        checkAndUpdateOrder()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 

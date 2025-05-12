@@ -54,11 +54,23 @@
     align-content: center;
     flex-wrap: wrap;
   }
+  .BTN.SHIP{
+    background-color: var(--Primary);
+    color:var(--FONT)
+  }
+  .BTN.SHIP:hover{
+    background-color: hsl(133, 20%, 55%);
+    color:#F8F2F4;
+  }
   .BTN.Reject{
-    background-color: brown;
+    background-color: hsl(0, 46%, 56%);
+  }
+  .BTN.Reject:hover{
+    background-color: hsl(0, 46%, 66%);
+    color:#F8F2F4;
   }
   #rejected{
-    color: brown;
+    color: hsl(0, 46%, 56%);
   }
 </style>
 <head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
@@ -120,7 +132,7 @@
           {% elif item['ItemStatus'] == 'Rejected' %}
           <h3 id = "rejected">ITEM WAS REJECTED</h3>
           {% else %}
-          <h3 id="shipped">ITEM WAS SHIPPED on {{item['DateShipped']}}</h3>
+          <h3 id="shipped">ITEM BEGAN SHIPPING ON {{item['DateShipped']}}</h3>
           {% endif %}
         </section></td>
      </tr>
