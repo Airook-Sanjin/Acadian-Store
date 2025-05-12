@@ -1,4 +1,4 @@
-from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify
+from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify,checkAndUpdateOrder
 
 import secrets
 from datetime import datetime
@@ -12,6 +12,7 @@ from User.chat import chat_bp
 from User.user_util.cart.cart import cart_bp
 from User.user_util.search.search import search_bp
 from User.user_util.PlaceOrder.PlaceOrder import OrderPlace_bp
+from jinja2 import Environment
 
 
 
@@ -22,9 +23,12 @@ app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key for ses
 
 conn = Connecttodb()
 
+
+
 @app.before_request # Before each request it will look for the values below
 def load_user():
     try:
+        
         conn.execute(text('SELECT 1')).fetchone()
     except Exception:
         print("Reconnecting to DB....")
@@ -35,6 +39,7 @@ def load_user():
     else:
         g.User = None
         
+
 
  # Get database connection
 
@@ -57,6 +62,7 @@ app.register_blueprint(vendor_bp)
 @app.route('/', methods=["GET"])
 def start():
     try:
+        checkAndUpdateOrder()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 

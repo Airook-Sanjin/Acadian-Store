@@ -1,5 +1,5 @@
 
-from globals import Blueprint,render_template,g,session,Connecttodb,text,request
+from globals import Blueprint,render_template,g,session,Connecttodb,text,request,checkAndUpdateOrder
 from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
@@ -9,7 +9,7 @@ admin_bp.register_blueprint(chat_bp)
 conn= Connecttodb()
 @admin_bp.before_request # Before each request it will look for the values below
 def load_user():
-        
+   
     if "User" in session:
         g.User = session["User"]
     else:
@@ -19,6 +19,7 @@ def load_user():
 @admin_bp.route('/Home')
 def AdminHomePage():
     try:
+        checkAndUpdateOrder()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
@@ -66,29 +67,45 @@ def AdminViewAccounts():
         """)).mappings().fetchall()
         
         UnAuthorizedVendor = conn.execute(text("""
-           SELECT 
-                *
-                FROM vendor
-                Where Authorization = 'denied' 
+           SELECT  
+                v.*,  
+                u.* 
+            FROM vendor AS v  
+            LEFT JOIN users AS u ON v.email = u.email  
+            WHERE v.Authorization = 'denied';
         """)).mappings().fetchall()
-
-        # inventory = conn.execute(text("""
-        #     SELECT color, amount
-        #     FROM product_inventory
-        # """)).mappings().fetchall()
 
         conn.commit()
         return render_template('PendingAccount.html', UnAuthorizedAdmins=UnAuthorizedAdmins, UnAuthorizedVendor=UnAuthorizedVendor)
     except Exception as e:
-        print(f"Error adding product: {e}")
+        print(f"Error viewing accounts: {e}")
         return render_template('PendingAccount.html')
-
-
-
-
-
-
-
+    
+@admin_bp.route('/AdminView', methods=["POST"])
+def AdminChangeAccountsAuth():
+    try:
+        conn = Connecttodb()
+        VID = request.form.get("VID")
+        AID = request.form.get("AID")
+        if VID:
+            print(VID)
+            changeVendorAuth = conn.execute(text("""
+               Update vendor 
+               SET Authorization = 'granted' 
+               WHERE VID = :VID;
+            """),{'VID':VID}) 
+        if AID:
+            print(AID)
+            changeAdminAuth = conn.execute(text("""
+               Update admin 
+               SET Authorization = 'granted' 
+               WHERE AID = :AID;
+            """),{'AID':AID})
+        conn.commit()
+        return redirect(url_for('admin_bp.AdminViewAccounts'))
+    except Exception as e:
+        print(f"Error Authorizing account: {e}")
+        return redirect(url_for('admin_bp.AdminViewAccounts'))
 
 # //////////////////////////////////////////////////////////////// #
 # //                                                            // #
@@ -439,7 +456,5 @@ def ViewProfile():
     except Exception as e:
         print(f"Error: {e}")
         return render_template('Adminprofile.html')
-    
-    
     
     

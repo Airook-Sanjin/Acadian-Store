@@ -64,9 +64,9 @@ def placeOrder():
         conn.commit()
         #* Sends money to the proper Vendor
         for item in list(ItemIDTable):
-            conn.execute(text("""
-                Update vendor set balance = balance + :Price
-                Where VID = :VID"""),{'VID':item['VID'],'Price':item['Price']})
+            # conn.execute(text("""
+            #     Update vendor set balance = balance + :Price
+            #     Where VID = :VID"""),{'VID':item['VID'],'Price':item['Price']})
             
              # * UPDATES PRODUCT INV
         
@@ -95,10 +95,10 @@ def ShowOrder():
     try:
         query = """SELECT ca.title AS ItemTitle,p.PID as PID,
             CASE
-                WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
-	            WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
+                WHEN p.discount IS NULL OR p.discount_date < curdate() THEN p.price * ca.quantity
+	            WHEN p.discount IS NOT NULL OR p.discount_date > curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
             END AS ItemPrice,
-            p.image_url as ItemImage, ca.email as CustEmail,ca.quantity AS ItemQuantity, o.ORDER_ID AS ORDERID, o.date AS DatePlaced,DATE(date_add(o.date, interval 5 DAY)) as DeliveryDate,
+            p.image_url as ItemImage,ca.ItemStatus as ItemStatus, ca.email as CustEmail,ca.quantity AS ItemQuantity, o.ORDER_ID AS ORDERID, o.date AS DatePlaced,DATE(o.date) as DatePlaced,
             o.status AS Status, o.amount AS OrderQuantity,o.total as Total from orders AS o 
             INNER JOIN cart AS ca ON o.ORDER_ID = ca.ORDER_ID
             LEFT JOIN product AS p ON ca.PID = p.PID"""

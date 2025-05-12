@@ -1,67 +1,15 @@
-<style>
-  .product_container{
-    display: none !important;
-  }
-  .ProfileInfo {
-    padding: 2em;
-    /* width:50vw; */
-    align-content: center;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-  }
-  .ProfileInfo input[type="text"] {
-    padding: 0.5em;
-    /* width:50%; */
-    border: none;
-    box-shadow: var(--BoxShadow);
-    border-bottom: 1px solid hsla(0, 0%, 99%, 0.5);
-    background-color: hsl(0, 0%, 86%);
-    outline: none;
-    &::placeholder {
-      color: black;
-    }
-  }
-  .OrderContainter {
-    display: grid;
-    height: 70vh;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    /* grid-template-rows: repeat(3, auto) ; */
-    /* background-color: var(--Primary); */
-    padding: 2em;
-    gap: 3em;
-    overflow: scroll;
-    overflow-x: hidden;
-  }
-  .OrderCard {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 100%;
-    max-height: 40.112vh;
-    background-color: var(--Primary);
-    padding: 2em;
-    border-radius: 20px;
-    justify-content: space-evenly;
-    box-shadow: var(--BoxShadow);
-  }
-  .itemCard{
-    display: flex;
-    flex-direction: row;
-    gap: .5em;
-    background-color: aqua;
-  }
-  .item-info {
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-    width: 60%;
-    align-items: center;
-  }
-</style>
+
+<head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
 {% extends 'VendorHomepage.html'%} {% block body%}
 <section class="Main">
-  <h1>{{customer_data['User'].title()}}'s Profile</h1>
+  <h1>{{customer_data['Name'].title()}}'s Profile</h1>
+</section>
+<section class="ProPageContainer">
+<section class="ProSideNav">
+<ul class="ProPageNav">
+  <li onclick="window.location.href='{{url_for('vendor_bp.VendRecievedOrders')}}'">Order History</li>
+  <li onclick="window.location.href='{{url_for('vendor_bp.ViewProfile')}}'"><span id="Current">Profile Information</span></li>
+</ul>
 </section>
 <section class="ProfileInfo">
   <h2>Name:</h2>
@@ -71,30 +19,7 @@
   <h2>User:</h2>
   <input type="text" disabled placeholder="{{customer_data['User'].title()}}" />
 </section>
+</section>
 
-<section class="OrderHistory">
-  <h1>Products bought</h1>
-  <section class="OrderContainter">
-    {% for order in GroupedOrders %}
-    <section
-      class="OrderCard"
-      onclick="window.location.href='{{ url_for('OrderPlace_bp.ShowOrder') }}?ORDER_ID={{ order.OID }}'"
-    >
-      <h2>Order Number: {{order['OrderId']}}</h2>
-      {% for item in order['Items'] %}
-      <section class="itemCard">
-        <section class="item-info">
-      <h3>{{item['ItemTitle']}}</h3>
-      <p>{{item['ItemColor']}}</p>
-      <p>{{item['ItemPrice']}}</p>
-      <p>{{item['ItemStatus']}}</p>
-    </section>
-    </section>
-      {% endfor %}
-      
-    </section>
-
-    {% endfor %}
-  </section>
 </section>
 {% endblock body %} {% block scripts %} {% endblock scripts %}

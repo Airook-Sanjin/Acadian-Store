@@ -178,9 +178,9 @@
           </p>
         </section>
         <section class="OrderInf">
-          <h3>Delivery Date -</h3>
+          <h3>Date Placed -</h3>
           <p>
-            {{OrderHistory[0]['DeliveryDate']| default('Delivery date unavailable')}}
+            {{OrderHistory[0]['DatePlaced']| default('Delivery date unavailable')}}
           </p>
         </section>
         <section class="OrderInf">
@@ -195,6 +195,7 @@
           <section class="item-info">
             <img src="{{item['ItemImage']}}" alt="{{item['ItemTitle']}}" />
             <h3>{{item['ItemTitle']}}</h3>
+            <p>{{item['ItemStatus']}}</p>
             
             
           </section>

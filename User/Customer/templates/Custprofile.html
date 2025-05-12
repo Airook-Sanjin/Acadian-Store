@@ -1,33 +1,12 @@
 <style>
-  .product_container{
-    display: none !important;
-  }
-.ProfileInfo{
-    padding:2em;
-    /* width:50vw; */
-    align-content: center;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-}
-.ProfileInfo input[type=text]{
-    padding: .5em;
-    /* width:50%; */
-    border: none;
-    box-shadow: var(--BoxShadow);
-    border-bottom: 1px solid hsla(0, 0%, 99%,0.5);
-    background-color: hsl(0, 0%, 86%);
-    outline: none;
-    &::placeholder{
-        color: black;
-    } 
-}
+  
+
+
 
   .OrderContainter {
     display: grid;
     height: 70vh;
     grid-template-columns: repeat(auto-fit, minmax(500px,1fr));
-    
     padding: 2em;
     gap: 3em;
     overflow: scroll;
@@ -46,9 +25,17 @@
     box-shadow: var(--BoxShadow);
   }
 </style>
+<head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
 {% extends 'CustomerHomepage.html' %} {% block body%}
 <section class="Main">
   <h1>{{customer_data['User'].title()}}'s Profile</h1>
+</section>
+<section class="ProPageContainer">
+  <section class="ProSideNav">
+<ul class="ProPageNav">
+  <li onclick="window.location.href='{{url_for('customer_bp.ViewOrderHistory')}}'">Order History</li>
+  <li onclick="window.location.href='{{url_for('customer_bp.ViewProfile')}}'"><span id ="Current">Profile Information</span></li>
+</ul>
 </section>
 <section class="ProfileInfo">
     <h2>Name: </h2>
@@ -58,20 +45,9 @@
 <h2>User:</h2>
 <input type="text" disabled placeholder="{{customer_data['User'].title()}}">
 </section>
-<section class="OrderHistory">
-  <h1>My Order History</h1>
-  <section class="OrderContainter">
-    {% for Order in OrderHistory %}
-    <section class="OrderCard" onclick="window.location.href='{{ url_for('OrderPlace_bp.ShowOrder') }}?ORDER_ID={{ Order.OID }}'">
-      <h2>Order Number: {{Order['OID']}}</h2>
-      <h2>Items: {{Order['amount']}}</h2>
-      <h2>Total: {{'%0.2f' | format(Order['total']|float)}}</h2>
-      <h4>Status: {{Order['status']}}</h4>
-    </section>
 
-    {% endfor %}
-  </section>
 </section>
+
 {% endblock body %}
 <!-- {% block scripts %}
 {% endblock scripts %} -->
