@@ -679,6 +679,14 @@ input[type="radio"] {
                             <label for="description">Description:</label>
                             <input type="text" name="description" placeholder="Description" required>
                         </div>
+                        <fieldset style="display: flex; flex-direction: column; border-radius: 6px; text-align: center;">
+                            <legend>INVENTORY</legend>
+                            <label for="Color">Color:</label>
+                            <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
+            
+                            <label for="Amount">Amount:</label>
+                            <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
+                        </fieldset>
                         
                     </div>
                     <div class="add-product-divs">
@@ -936,8 +944,7 @@ input[type="radio"] {
                         </div>
 
                         <div>
-                            <label for="VID">Vendor ID:</label>
-                            <input type="number" name="VID" value="{{ product['VID'] }}" required>
+                            <input type="hidden" name="VID" value="{{ product['VID'] }}" required>
                         </div>
                         <input type="submit" value="Update Product">
                     </div>

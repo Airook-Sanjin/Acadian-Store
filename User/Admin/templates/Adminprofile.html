@@ -1,6 +1,18 @@
+<head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
 {% extends 'AdminHomepage.html'%}
 {% block body%}
-<section class="Main"></section>
+<section class="Main">
+    <section class="ProPageContainer">
+        <section class="ProSideNav">
+        <ul class="ProPageNav">
+          <li>Return Claims</li>
+          <li>Refund Claims</li>
+          <li>Warranty Claims</li>
+        </ul>
+        </section>
+        
+        </section>
+</section>
 {% endblock %}
 {% block scripts %}
-{% endscripts %}
+{% endblock scripts %}
