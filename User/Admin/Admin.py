@@ -106,13 +106,6 @@ def AdminChangeAccountsAuth():
         print(f"Error Authorizing account: {e}")
         return redirect(url_for('admin_bp.AdminViewAccounts'))
 
-
-
-
-
-
-
-
 # //////////////////////////////////////////////////////////////// #
 # //                                                            // #
 # //                      VENDOR PRODUCT                        // #
@@ -462,7 +455,5 @@ def ViewProfile():
     except Exception as e:
         print(f"Error: {e}")
         return render_template('Adminprofile.html')
-    
-    
     
     
