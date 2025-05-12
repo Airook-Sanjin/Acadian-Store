@@ -7,7 +7,7 @@ from globals import redirect, url_for
 
 
 
-vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates')
+vendor_bp = Blueprint('vendor_bp', __name__, url_prefix='/vendor', template_folder='templates',static_folder='static',static_url_path='/static')
 
 vendor_bp.register_blueprint(chat_bp)
 
@@ -449,6 +449,34 @@ def ViewProfile():
             WHERE v.VID = :ID
         """), {'ID': g.User['ID']}).mappings().first()
         
+       
+        print(session)
+        print(g.User)
+        
+        return render_template('Vendorprofile.html',customer_data=customer_data)
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template('Vendorprofile.html',customer_data=[])
+    
+@vendor_bp.route('/RecievedOrder',methods=["POST"])
+def GetProfileOrderHistory():
+    conn.commit()
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        
+        return redirect(url_for('vendor_bp.VendRecievedOrders'))
+    except Exception as e:
+        print(f"Error POST: {e}")
+        return redirect(url_for('vendor_bp.VendRecievedOrders'))
+
+@vendor_bp.route('/RecievedHistory',methods=["GET"])
+def VendRecievedOrders():
+    
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        
         PlacedOrders= conn.execute(text("""
             select o.ORDER_ID as OID,o.total as total, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
             CASE
@@ -485,10 +513,10 @@ def ViewProfile():
         GroupedOrdersList = list(GroupedOrders.values())
         print(f"Grouped Orders: {GroupedOrdersList}")
             
-        print(session)
-        print(g.User)
         
-        return render_template('Vendorprofile.html',customer_data=customer_data,GroupedOrders=GroupedOrdersList)
+        return render_template('VendRecievedOrders.html', GroupedOrders=GroupedOrdersList)
+        
+        
     except Exception as e:
-        print(f"Error: {e}")
-        return render_template('Vendorprofile.html',customer_data=[],GroupedOrders=[])
+        print(f"Error GET: {e}")
+        return render_template('VendRecievedOrders.html',GroupedOrders=[])

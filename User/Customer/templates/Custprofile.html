@@ -1,52 +1,7 @@
 <style>
-  .ProPageNav{
-      display: flex;
-      flex-direction: column;
-      gap:3em;
-      align-items: center;
-      border-right: solid black 1px;
-  }
-  .ProPageNav li{
-    cursor: pointer;
-    list-style: none;
-    font-weight: 600;
-    color:var(--Quad);
-    
-  }
-  .product_container{
-    display: none !important;
-  }
-.ProPageContainer{
-  display:flex;
-  flex-direction: row;
-}
-.ProSideNav{
-  width:20vw;
+  
 
-}
-#Current{
-    color: var(--Secondary);
-}
-.ProfileInfo{
-    padding:2em;
-    width:60vw;
-    align-content: center;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-}
-.ProfileInfo input[type=text]{
-    padding: .5em;
-    /* width:50%; */
-    border: none;
-    box-shadow: var(--BoxShadow);
-    border-bottom: 1px solid hsla(0, 0%, 99%,0.5);
-    background-color: hsl(0, 0%, 86%);
-    outline: none;
-    &::placeholder{
-        color: black;
-    } 
-}
+
 
   .OrderContainter {
     display: grid;
@@ -70,6 +25,7 @@
     box-shadow: var(--BoxShadow);
   }
 </style>
+<head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
 {% extends 'CustomerHomepage.html' %} {% block body%}
 <section class="Main">
   <h1>{{customer_data['User'].title()}}'s Profile</h1>

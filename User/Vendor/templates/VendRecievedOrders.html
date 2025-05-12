@@ -1,0 +1,140 @@
+<style>
+  
+  .OrderContainter {
+    display: grid;
+    height: 70vh;
+    grid-template-columns: repeat(auto-fit,minmax(min(50vw,100%), 1fr));
+    /* grid-template-rows: repeat(3, auto) ; */
+    /* background-color: var(--Primary); */
+    padding: 2em;
+    gap: 3em;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+  .OrderCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    max-height: 40.112vh;
+    background-color: hsl(0, 0%, 89%);
+    padding: 2em;
+    border-radius: 20px;
+    justify-content: space-evenly;
+    box-shadow: var(--BoxShadow);
+  }
+  .OrderInfo{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:4em;
+  }
+  .ItemTable {
+    display: table;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-radius: 20px;
+    background-color: #F8F2F4;
+  }
+  
+  
+  .ItemTable tbody{
+    text-align: center;
+  }
+  .ItemTable th,.ItemTable td{
+    padding: 10px 20px;
+  }
+  
+  #shipped{
+  color:var(--Primary);
+  }
+  .ItemFun{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-wrap: wrap;
+  }
+  .BTN.Reject{
+    background-color: brown;
+  }
+  #rejected{
+    color: brown;
+  }
+</style>
+<head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
+{% extends 'VendorHomepage.html' %}
+{% block body %}
+<section class="Main">
+  <h1>{{g.User['Name'].title()}}'s Order History</h1>
+</section>
+<section class="ProPageContainer">
+  <section class="ProSideNav">
+<ul class="ProPageNav">
+  <li onclick="window.location.href='{{url_for('vendor_bp.VendRecievedOrders')}}'"><span id="Current">Order History</span></li>
+  <li onclick="window.location.href='{{url_for('vendor_bp.ViewProfile')}}'">Profile Information</li>
+</ul>
+</section>
+<section class="OrderHistory">
+  <h1>Products bought</h1>
+  <section class="OrderContainter">
+    {% for order in GroupedOrders %}
+    <section class="OrderCard">
+      <section class="OrderInfo">
+        <h2>Order Number: {{order['OrderId']}}</h2>
+        <h3>Status: {{order['OrderStatus']}}</h3>
+        <h3>Total: ${{order['OrderTotal']}}</h3>
+      </section>
+      
+       <table class="ItemTable">
+        <thead>
+        <tr>
+        <th>Title</th>
+        <th>Color</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        
+      <tbody>
+      {% for item in order['Items'] %}
+     <tr >
+      <td>{{item['ItemTitle']}}</td>
+      <td>{{item['ItemColor']}}</td>
+      <td>{{item['ItemQuantity']}}</td>
+      <td>${{item['ItemPrice']}}</td>
+      <td>{{item['ItemStatus']}}</td>
+      <td>
+        <section class="ItemFun">
+          {% if item['ItemStatus'] == 'Pending'  %}
+          <form id="Ship Order" action="{{url_for('vendor_bp.ShipItem')}}" method="POST">
+            
+            <input type="hidden" name="ItemID" value="{{item['ItemID']}}" />
+            <input class="BTN Ship"type="submit" value="Ready to ship" />
+          </form>
+          <form id="Ship Order" action="{{url_for('vendor_bp.RejectItem')}}" method="POST">
+            
+            <input type="hidden" name="ItemID" value="{{item['ItemID']}}" />
+            <input class="BTN Reject"type="submit" value="RejectItem" />
+          </form>
+          {% elif item['ItemStatus'] == 'Rejected' %}
+          <h3 id = "rejected">ITEM WAS REJECTED</h3>
+          {% else %}
+          <h3 id="shipped">ITEM WAS SHIPPED on {{item['DateShipped']}}</h3>
+          {% endif %}
+        </section></td>
+     </tr>
+     
+        
+      </tbody>
+      </table>
+    </section>
+      {% endfor %}
+      
+    
+
+    {% endfor %}
+    </section>
+  </section>
+</section>
+{% endblock body%}

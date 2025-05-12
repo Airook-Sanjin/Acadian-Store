@@ -4,7 +4,7 @@ from datetime import datetime
 from User.chat import chat_bp
 
 
-customer_bp = Blueprint('customer_bp', __name__, url_prefix='/cust', template_folder='templates')
+customer_bp = Blueprint('customer_bp', __name__, url_prefix='/cust', template_folder='templates',static_folder='static',static_url_path='/static')
 customer_bp.register_blueprint(chat_bp)
 
 
