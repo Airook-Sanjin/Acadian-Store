@@ -94,6 +94,9 @@
       <section class="OrderInfo">
         <h2>Order Number: {{order['OrderId']}}</h2>
         <h3>Status: {{order['OrderStatus']}}</h3>
+        {% if order['OrderDateShipped'] %}
+        <h3>DateShipped: {{order['OrderDateShipped']}}</h3>
+        {% endif %}
         <h3>Total: ${{order['OrderTotal']}}</h3>
       </section>
       

@@ -228,6 +228,7 @@ def quantityUpdate(username):
 @cart_bp.route('/checkout/<username>')
 def GotoCheckout(username):
     try:
+        print(session)
         # ?Should I have an autofill for card info?
         # userinfo = conn.execute(text("""
         #             Select """))

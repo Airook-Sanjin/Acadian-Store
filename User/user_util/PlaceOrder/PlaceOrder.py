@@ -1,4 +1,4 @@
-from globals import Blueprint, render_template, request,g,session,redirect,url_for,Connecttodb,text
+from globals import Blueprint, render_template, request,g,session,redirect,url_for,Connecttodb,text,CheckOrderDelivered,checkAndUpdateOrder
 from datetime import datetime
 
 OrderPlace_bp = Blueprint('OrderPlace_bp', __name__, url_prefix='/order', template_folder='templates')
@@ -21,6 +21,15 @@ def load_user():
 @OrderPlace_bp.route('/OrderPlaced', methods=["POST"])
 def placeOrder():
     try:
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
+        ADDRESS = request.form.get('Address1')
+        CITY= request.form.get('City')
+        STATE = request.form.get('State')
+        ZIP = request.form.get('ZIP')
+        EMAIL = request.form.get('Email')
+        
+        
         total = request.form.get('Total')
         
         CurTime = datetime.now()
@@ -53,9 +62,9 @@ def placeOrder():
         # * Creates new OrderID
         conn.execute(text("""
                 INSERT INTO orders
-	                (date,total,amount)
+	                (date,total,amount,ContactInfo)
                 VALUES
-	                (now(),:total, :quantity);"""),{'total':total,'quantity':int(CartQuantity['CartQuantity'])})
+	                (now(),:total, :quantity,:ContactInfo);"""),{'total':total,'quantity':int(CartQuantity['CartQuantity']),'ContactInfo':f'{ADDRESS},{CITY},{STATE},{ZIP}'})
         conn.commit()
         # * Gets Recent OrderID
         RecentOrder=conn.execute(text("""
@@ -93,13 +102,21 @@ def placeOrder():
 @OrderPlace_bp.route('/OrderPlaced', methods=["GET"])
 def ShowOrder():
     try:
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
+        ADDRESS = request.form.get('Address1')
+        CITY= request.form.get('City')
+        STATE = request.form.get('State')
+        ZIP = request.form.get('ZIP')
+        EMAIL = request.form.get('Email')
+       
         query = """SELECT ca.title AS ItemTitle,p.PID as PID,
             CASE
                 WHEN p.discount IS NULL OR p.discount_date < curdate() THEN p.price * ca.quantity
 	            WHEN p.discount IS NOT NULL OR p.discount_date > curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
             END AS ItemPrice,
-            p.image_url as ItemImage,ca.ItemStatus as ItemStatus, ca.email as CustEmail,ca.quantity AS ItemQuantity, o.ORDER_ID AS ORDERID, o.date AS DatePlaced,DATE(o.date) as DatePlaced,
-            o.status AS Status, o.amount AS OrderQuantity,o.total as Total from orders AS o 
+            p.image_url as ItemImage,date(ca.DateShipped) as DateShipped,ca.ItemStatus as ItemStatus, ca.email as CustEmail,ca.quantity AS ItemQuantity, o.ORDER_ID AS ORDERID, o.date AS DatePlaced,DATE(o.date) as DatePlaced,date(date_add(ca.DateShipped, interval 5 DAY)) as DeliveryDate,
+            o.status AS Status,o.ContactInfo as ContactInfo, o.amount AS OrderQuantity,o.total as Total from orders AS o 
             INNER JOIN cart AS ca ON o.ORDER_ID = ca.ORDER_ID
             LEFT JOIN product AS p ON ca.PID = p.PID"""
             

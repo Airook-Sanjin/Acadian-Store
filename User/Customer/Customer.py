@@ -1,5 +1,5 @@
 
-from globals import Blueprint, render_template,redirect,url_for,session,g,text,Connecttodb,checkAndUpdateOrder
+from globals import Blueprint, render_template,redirect,url_for,session,g,text,Connecttodb,checkAndUpdateOrder,CheckOrderDelivered
 from datetime import datetime
 from User.chat import chat_bp
 
@@ -72,7 +72,7 @@ def ViewProfile():
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-         
+        
         customer_data = conn.execute(text("""
             SELECT u.email as Email,u.username as User,u.name as Name  FROM users AS u LEFT JOIN customer as c ON u.email = c.email
             WHERE c.CID = :ID
@@ -102,20 +102,60 @@ def GetProfileOrderHistory():
 
 @customer_bp.route('/OrderHistory',methods=["GET"])
 def ViewOrderHistory():
-    
+    conn.commit()
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-         
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
         
         
+        # OrderHistory= conn.execute(text("""
+        #     SELECT o.ORDER_ID as OID,o.amount as amount,o.total as total,o.status as status FROM cart AS ca Inner JOIN orders as o ON ca.ORDER_ID= o.ORDER_ID
+        #     Where ca.CID = :ID Group by o.ORDER_ID,o.total,o.amount,o.status; """),{'ID': g.User['ID']}).mappings().fetchall()
+        # print(session)
+        # print(g.User)
+        
+        # !-------------------------TEST-----------------------
         OrderHistory= conn.execute(text("""
-            SELECT o.ORDER_ID as OID,o.amount as amount,o.total as total,o.status as status FROM cart AS ca Inner JOIN orders as o ON ca.ORDER_ID= o.ORDER_ID
-            Where ca.CID = :ID Group by o.ORDER_ID,o.total,o.amount,o.status; """),{'ID': g.User['ID']}).mappings().fetchall()
-        print(session)
-        print(g.User)
+            select o.ORDER_ID as OID,o.total as OrderTotal, o.status as OrderStatus,o.amount as OrderAmount,p.image_url as ItemIMG, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
+            CASE
+            	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
+            	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
+            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID,Date(ca.DateShipped) as DateShipped, v.email as CustEmail FROM cart AS ca 
+            LEFT JOIN orders as o on ca.ORDER_ID = o.ORDER_ID 
+            LEFT JOIN product as p on ca.PID =p.PID 
+            LEFT JOIN vendor as v on p.VID = v.VID
+            LEFT JOIN users as u on v.email = u.email
+            WHERE ca.CID = :ID and o.ORDER_ID is Not Null
+            Order By o.ORDER_ID; """),{'ID': g.User['ID']}).mappings().fetchall()
+        GroupedOrderHistory={} #* Dictionary to keep all the values of PlacedOrder
+        for row in OrderHistory:
+            OrderId = row['OID'] #* Extracts order ID
+            if OrderId not in GroupedOrderHistory:
+                GroupedOrderHistory[OrderId]={
+                    "OrderId":OrderId,
+                    "OrderStatus":row['OrderStatus'],
+                    "OrderTotal":row['OrderTotal'] or 0,
+                    "OrderAmount":row['OrderAmount'] or 0,
+                    "Items":[]
+                }
+            # * 
+            GroupedOrderHistory[OrderId]["Items"].append({
+                "ItemID":row['ItemID'],
+                "ItemIMG":row['ItemIMG'],
+                "ItemTitle":row['Itemtitle'],
+                "ItemColor":row['ItemColor'],
+                "ItemQuantity":row['ItemQuantity'],
+                "ItemPrice":row['ItemPrice'] or 0,
+                "ItemStatus":row['ItemStatus'],
+                "DateShipped":row['DateShipped']
+                
+                })
+        GroupedOrderHistoryList = list(GroupedOrderHistory.values())
+        # !----------------------------------------------------
         
-        return render_template('CustOrderHistory.html', OrderHistory=OrderHistory)
+        return render_template('CustOrderHistory.html', OrderHistory=GroupedOrderHistoryList)
         
         
     except Exception as e:
