@@ -197,7 +197,7 @@
         justify-content: center;
         margin: auto;
         width: 30%;
-        height: 300px;
+        height: 200px;
         background-color: white;
         border: 1px solid lightgray;
     }
@@ -210,7 +210,6 @@
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        height: 200px;
     }
     #chat-options-form input[type="submit"]{
         width: 90%;
@@ -230,6 +229,14 @@
         justify-content: center;
         align-items: center;
         width: 90%;
+        margin-bottom: 10px;
+    }
+    #chat_type_buttons{
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        width: 90%;
+        margin: 10px auto 0 auto;
     }
 </style>
 {% extends 'GuestHomepage.html' %}
@@ -246,34 +253,40 @@
                     <option value="Admin">Admin</option>
                 </select>
 
-                <select id="vendor_dropdown" style="margin: 0 10px;">
+                <select id="vendor_dropdown" style="margin: 0 5px 0 10px;">
                     <option value="">Select Vendor</option>
                     {% for vendor in vendors %}
                         <option value="{{ vendor.VID }}">{{ vendor.username.title() }}</option>
                     {% endfor %}
                 </select>
 
-                <select id="admin_dropdown" style="margin: 0 10px; display: none;">
+                <select id="admin_dropdown" style="margin: 0 5px 0 10px; display: none;">
                     <option value="">Select Admin</option>
                     {% for admin in admins %}
                         <option value="{{ admin.AID }}">{{ admin.username.title() }}</option>
                     {% endfor %}
                 </select>
 
-                <select id="product_id" name="product_id" required>
+                <select id="product_id" name="product_id" required style="margin: 0 10px 0 5px;">
+                    {% if selected_chat %}
+                        <option value="{{ selected_chat.PID }}" data-vid="{{ selected_chat.VID }}">{{ product_title.title() }}</option>
+                    {% endif %}
                     <option value="">Select Product</option>
                     {% for product in all_products %}
-                        <option value="{{ product.PID }}">{{ product.title }}</option>
+                        <option value="{{ product.PID }}" data-vid="{{ product.VID }}">{{ product.title }}</option>
                     {% endfor %}
                 </select>
 
+                <input type="submit" name="action" value="START" id="start_chat_button" style="padding: 5px;">
                 <input type="hidden" id="vendor_id" name="vendor_id">
                 <input type="hidden" id="admin_id" name="admin_id">
             </div>
-            
-            <button type="submit" name="action" value="WARRANTY CLAIM">WARRANTY CLAIM</button>
-            <button type="submit" name="action" value="REFUND">REFUND</button>
-            <button type="submit" name="action" value="RETURN">RETURN</button>
+
+            <div id="chat_type_buttons">
+                <input type="submit" name="action" value="RETURN" style="padding: 5px;">
+                <input type="submit" name="action" value="REFUND" style="padding: 5px;">
+                <input type="submit" name="action" value="WARRANTY CLAIM" style="padding: 5px;">
+            </div>
         </form>
     </div>
 
@@ -308,7 +321,7 @@
                             </select>
                             <input type="submit" id="open_previous_chat" value="Open Chat" disabled>
                         {% endif %}
-                        <p>
+                        <p id="chat_type_label">
                             <strong>Chat Type:</strong>
                             {% if selected_chat.returns == 'YES' %}<span>Return</span>
                             {% elif selected_chat.refund == 'YES' %}<span>Refund</span>
@@ -316,7 +329,7 @@
                             {% else %}<span>N/A</span>
                             {% endif %}
                         </p>
-                        
+
                     </form>
                 </div>
             </div>
@@ -451,9 +464,8 @@
             </div>
 
             <div class="send-message-container">
-                <form method="POST" action="{{ url_for('chat_bp.chat_view', chat_id=selected_chat['CHAT_ID']) }}" id="send_message_form">
-                    <input type="hidden" name="chat_id" value="{{ selected_chat.CHAT_ID }}">
-                    <input type="hidden" name="chat_type" value="{{ selected_chat.chat_type }}">
+                <form method="POST" action="{{ url_for('chat_bp.chat_view') }}" id="send_message_form">
+                    <input type="hidden" name="chat_id" value="{{ selected_chat.CHAT_ID if selected_chat else '' }}">
                     <input type="text" placeholder="Type your message here..." id="message" name="message" required autocomplete="off">
                     <input type="text" placeholder="Image URL (optional)" id="image_url" name="image_url" autocomplete="off">
                     <input type="submit" value="Send" id="send_message">
@@ -527,6 +539,72 @@
         });
         toggleDropdowns();
         userTypeSelect.addEventListener('change', toggleDropdowns);
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+        let userTypeSelect = document.getElementById('user_type');
+        let startChatButton = document.getElementById('start_chat_button');
+
+        function toggleStartButton(){
+            if(userTypeSelect.value === 'Vendor'){
+                startChatButton.style.display = 'inline-block';
+            }
+            else{
+                startChatButton.style.display = 'none';
+            }
+        }
+        toggleStartButton();
+        userTypeSelect.addEventListener('change', toggleStartButton);
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+        let userTypeSelect = document.getElementById('user_type');
+        let chatTypeButtons = document.getElementById('chat_type_buttons');
+        let chatTypeLabel = document.getElementById('chat_type_label');
+
+        function toggleChatTypeUI(){
+            if(userTypeSelect.value === 'Admin'){
+                chatTypeButtons.style.display = 'flex';
+                chatTypeLabel.style.display = 'block';
+            }
+            else{
+                chatTypeButtons.style.display = 'none';
+                chatTypeLabel.style.display = 'none';
+            }
+        }
+        userTypeSelect.addEventListener('change', toggleChatTypeUI);
+        toggleChatTypeUI();
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function(){
+        let userTypeSelect = document.getElementById('user_type');
+        let vendorDropdown = document.getElementById('vendor_dropdown');
+        let productSelect = document.getElementById('product_id');
+
+        function filterProducts(){
+            let userType = userTypeSelect.value;
+            let selectedVendorId = vendorDropdown.value;
+            let options = productSelect.querySelectorAll('option');
+
+            options.forEach(option =>{
+                if(!option.value){
+                    option.style.display = 'block';
+                    return;
+                }
+                let productVendorId = option.getAttribute('data-vid');
+                let shouldShow = (userType === 'Admin')||(productVendorId=== selectedVendorId);
+                option.style.display=shouldShow ? 'block' : 'none';
+            });
+
+            let selectedOption = productSelect.selectedOptions[0];
+            if (selectedOption && selectedOption.style.display === 'none') {
+                productSelect.value = '';
+            }
+        }
+        userTypeSelect.addEventListener('change', filterProducts);
+        vendorDropdown.addEventListener('change', filterProducts);
+        filterProducts();
     });
 
     document.addEventListener('DOMContentLoaded', function(){
