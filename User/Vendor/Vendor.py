@@ -134,17 +134,18 @@ def VendorAddProduct():
         CATEGORY = request.form.get("category")
         VID = g.User['ID']
         IMAGE = request.form.get("URL")
+        COLOR = request.form.get('Color')
+        AMOUNT = request.form.get('Amount')
 
         # Handle empty discount, discount_date, and warranty
         DISCOUNT = float(DISCOUNT) / 100 if DISCOUNT else None
         DISCOUNT_DATE = DISCOUNT_DATE if DISCOUNT_DATE else None
         WARRANTY = WARRANTY if WARRANTY else None
 
-        # Insert product into the database
         conn.execute(text("""
             INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url, category)
             VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :VID, :image_url, :category)
-        """), {
+            """), {
             'title': TITLE,
             'price': PRICE,
             'description': DESCRIPTION,
@@ -157,10 +158,19 @@ def VendorAddProduct():
             'image_url': IMAGE
         })
 
-        # Commit the changes to the database
+        PID = conn.execute(text("SELECT LAST_INSERT_ID()")).scalar()
+
+        conn.execute(text("""
+            INSERT INTO product_inventory (color, amount, PID)
+            VALUES (:color, :amount, :PID)
+        """), {
+            'color': COLOR,
+            'amount': AMOUNT,
+            'PID': PID
+        })
+
         conn.commit()
 
-        # Redirect to GET route that loads and displays all products
         return redirect(url_for('vendor_bp.VendorViewProducts', message="Product added successfully", success=True))
     except Exception as e:
         print(f"ERROR ADDING PRODUCT: {e}")

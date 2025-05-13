@@ -1,7 +1,9 @@
 <style>
-    
+    .product_container{
+    display: none !important;
+  }
     /* === Add Product Page === */
-    .add-product-page {
+    /* .add-product-page {
             display: flex;
             justify-content: space-between;
             flex-direction: row;
@@ -12,8 +14,126 @@
             border-radius: 20px;
             background-color: #9f9281;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-    
+        } */
+.add-product-page {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+.leftside-of-add-product-page {
+    flex: 1;
+    padding: 2rem;
+    background: #8c8174;
+    border-radius: 1rem;
+    color: #fff;
+}
+
+.leftside-of-add-product-page h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #000;
+}
+
+.leftside-of-add-product-page h2 {
+    font-size: 1rem;
+    margin-top: 1rem;
+    color: green;
+}
+
+.form-css {
+    flex: 2;
+    padding: 2rem;
+    background-color: #d0f0f7;
+    border-radius: 1rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-css h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #222;
+    text-align: center;
+}
+
+.form-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.add-product-divs {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.add-product-divs label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.add-product-divs input,
+.add-product-divs select {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    background-color: #fff;
+    transition: all 0.2s ease;
+}
+
+.add-product-divs input:focus,
+.add-product-divs select:focus {
+    border-color: #0d6efd;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+}
+
+input[type="radio"] {
+    margin-right: 0.4rem;
+}
+
+#warranty,
+#discount {
+    margin-top: 0.5rem;
+}
+
+#warranty input,
+#discount input {
+    margin-top: 0.25rem;
+}
+
+#warranty label,
+#discount label {
+    margin-top: 0.5rem;
+}
+
+#warranty,
+#discount {
+    display: none;
+}
+
+#AddProductBTN {
+    margin-top: 1rem;
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    background-color: #ffb347;
+    color: #000;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#AddProductBTN:hover {
+    background-color: #ffa500;
+}
+
         
     /* === Main Section === */
     .Main {
@@ -49,8 +169,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 220px;
-            max-width: 300px;
+            width: auto;
+            /* min-width: 220px;
+            max-width: 300px; */
             padding: 20px;
             box-shadow: 2px 1px 2px 1px rgb(152, 152, 152);
             border-radius: 10px;
@@ -59,9 +180,24 @@
         
     /* === Form Style 1 === */
     .form1 {
-            width: 100%;
-            background-color: rgb(207, 239, 239);
-        }
+        width: auto;
+        background-color: rgb(207, 239, 239);
+    }
+    
+    .form-section {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        width: auto;
+        background-color: rgb(207, 239, 239);
+    }
+    .add-form-section,div{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;  
+    }
+
         
     /* === Edit Form Section === */
     .edit-form {
@@ -138,7 +274,7 @@
         padding: 5px 0;
     }
 
-    input[type="submit"] {
+    #AddProductBTN {
         margin-top: 10px;
         padding: 8px 12px;
         background-color: antiquewhite;
@@ -287,6 +423,7 @@
             display: flex;
             justify-content: center;
             width: 100%;
+            margin-top: 2%;
         }
         /* ################################### */
         .Options-dialog {
@@ -298,17 +435,23 @@
         .Options-button-holder {
             display: flex;
             flex-direction: column;
+            height: 100%;
             justify-content: space-around;
         }
         .Options-body {
             display: flex;
+            
             justify-content: space-around;
-            height: 300px;
+            height: 250px;
         }
         .Options-footer {
             
         }
         /* ################################### */
+        .edit {
+            background-color: #007BFF;
+            max-height: 300px;
+        }
         .edit-product-dialog {
             background-color: #007BFF;
             max-height: 300px;
@@ -323,6 +466,7 @@
         }
         /* ################################### */
         .edit-image-content {
+          
             width: 1200px;
         }
         .edit-image-dialog {
@@ -489,81 +633,124 @@
         align-items: center;
         gap: 0.3rem; /* spacing between input and label */
     }
+    .add-product-divs{
+        padding: 10px 10px;
+    }
     
     </style>
-    
     
      {% extends 'GuestHomepage.html'%}
      
      {% block body %}
      <section class="Main">
          <section class="add-product-page">
-             <div class="leftside-of-add-product-page">
-                <h1 style="font-size: 40px;">Vendor</h1><br>
-                {% if success == True %}
-                    <h2 style="color: green; margin: 0%;">{{ message }}</h2>
-                {% elif success == False %}
-                    <h2 style="color: red; margin: 0%;">{{ message }}</h2>
-                <!-- {% elif successinv == True%}
-                    <h2 style="color: green; margin: 0%;">{{ messageinv }}</h2>
-                {% elif successinv == False%}
-                    <h2 style="color: green; margin: 0%;">{{ messageinv }}</h2> -->
-                {% endif %}
-             </div>
-     
-             <form class="form-css form1" method="POST" action="{{ url_for('vendor_bp.VendorAddProduct') }}">
+            <div class="leftside-of-add-product-page">
+               <h1 style="font-size: 40px;">Admin</h1><br>
+               {% if success == True %}
+                   <h2 style="color: green; margin: 0%;">{{ message }}</h2>
+               {% elif success == False %}
+                   <h2 style="color: red; margin: 0%;">{{ message }}</h2>
+               <!-- {% elif successinv == True%}
+                   <h2 style="color: green; margin: 0%;">{{ messageinv }}</h2>
+               {% elif successinv == False%}
+                   <h2 style="color: green; margin: 0%;">{{ messageinv }}</h2> -->
+               {% endif %}
+            </div>
+            
+            <!-- Add Product section -->
+            <form class="form-css form1" method="POST" action="{{ url_for('admin_bp.AdminAddProduct') }}">
                 <h1 class="modal-title">Add Product</h1>
+                <section class="form-section">
+                    <div class="add-product-divs">
+                        <div>
+                            <label for="URL">Main Image URL:</label>
+                            <input type="url" name="URL" placeholder="IMG" required>
+                        </div>
+
+                        <div>
+                            <label for="title">Product Title:</label>
+                            <input type="text" name="title" placeholder="Title" required>
+                        </div>
+                        
+                        <div>
+                            <label for="price">Price:</label>
+                            <input type="number" name="price" step="0.01" placeholder="Price" required>
+                        </div>
+                    
+                        <div>
+                            <label for="description">Description:</label>
+                            <input type="text" name="description" placeholder="Description" required>
+                        </div>
+                        <fieldset style="display: flex; flex-direction: column; border-radius: 6px; text-align: center;">
+                            <legend>INVENTORY</legend>
+                            <label for="Color">Color:</label>
+                            <input type="text" id="Color" name="Color" placeholder="Enter Color" required>
             
-                <label for="URL">Image URL:</label>
-                <input type="url" name="URL" placeholder="IMG" required>
-            
-                <label for="title">Product Title:</label>
-                <input type="text" name="title" placeholder="Title" required>
-            
-                <label for="price">Price:</label>
-                <input type="number" name="price" step="0.01" placeholder="Price" required>
-            
-                <label for="description">Description:</label>
-                <input type="text" name="description" placeholder="Description" required>
-            
-                <label>Do you want to add a Warranty?</label>
-                <div>
-                    <input type="radio" name="add_warranty" value="yes" onclick="toggleWarrantyFields(this, true)" required>
-                    <label>Yes</label>
-                    <input type="radio" name="add_warranty" value="no" onclick="toggleWarrantyFields(this, false)">
-                    <label>No</label>
-                </div>
-            
-                <div class="warranty_field_css" style="display: none;">
-                    <label>Warranty:</label>
-                    <input type="date" name="warranty">
-                </div>
-            
-                <label>Do you want to add a discount?</label>
-                <div>
-                    <input type="radio" name="add_discount" value="yes" onclick="toggleDiscountFields(this, true)" required>
-                    <label>Yes</label>
-                    <input type="radio" name="add_discount" value="no" onclick="toggleDiscountFields(this, false)">
-                    <label>No</label>
-                </div>
-            
-                <div class="discount_field_css" style="display: none;">
-                    <label>Discount (%):</label>
-                    <input type="number" name="discount" placeholder="Discount">
-                    <label>Discount End Date:</label>
-                    <input type="date" name="discount_date">
-                </div>
-            
-                <label for="availability">Availability:</label>
-                <select name="availability" required>
-                    <option value="" disabled selected>Select availability</option>
-                    <option value="IN STOCK">IN STOCK</option>
-                    <option value="OUT OF STOCK">OUT OF STOCK</option>
-                </select>
-                <input type="submit" value="Add Product to Acadia">
+                            <label for="Amount">Amount:</label>
+                            <input type="number" id="Amount" name="Amount" placeholder="Enter Amount" required>
+                        </fieldset>
+                        
+                    </div>
+                    <div class="add-product-divs">
+                        <div>
+                        <label>Do you want to add a Warranty?</label>
+                            <div style="display: flex; flex-direction: row;">
+                                <input type="radio" name="add_warranty" value="yes" onclick="toggleWarrantyFields(this, true)" required>
+                                <label>Yes</label>
+                                <input type="radio" name="add_warranty" value="no" onclick="toggleWarrantyFields(this, false)">
+                                <label>No</label>
+                            </div>
+                        </div>
+                    
+                        <div class="warranty_field_css" style="display: none;">
+                            <label>Warranty:</label>
+                            <input type="date" name="warranty">
+                        </div>
+
+                        <div>
+                            <label>Do you want to add a discount?</label>
+                            <div style="display: flex; flex-direction: row;">
+                                <input type="radio" name="add_discount" value="yes" onclick="toggleDiscountFields(this, true)" required>
+                                <label>Yes</label>
+                                <input type="radio" name="add_discount" value="no" onclick="toggleDiscountFields(this, false)">
+                                <label>No</label>
+                            </div>
+                        </div>
+
+                        <div class="discount_field_css" style="display: none;">
+                            <label>Discount (%):</label>
+                            <input type="number" name="discount" placeholder="Discount">
+                            <label>Discount End Date:</label>
+                            <input type="date" name="discount_date">
+                        </div>
+                        
+                    </div>
+                    <div class="add-product-divs">
+                        <div>
+                            <label for="category">Category:</label>
+                            <select name="category" required>
+                                <option value="" disabled selected>Select category</option>
+                                <option value="Cell Phones">Cell Phones</option>
+                                <option value="Computers & Accessories">Computers & Accessories</option>
+                                <option value="Televisions">Televisions</option>
+                                <option value="Headphones">Headphones</option>
+                                <option value="Photography & Videography">Photography & Videography</option>
+                                <option value="Wearable Tech">Wearable Tech</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="availability">Availability:</label>
+                            <select name="availability" required>
+                                <option value="" disabled selected>Select availability</option>
+                                <option value="IN STOCK">IN STOCK</option>
+                                <option value="OUT OF STOCK">OUT OF STOCK</option>
+                            </select>
+                        </div>
+                        <input id="AddProductBTN" type="submit" value="Add Product to Acadia">
+                        </div>
+                </section>
             </form>
-            
-         </section>
+       </section>
         
          <section class="vendor-Products"> 
             <h1>Your Products</h1>
@@ -736,8 +923,20 @@
                                 <label>Discount End Date:</label>
                                 <input type="date" name="discount_date" value="{{ product['discount_date'] }}">
                             </div>
-                        </div>
-
+                        </div></div>
+                        <div class="right-side-form">
+                            <div>
+                                <label for="category">Category:</label>
+                                <select name="category" required>
+                                    <option value="" disabled selected>Select category</option>
+                                    <option value="Cell Phones" {% if product['category'] == "Cell Phones" %}selected{% endif %}>Cell Phones</option>
+                                    <option value="Computers & Accessories" {% if product['category'] == "Computers & Accessories" %}selected{% endif %}>Computers & Accessories</option>
+                                    <option value="Televisions" {% if product['category'] == "Televisions" %}selected{% endif %}>Televisions</option>
+                                    <option value="Headphones" {% if product['category'] == "Headphones" %}selected{% endif %}>Headphones</option>
+                                    <option value="Photography & Videography" {% if product['category'] == "Photography & Videography" %}selected{% endif %}>Photography & Videography</option>
+                                    <option value="Wearable Tech" {% if product['category'] == "Wearable Tech" %}selected{% endif %}>Wearable Tech</option>
+                                </select>
+                            </div>
                         <div>
                             <label for="availability">Availability:</label><br>
                             <select name="availability" required>
@@ -745,13 +944,20 @@
                                 <option value="OUT OF STOCK" {% if product['availability'] == "OUT OF STOCK" %}selected{% endif %}>OUT OF STOCK</option>
                             </select>
                         </div>
-
-                        <div>
-                            <label for="VID">Vendor ID:</label>
-                            <input type="number" name="VID" value="{{ product['VID'] }}" required>
-                        </div>
+                        {%  if product['VID'] %}
+                            <div>
+                                <label for="VID">Vendor ID:</label>
+                                <input type="number" name="VID" value="{{ product['VID'] }}" required>
+                            </div>
+                        {%else%}
+                            <div>
+                                <label for="AID">Admin ID:</label>
+                                <input type="number" name="VID" value="{{ product['AID'] }}" required>
+                            </div>
+                        {%endif%}
                         <input type="submit" value="Update Product">
                     </div>
+                    
                     </form>    
                     {% endfor %}
                 </div>

@@ -323,13 +323,23 @@
                         {% endif %}
                         <p id="chat_type_label">
                             <strong>Chat Type:</strong>
-                            {% if selected_chat.returns == 'YES' %}<span>Return</span>
-                            {% elif selected_chat.refund == 'YES' %}<span>Refund</span>
-                            {% elif selected_chat.warranty_claim == 'YES' %}<span>Warranty Claim</span>
+                            {% if selected_chat.returns == 'YES' %}<span style="margin-right: 20px;">Return</span>
+                            {% elif selected_chat.refund == 'YES' %}<span style="margin-right: 20px;">Refund</span>
+                            {% elif selected_chat.warranty_claim == 'YES' %}<span style="margin-right: 20px;">Warranty Claim</span>
+                            {% else %}<span style="margin-right: 20px;">N/A</span>
+                            {% endif %}
+                        </p>
+                        <p>
+                            <strong>Request Status:</strong>
+                              {% if selected_chat.request_status == 'pending' %}<span>Pending</span>
+                            {% elif selected_chat.request_status == 'rejected' %}<span>Rejected</span>
+                            {% elif selected_chat.request_status == 'confirmed' %}<span>Confirmed</span>
+                            {% elif selected_chat.request_status == 'processing' %}<span>Processing</span>
+                            {% elif selected_chat.request_status == 'complete' %}<span>Complete</span>
                             {% else %}<span>N/A</span>
                             {% endif %}
                         </p>
-
+                        <!-- enum('pending','rejected','confirmed','processing','complete') -->
                     </form>
                 </div>
             </div>
@@ -560,16 +570,13 @@
     document.addEventListener('DOMContentLoaded', function(){
         let userTypeSelect = document.getElementById('user_type');
         let chatTypeButtons = document.getElementById('chat_type_buttons');
-        let chatTypeLabel = document.getElementById('chat_type_label');
 
         function toggleChatTypeUI(){
             if(userTypeSelect.value === 'Admin'){
                 chatTypeButtons.style.display = 'flex';
-                chatTypeLabel.style.display = 'block';
             }
             else{
                 chatTypeButtons.style.display = 'none';
-                chatTypeLabel.style.display = 'none';
             }
         }
         userTypeSelect.addEventListener('change', toggleChatTypeUI);

@@ -133,6 +133,7 @@ def AdminViewProducts():
                 p.VID,
                 p.AID,
                 p.image_url,
+                p.category,
                 GROUP_CONCAT(DISTINCT pi.image ORDER BY pi.IMG_ID SEPARATOR '|') AS additional_images,
                 GROUP_CONCAT(DISTINCT pi.IMG_ID ORDER BY pi.IMG_ID SEPARATOR '|') AS image_ids,
                 inv_summary.color,
@@ -150,7 +151,7 @@ def AdminViewProducts():
             GROUP BY 
                 p.PID, p.title, p.price, p.discount, p.description, 
                 p.warranty, p.discount_date, p.availability, p.VID, 
-                p.AID, p.image_url, inv_summary.color, inv_summary.amount
+                p.AID, p.image_url, p.category,inv_summary.color, inv_summary.amount
         """)).mappings().fetchall()
 
         AllProducts = [dict(product) for product in AllProducts]
@@ -187,18 +188,20 @@ def AdminAddProduct():
         DISCOUNT = request.form.get("discount")
         DISCOUNT_DATE = request.form.get("discount_date")
         AVAILABILITY = request.form.get("availability")
-        VID = g.User['ID']
+        AID = g.User['ID']
         IMAGE = request.form.get("URL")
+        CATEGORY = request.form.get("category")
+        COLOR = request.form.get('Color')
+        AMOUNT = request.form.get('Amount')
 
         # Handle empty discount, discount_date, and warranty
         DISCOUNT = float(DISCOUNT) / 100 if DISCOUNT else None
         DISCOUNT_DATE = DISCOUNT_DATE if DISCOUNT_DATE else None
         WARRANTY = WARRANTY if WARRANTY else None
 
-        # Insert product into the database
         conn.execute(text("""
-            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url)
-            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :VID, :image_url)
+            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, AID, image_url, category)
+            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :AID, :image_url, :category)
         """), {
             'title': TITLE,
             'price': PRICE,
@@ -207,14 +210,24 @@ def AdminAddProduct():
             'discount': DISCOUNT,
             'discount_date': DISCOUNT_DATE,
             'availability': AVAILABILITY,
-            'VID': VID,
-            'image_url': IMAGE
+            'AID': AID,
+            'image_url': IMAGE,
+            'category': CATEGORY
         })
 
-        # Commit the changes to the database
+        PID = conn.execute(text("SELECT LAST_INSERT_ID()")).scalar()
+
+        conn.execute(text("""
+            INSERT INTO product_inventory (color, amount, PID)
+            VALUES (:color, :amount, :PID)
+        """), {
+            'color': COLOR,
+            'amount': AMOUNT,
+            'PID': PID
+        })
+
         conn.commit()
 
-        # Redirect to GET route that loads and displays all products
         return redirect(url_for('admin_bp.AdminViewProducts', message="Product added successfully", success=True))
     except Exception as e:
         print(f"ERROR ADDING PRODUCT: {e}")
@@ -449,12 +462,57 @@ def GetProfileInfo():
         print(f"Error: {e}")
         return render_template('Adminprofile.html')
 
-@admin_bp.route('/Profile',methods=["GET"])
-def ViewProfile():
+
+@admin_bp.route('/ClaimHistory', methods=["GET"])
+def claimHistory():
+    print("ViewProfile route hit!")
+
+    request_type = request.args.get("type")  # 'return', 'refund', 'warranty'
+
     try:
-        return render_template('Adminprofile.html')
-    except Exception as e:
-        print(f"Error: {e}")
-        return render_template('Adminprofile.html')
+        result = conn.execute(text("SELECT * FROM chatroom_admin")).mappings()
+        chatroom = [dict(row) for row in result]
+
+        # Deduplicate
+        seen_chat_ids = set()
+        unique_chatroom = []
+        for request_row in chatroom:
+            if request_row["CHAT_ID"] not in seen_chat_ids:
+                seen_chat_ids.add(request_row["CHAT_ID"])
+                unique_chatroom.append(request_row)
+                
+        if request_type == "return":
+            unique_chatroom = [r for r in unique_chatroom if r.get("returns") == "YES"]
+        elif request_type == "refund":
+            unique_chatroom = [r for r in unique_chatroom if r.get("refund") == "YES"]
+        elif request_type == "warranty":
+            unique_chatroom = [r for r in unique_chatroom if r.get("warranty_claim") == "YES"]
+
+        print("Filtered Chatroom Length:", len(unique_chatroom))
+
+        return render_template("Adminprofile.html", chatroom=unique_chatroom)
     
+    except Exception as e:
+        print("Error fetching data:", e)
+        return render_template("Adminprofile.html", chatroom=[])
+    
+@admin_bp.route('/UpdateClaimStatus', methods=["POST"])
+def updateClaimStatus():
+    chat_id = request.form.get("chat_id")
+    new_status = request.form.get("status")
+
+    try:
+        conn.execute(text("""
+            UPDATE chatroom_admin
+            SET request_status = :new_status
+            WHERE CHAT_ID = :chat_id
+        """), {"new_status": new_status, "chat_id": chat_id})
+        conn.commit()
+    except Exception as e:
+        print("Error updating status:", e)
+
+    return redirect(url_for('admin_bp.claimHistory'))
+
+
+
     
