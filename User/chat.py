@@ -17,6 +17,8 @@ def chat_view():
     if request.method == "POST":
         try:
             action = request.form.get("action")
+            chat_id = request.form.get("chat_id")
+
             if action:
                 user_type = request.form.get("user_type")
                 vendor_id = request.form.get("vendor_id")
@@ -35,15 +37,17 @@ def chat_view():
                 except (TypeError, ValueError):
                     return render_template("chat.html", message="Invalid product ID.", previous_chats=[], selected_chat=None)
 
-                if user_role == "customer":
-                    user_id = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).scalar()
-                else:
-                    message = "Only customers can initiate chats."
-                    return render_template("chat.html", message=message, previous_chats=[], selected_chat=None)
+                if user_role != "customer":
+                    return render_template("chat.html", message="Only customers can initiate chats.", previous_chats=[], selected_chat=None)
+
+                user_id = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).scalar()
 
                 result = conn.execute(text("INSERT INTO chat () VALUES ()"))
                 conn.commit()
-                chat_id = result.lastrowid
+                chat_id = conn.execute(text("SELECT LAST_INSERT_ID()")).scalar()
+
+                if not chat_id:
+                    return render_template("chat.html", message="Could not create new chat ID.", previous_chats=[], selected_chat=None)
 
                 returns = 'YES' if action == "RETURN" else 'NO'
                 refund = 'YES' if action == "REFUND" else 'NO'
@@ -78,14 +82,15 @@ def chat_view():
                 conn.commit()
                 return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
 
-            else:
-                chat_id = request.form.get("chat_id")
-                chat_type = request.form.get("chat_type")
+            elif chat_id:
                 message_text = request.form.get("message")
                 image_url = request.form.get("image_url")
 
-                if not chat_id or not chat_type:
-                    return render_template("chat.html", message="Invalid chat context.", previous_chats=[], selected_chat=None)
+                chat_type_check = conn.execute(text("""SELECT 'vendor' AS chat_type FROM chatroom_vendor WHERE CHAT_ID = :chat_id UNION
+                    SELECT 'admin' AS chat_type FROM chatroom_admin WHERE CHAT_ID = :chat_id LIMIT 1"""), {"chat_id": chat_id}).mappings().first()
+                chat_type = chat_type_check["chat_type"] if chat_type_check else None
+                if not chat_type:
+                    return render_template("chat.html", message="Invalid chat type.", previous_chats=[], selected_chat=None)
 
                 user_email = g.User["Email"]
                 user_role = g.User["Role"]
@@ -99,14 +104,8 @@ def chat_view():
                 else:
                     return render_template("chat.html", message="Invalid user role.", previous_chats=[], selected_chat=None)
 
-                if chat_type == "vendor":
-                    flag_query = text("SELECT returns, refund, warranty_claim FROM chatroom_vendor WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC LIMIT 1")
-                elif chat_type == "admin":
-                    flag_query = text("SELECT returns, refund, warranty_claim FROM chatroom_admin WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC LIMIT 1")
-                else:
-                    return render_template("chat.html", message="Invalid chat type.", previous_chats=[], selected_chat=None)
+                flags = conn.execute(text(f"SELECT returns, refund, warranty_claim FROM chatroom_{chat_type} WHERE CHAT_ID = :chat_id ORDER BY timestamp ASC LIMIT 1"), {"chat_id": chat_id}).mappings().first()
 
-                flags = conn.execute(flag_query, {"chat_id": chat_id}).mappings().first()
                 returns = flags["returns"] if flags else "NO"
                 refund = flags["refund"] if flags else "NO"
                 warranty_claim = flags["warranty_claim"] if flags else "NO"
@@ -137,6 +136,10 @@ def chat_view():
                 conn.commit()
                 return redirect(url_for("chat_bp.chat_view", chat_id=chat_id))
 
+            else:
+                message = "Invalid chat context."
+                return render_template("chat.html", message=message, previous_chats=[], selected_chat=None)
+
         except Exception as e:
             print(f"Error in POST chat handler: {e}")
             return render_template("chat.html", message="An error occurred.", previous_chats=[], selected_chat=None)
@@ -148,7 +151,7 @@ def chat_view():
     product_title = None
     vendors = conn.execute(text("SELECT vendor.VID, users.username FROM vendor JOIN users ON vendor.email = users.email")).mappings().all()
     admins = conn.execute(text("SELECT admin.AID, users.username FROM admin JOIN users ON admin.email = users.email")).mappings().all()
-    all_products = conn.execute(text("SELECT PID, title FROM product")).mappings().all()
+    all_products = conn.execute(text("SELECT PID, title, VID FROM product")).mappings().all()
 
     if user_role == "customer":
         customer_result = conn.execute(text("SELECT CID FROM customer WHERE email = :email"), {"email": user_email}).fetchone()
