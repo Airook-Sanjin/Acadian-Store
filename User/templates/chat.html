@@ -336,6 +336,7 @@
                             {% elif selected_chat.request_status == 'confirmed' %}<span>Confirmed</span>
                             {% elif selected_chat.request_status == 'processing' %}<span>Processing</span>
                             {% elif selected_chat.request_status == 'complete' %}<span>Complete</span>
+                            {% else %}<span>N/A</span>
                             {% endif %}
                         </p>
                         <!-- enum('pending','rejected','confirmed','processing','complete') -->
@@ -569,16 +570,13 @@
     document.addEventListener('DOMContentLoaded', function(){
         let userTypeSelect = document.getElementById('user_type');
         let chatTypeButtons = document.getElementById('chat_type_buttons');
-        let chatTypeLabel = document.getElementById('chat_type_label');
 
         function toggleChatTypeUI(){
             if(userTypeSelect.value === 'Admin'){
                 chatTypeButtons.style.display = 'flex';
-                chatTypeLabel.style.display = 'block';
             }
             else{
                 chatTypeButtons.style.display = 'none';
-                chatTypeLabel.style.display = 'none';
             }
         }
         userTypeSelect.addEventListener('change', toggleChatTypeUI);
