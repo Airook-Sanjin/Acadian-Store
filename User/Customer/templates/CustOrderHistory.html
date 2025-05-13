@@ -7,7 +7,7 @@
 
   .OrderContainter {
     display: grid;
-    height: 70vh;
+    height: 100%;
     grid-template-columns: repeat(auto-fit, minmax(500px,1fr));
     padding: 2em;
     gap: 3em;
@@ -18,13 +18,72 @@
     display: flex;
     flex-direction: row;
     width: 100%;
+    gap:1em;
     max-width: 100%;
     max-height: 40.112vh;
-    background-color: var(--Primary);
+    background-color: hsl(0, 0%, 89%);
     padding: 2em;
     border-radius: 20px;
     justify-content: space-evenly;
+    align-items: center;
     box-shadow: var(--BoxShadow);
+  }
+  .OrderContainter::-webkit-scrollbar {
+    width: 0.2em;
+    /* height: 2em; */
+  }
+  .OrderContainter::-webkit-scrollbar-track {
+    background: hsl(0, 0%, 95%);
+    /* height:80%; */
+  }
+  .OrderContainter::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      0deg,
+      hsl(0, 0%, 95%) 0 10%,
+      black 50% 55%,
+      hsl(0, 0%, 95%) 90% 100%
+    );
+    border-radius: 32px;
+  }
+  .OrderInfo{
+    width:50%;
+  }
+  .OrderInfo p {
+    cursor: pointer;
+    color:var(--Primary);
+    transition:.125s ease-in-out;
+  }
+  .OrderInfo p:hover {
+    transition:.125s ease-in-out;
+    color:var(--Secondary);
+  }
+  .ItemIMGs{
+    text-overflow: ellipsis;
+    display: grid;
+    width:50%;
+    gap:.250em;
+    grid-template-columns: repeat(2, 1fr);  /* Creates 4 equal columns */
+    grid-template-rows: repeat(auto-fit, 1fr);
+    overflow: scroll;
+    overflow-x: hidden;    /* Creates 4 equal rows */
+    grid-auto-flow: row;  
+  }
+  .ItemIMGs::-webkit-scrollbar {
+    width: 0.2em;
+    /* height: 2em; */
+  }
+  .ItemIMGs::-webkit-scrollbar-track {
+    background: hsl(0, 0%, 95%);
+    /* height:80%; */
+  }
+  .ItemIMGs::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      0deg,
+      hsl(0, 0%, 95%) 0 10%,
+      black 50% 55%,
+      hsl(0, 0%, 95%) 90% 100%
+    );
+    border-radius: 32px;
   }
 </style>
 {% extends 'CustomerHomepage.html' %}
@@ -42,11 +101,23 @@
 <section class="OrderHistory">
   <section class="OrderContainter">
     {% for Order in OrderHistory %}
-    <section class="OrderCard" onclick="window.location.href='{{ url_for('OrderPlace_bp.ShowOrder') }}?ORDER_ID={{ Order.OID }}'">
-      <h2>Order Number: {{Order['OID']}}</h2>
-      <h2>Items: {{Order['amount']}}</h2>
-      <h2>Total: {{'%0.2f' | format(Order['total']|float)}}</h2>
-      <h4>Status: {{Order['status']}}</h4>
+    <section class="OrderCard" >
+      <section class="ItemIMGs">
+        {% for item in Order['Items'] %}
+        <img src="{{ item['ItemIMG'] }}" alt="{{item[ItemTitle]}}" width="100px">
+        {% endfor %}
+      </section>
+      <section class="OrderInfo">
+        <h2>Order Number: {{Order['OrderId']}}</h2>
+      <h2>Items: {{Order['OrderAmount']}}</h2>
+      
+
+      <p onclick="window.location.href='{{ url_for('OrderPlace_bp.ShowOrder') }}?ORDER_ID={{ Order.OrderId }}'">See more Details</p>
+      <!-- <h2>Total: {{'%0.2f' | format(Order['OrderTotal']|float)}}</h2>
+      <h4>Status: {{Order['OrderStatus']}}</h4> -->
+      </section>
+      
+      
     </section>
 
     {% endfor %}
