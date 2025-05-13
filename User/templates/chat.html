@@ -345,7 +345,11 @@
             </div>
 
             <div class="chat-messages">
-                {% if message %}
+                {% if message == "No chats found. Create a new chat to start."%}
+                    <div class="system-message">
+                        <p style="text-align: center; margin-bottom: 10px;">{{ message }}</p>
+                    </div>
+                    {% else %}
                     <p style="background-color: #ff4f4f; text-align: center; margin-bottom: 10px;">{{ message }}</p>
                 {% endif %}
                 {% for message in messages %}
