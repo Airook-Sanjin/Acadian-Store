@@ -510,7 +510,7 @@
                     <p>Vendors cannot write reviews for products.</p>
                 {% elif session['User']['role'] == 'admin' %}
                     <p>Admins cannot write reviews for products.</p>
-                {% else %}
+                {% elif can_review %}
                     <!-- Review Form -->
                     <form class="write-review" method="POST" action="{{ url_for('Review') }}">
                         <input type="hidden" name="pid" value="{{ product.PID }}">

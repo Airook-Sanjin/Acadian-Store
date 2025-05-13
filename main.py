@@ -188,27 +188,39 @@ def Review():
 
         if g.User.get('role') in ['vendor', 'admin']:
             return redirect(url_for('ProductView', pid=request.form.get('pid')))
-
+        
         pid = request.form.get('pid')
+        can_review = False
+        if g.User and g.User.get("role") == "customer":
+            cid = g.User.get("ID")
+            has_purchased = conn.execute(text("SELECT 1 FROM cart WHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL LIMIT 1"),
+                                        {"cid": cid, "pid": pid}).fetchone()
+            can_review = bool(has_purchased)
+
+
         rating = request.form.get('rating')
         title = request.form.get('title', '')
         review = request.form.get('description', '')
         cid = g.User.get('ID')
 
         # Ensure rating is an integer and properly handled
-        if rating:
-            rating = int(rating)
-        else:
-            rating = 0  # Default to 0 if no rating is selected
-        conn.execute(text("""INSERT INTO reviews (CID, PID, rating, title, description) 
-                             VALUES (:CID, :PID, :rating, :title, :description)"""), 
-                     {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
+        rating = int(rating) if rating else 0
+
+        purchase = conn.execute(text("SELECT 1 FROM cartWHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL LIMIT 1"), {"cid": cid, "pid": pid}).fetchone()
+
+        if not purchase:
+            return redirect(url_for('ProductView', pid=pid))
+    
+        conn.execute(text("""
+            INSERT INTO reviews (CID, PID, rating, title, description) 
+            VALUES (:CID, :PID, :rating, :title, :description)
+        """), {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
         conn.commit()
         print(f"Redirecting to ProductView with PID: {pid}")  # Log the pid
         return redirect(url_for('ProductView', pid=pid))
     except Exception as e:
         print(f"Error: {e}")
-        return redirect(url_for('ProductView', pid=request.form.get('pid')))
+        return redirect(url_for('ProductView', can_review=can_review, pid=request.form.get('pid')))
 
 
 
