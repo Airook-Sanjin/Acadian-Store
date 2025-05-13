@@ -194,7 +194,7 @@ def chat_view():
     chat_details = conn.execute(text("SELECT CHAT_ID, CID, VID, PID, images, message, returns, refund, warranty_claim FROM chatroom_vendor WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
     chat_type = "vendor"
     if not chat_details:
-        chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID, images, message, returns, refund, warranty_claim FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
+        chat_details = conn.execute(text("SELECT CHAT_ID, CID, AID, PID, images, message, returns, refund, warranty_claim, request_status FROM chatroom_admin WHERE CHAT_ID = :chat_id"), {"chat_id": chat_id}).mappings().first()
         chat_type = "admin" if chat_details else None
 
     if not chat_details:

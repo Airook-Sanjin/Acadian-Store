@@ -179,8 +179,6 @@ def GetInventory():
     return jsonify({'amount':inventory.amount if inventory.amount > 0 else 'Out of Stock' })
 
     
-    
-    
 
 @app.route('/Review', methods=["POST"])
 def Review():

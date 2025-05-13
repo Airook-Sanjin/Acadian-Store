@@ -316,6 +316,16 @@
                             {% else %}<span>N/A</span>
                             {% endif %}
                         </p>
+                        <p>
+                            <strong>Request Status:</strong>
+                              {% if selected_chat.request_status == 'pending' %}<span>Pending</span>
+                            {% elif selected_chat.request_status == 'rejected' %}<span>Rejected</span>
+                            {% elif selected_chat.request_status == 'confirmed' %}<span>Confirmed</span>
+                            {% elif selected_chat.request_status == 'processing' %}<span>Processing</span>
+                            {% elif selected_chat.request_status == 'complete' %}<span>Complete</span>
+                            {% endif %}
+                        </p>
+                        <!-- enum('pending','rejected','confirmed','processing','complete') -->
                         
                     </form>
                 </div>
