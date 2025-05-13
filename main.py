@@ -166,12 +166,18 @@ def ProductView():
         can_review = False
         if g.User and g.User.get("role") == "customer":
             cid = g.User.get("ID")
+            pid = request.args.get("pid")
             has_purchased = conn.execute(text("""
-                SELECT 1 FROM cart 
-                WHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL 
-                LIMIT 1
+                SELECT 1
+                FROM cart c
+                JOIN orders o ON c.ORDER_ID = o.ORDER_ID
+                WHERE c.CID = :cid
+                AND c.PID = :pid
+                AND o.status IN ('Placed', 'Shipped', 'Delivered', 'Complete')
+                LIMIT 1;
             """), {"cid": cid, "pid": pid}).fetchone()
             can_review = bool(has_purchased)
+
 
         return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages, can_review=can_review)
 
