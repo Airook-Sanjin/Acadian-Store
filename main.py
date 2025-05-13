@@ -100,20 +100,20 @@ def ProductView():
         pid = request.args.get('pid')
 
         product = conn.execute(text("""
-             SELECT 
-                PID, title, CAST(price AS DECIMAL(10,2)) AS price,
-                (price * discount) as saving_discount,
-                price - (price * discount) AS discounted_price,
-                description,
-                warranty,
-                discount, discount_date,
-                availability,
-                VID,
-                AID,
-                image_url
-            FROM product
-            WHERE PID = :pid
-        """), {"pid": pid}).mappings().first()
+         SELECT 
+            PID, title, CAST(price AS DECIMAL(10,2)) AS price,
+            (price * discount) as saving_discount,
+            price - (price * discount) AS discounted_price,
+            description,
+            warranty,
+            discount, discount_date,
+            availability,
+            VID,
+            AID,
+            image_url
+        FROM product
+        WHERE PID = :pid
+    """), {"pid": pid}).mappings().first()
 
         inventory = conn.execute(text("""
             SELECT color, amount
@@ -157,15 +157,29 @@ def ProductView():
         
         # Calculate rating percentages
         total_reviews = Review_Count["review_count"] if Review_Count and Review_Count["review_count"] else 0
-        rating_percentages = {star: (rating_counts.get(star, 0) / total_reviews * 100) if total_reviews > 0 else 0 for star in range(1, 6)}
-        
-        return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages)
+        rating_percentages = {
+            star: (rating_counts.get(star, 0) / total_reviews * 100)
+            if total_reviews > 0 else 0
+            for star in range(1, 6)
+        }
+
+        can_review = False
+        if g.User and g.User.get("role") == "customer":
+            cid = g.User.get("ID")
+            has_purchased = conn.execute(text("""
+                SELECT 1 FROM cart 
+                WHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL 
+                LIMIT 1
+            """), {"cid": cid, "pid": pid}).fetchone()
+            can_review = bool(has_purchased)
+
+        return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages, can_review=can_review)
 
     except Exception as e:
         print("##############################################") 
         print("Error:", e)  
         print("##############################################") 
-        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate, Review_Count=0, Avg_Rating=0, Rating_Percentages={})
+        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[], CurDate=datetime.now().date(), Review_Count=0, Avg_Rating=0, Rating_Percentages={}, can_review=False)
 
 @app.route('/api/inventory')
 def GetInventory():
