@@ -1,5 +1,5 @@
 
-from globals import Blueprint, render_template, request,g,session,Connecttodb,text,checkAndUpdateOrder
+from globals import Blueprint, render_template, request,g,session,Connecttodb,text,checkAndUpdateOrder,CheckOrderDelivered
 from datetime import datetime
 from User.chat import chat_bp
 from globals import redirect, url_for
@@ -457,6 +457,7 @@ def ViewProfile():
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
         checkAndUpdateOrder()
+        CheckOrderDelivered()
         customer_data = conn.execute(text("""
             SELECT u.email as Email,u.username as User,u.name as Name FROM users AS u LEFT JOIN vendor as v ON u.email = v.email
             WHERE v.VID = :ID
@@ -478,6 +479,7 @@ def GetProfileOrderHistory():
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
         checkAndUpdateOrder()
+        CheckOrderDelivered()
         return redirect(url_for('vendor_bp.VendRecievedOrders'))
     except Exception as e:
         print(f"Error POST: {e}")
@@ -489,9 +491,10 @@ def VendRecievedOrders():
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-        
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
         PlacedOrders= conn.execute(text("""
-            select o.ORDER_ID as OID,o.total as total, o.status as OrderStatus, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
+            select o.ORDER_ID as OID,o.total as total, o.status as OrderStatus,o.DateShipped as DateShipped,date(date_add(o.DateShipped, interval 5 DAY)) as DeliveryDate, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
             CASE
             	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
             	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
@@ -509,6 +512,7 @@ def VendRecievedOrders():
                 GroupedOrders[OrderId]={
                     "OrderId":OrderId,
                     "OrderStatus":row['OrderStatus'],
+                    "OrderDateShipped":row['DateShipped'],
                     "OrderTotal":row['total'],
                     "Items":[]
                 }

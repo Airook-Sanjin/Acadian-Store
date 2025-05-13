@@ -184,7 +184,7 @@ def chat_view():
         return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
 
     if not chats:
-        message = "No chats found."
+        message = "No chats found. Create a new chat to start."
         return render_template("chat.html", message=message, messages=[], previous_chats=[], selected_chat=None, vendors=vendors, admins=admins, all_products=all_products)
 
     chat_id = request.form.get("chat_id") or request.args.get("chat_id")

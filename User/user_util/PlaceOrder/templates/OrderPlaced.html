@@ -118,7 +118,7 @@
     display: flex;
     flex-direction: row;
     gap: 2em;
-    width: 2.5em;
+    width: 30em;
     align-items: center;
   }
   .item-info img {
@@ -128,6 +128,7 @@
   #Title {
     text-align: left;
     padding: 1em;
+    width: 8em;
   }
   #Total {
     border-top: 1px black solid;
@@ -184,8 +185,12 @@
           </p>
         </section>
         <section class="OrderInf">
+          <h3>Order Status -</h3>
+          <P>{{OrderHistory[0]['Status']| default('Status unavailable')}}</P>
+        </section>
+        <section class="OrderInf">
           <h3>Shipping Details -</h3>
-          <p>703 Hay Road,Temple,PA,19560</p>
+          <P>{{OrderHistory[0]['ContactInfo']| default('Address unavailable')}}</P>
         </section>
       </section>
       <section class="Cart-Container">
@@ -194,14 +199,26 @@
         <section class="item-Card" >
           <section class="item-info">
             <img src="{{item['ItemImage']}}" alt="{{item['ItemTitle']}}" />
-            <h3>{{item['ItemTitle']}}</h3>
-            <p>{{item['ItemStatus']}}</p>
+            <h3 id="Title">{{item['ItemTitle']}}</h3>
+            {% if item['ItemStatus'] == 'Rejected' %}
+          <h3 id = "rejected">ITEM WAS REJECTED</h3>
+          {% elif item['ItemStatus'] == 'Shipping'%}
+          <h3 id="shipped">ITEM BEGAN SHIPPING ON {{item['DateShipped']}}</h3>
+          {% else %}
+          <h3>item['ItemStatus']</h3>
+          {% endif %}
             
             
           </section>
           <section class="item-fun">
+            <!-- Return -->
+             {% if item['ItemStatus'] =='Delivered' %}
+             <button title="Chat with the vendor!" onclick="window.location.href='{{ url_for('chat_bp.chat_view') }}'">Want to Return?</button>
+             <button onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ item.PID }}'">Leave a review?</button>
+             {% else %}
+             {% endif %}
             <!-- Formating  -->
-            <button onclick="window.location.href='{{ url_for('ProductView') }}?pid={{ item.PID }}'">Leave a review?</button>
+            
             <h4>{{item['ItemQuantity']}}x</h4>
             <h3>${{'%0.2f' | format(item['ItemPrice']|float)}}</h3>
             
