@@ -186,6 +186,9 @@ def Review():
         if not g.User:
             return redirect(url_for('login_bp.Login'))
 
+        if g.User.get('role') in ['vendor', 'admin']:
+            return redirect(url_for('ProductView', pid=request.form.get('pid')))
+
         pid = request.form.get('pid')
         rating = request.form.get('rating')
         title = request.form.get('title', '')

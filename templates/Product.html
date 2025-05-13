@@ -505,25 +505,33 @@
                      {% endfor %}
                  </div>
              </div>
-             <!-- ############### -->
-             <!-- # Review Form # -->
-             <!-- ############### -->
-             <form class="write-review" method="POST" action="{{ url_for('Review') }}">
-                 <input type="hidden" name="pid" value="{{ product.PID }}">
-                 <input type="hidden" name="rating" id="rating-input">
-                 <h3 class="review-form-title">Write a Review</h3>
-                 <div class="rating-input">
-                     <span class="star" data-rating="1">★</span>
-                     <span class="star" data-rating="2">★</span>
-                     <span class="star" data-rating="3">★</span>
-                     <span class="star" data-rating="4">★</span>
-                     <span class="star" data-rating="5">★</span>
-                 </div>
-                 <input class="review-title-text" type="text" name="title" placeholder="Title" required>
-                 <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
-                 <button type="submit" class="submit-review">Submit Review</button>
-             </form>
- 
+             {% if session.get('User') %}
+                {% if session['User']['role'] == 'vendor' %}
+                    <p>Vendors cannot write reviews for products.</p>
+                {% elif session['User']['role'] == 'admin' %}
+                    <p>Admins cannot write reviews for products.</p>
+                {% else %}
+                    <!-- Review Form -->
+                    <form class="write-review" method="POST" action="{{ url_for('Review') }}">
+                        <input type="hidden" name="pid" value="{{ product.PID }}">
+                        <input type="hidden" name="rating" id="rating-input">
+                        <h3 class="review-form-title">Write a Review</h3>
+                        <div class="rating-input">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <input class="review-title-text" type="text" name="title" placeholder="Title" required>
+                        <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
+                        <button type="submit" class="submit-review">Submit Review</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <p>You must be logged in to write a review.</p>
+            {% endif %}
+            
          </div>
          
          <!-- Right Side - Review List -->           
