@@ -4,7 +4,7 @@
         flex-direction: column;
         /* margin-top: 3%; */
         justify-content: space-around;
-        background-color: bisque;
+        background-color: rgb(241, 223, 200);
     }
     .Pending-Account {
         width: 100%;
@@ -18,7 +18,7 @@
     .Pending-Account-Container{
         width: 80%;
         height: 100%;
-        background-color: rgb(217, 197, 236);
+        background-color: var(--Tertiary);
         border-radius: 6px;
     }
     .Pending-Grid-Container{
@@ -42,7 +42,7 @@
         width: 80%;
         height: 90%;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        background-color: cadetblue;
+        background-color: #c4be8c;
     }
 
     .Pending-card input{
@@ -66,7 +66,7 @@
                         <h1>Name: {{ admin.name }}</h1>
                         <h1>Email: {{ admin.email }}</h1>
                         <h1>Authoritization: {{ admin.Authorization }}</h1> 
-                        <input type="submit" class="form-sub"value="Approve">
+                        <input type="submit" class="BTN" value="Approve">
                     </form>
                 </div>
                 {% endfor %}
@@ -85,7 +85,7 @@
                         <h1>Name: {{ vendor.name }}</h1>
                         <h1>Email: {{ vendor.email }}</h1>
                         <h1>Authoritization: {{ vendor.Authorization }}</h1> 
-                        <input type="submit"class="form-sub" value="Approve">
+                        <input type="submit" class="BTN" value="Approve">
                     </form>
                 </div>
                 {% endfor %}
