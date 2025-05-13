@@ -2,6 +2,7 @@
 from globals import Blueprint,render_template,g,session,Connecttodb,text,request,checkAndUpdateOrder
 from datetime import datetime
 from User.chat import chat_bp
+from threading import Timer
 from globals import redirect, url_for
 
 admin_bp=Blueprint('admin_bp',__name__, url_prefix='/admin',template_folder='templates',static_folder='static',static_url_path='/static') # * init blueprint
@@ -454,13 +455,18 @@ def AdminEditProductImages():
         print(f"ERROR UPDATING PRODUCT IMAGE: {e}")
         return redirect(url_for('admin_bp.AdminViewProducts', message="Product image update failed", success=False))
     
-@admin_bp.route('/Profile',methods=["POST"])
+@admin_bp.route('/Profile',methods=["GET","POST"])
 def GetProfileInfo():
     try:
-        return render_template('Adminprofile.html')
+        customer_data = conn.execute(text("""
+            SELECT u.email as Email,u.username as User,u.name as Name FROM users AS u LEFT JOIN admin as a ON u.email = a.email
+            WHERE a.AID = :ID
+        """), {'ID': g.User['ID']}).mappings().first()
+        
+        return render_template("Adminprofile.html", customer_data=customer_data)
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('Adminprofile.html')
+        return render_template("Adminprofile.html",customer_data=customer_data)
 
 
 @admin_bp.route('/ClaimHistory', methods=["GET"])
@@ -490,28 +496,50 @@ def claimHistory():
 
         print("Filtered Chatroom Length:", len(unique_chatroom))
 
-        return render_template("Adminprofile.html", chatroom=unique_chatroom)
+        return render_template("Adminclaims.html", chatroom=unique_chatroom)
     
     except Exception as e:
         print("Error fetching data:", e)
-        return render_template("Adminprofile.html", chatroom=[])
-    
+        return render_template("Adminclaims.html", chatroom=[])
+
+def update_status(chat_id, status):
+    try:
+        conn.execute(text("""
+            UPDATE chatroom_admin
+            SET request_status = :status
+            WHERE CHAT_ID = :chat_id
+        """), {"status": status, "chat_id": chat_id})
+        conn.commit()
+    except Exception as e:
+        print(f"Error updating to {status}:", e)
+
 @admin_bp.route('/UpdateClaimStatus', methods=["POST"])
 def updateClaimStatus():
     chat_id = request.form.get("chat_id")
     new_status = request.form.get("status")
+    # Status flow: pending -> rejected/confirmed -> processing -> complete
 
     try:
+        # Step 1: Update to confirmed or rejected
         conn.execute(text("""
             UPDATE chatroom_admin
             SET request_status = :new_status
             WHERE CHAT_ID = :chat_id
         """), {"new_status": new_status, "chat_id": chat_id})
         conn.commit()
+
+        # Step 2: If confirmed, schedule automatic transitions
+        if new_status == "confirmed":
+            Timer(180, update_status, args=(chat_id, "processing")).start()  # processing after 3 mins = 180 both start at the same time
+            Timer(360, update_status, args=(chat_id, "complete")).start()   # complete after 6 mins = 360
+
+
     except Exception as e:
         print("Error updating status:", e)
 
     return redirect(url_for('admin_bp.claimHistory'))
+
+
 
 
 

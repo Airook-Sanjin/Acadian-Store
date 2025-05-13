@@ -1,110 +1,29 @@
 <head><link rel="stylesheet" href="{{ url_for('user_bp.static', filename='styles/Profile.css') }}"></head>
-<style>
-    .admin-claim-history {
-    display: flex;
-    flex-direction: column; /* Newest at the top */
-    justify-content: flex-start;
-    width: 100%;
-    /* background-color: bisque; */
-    height: 800px;
-    overflow-y: auto;
-    padding: 1rem;
-    gap: 1rem;
-}
-
-.claim-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* background-color: aquamarine; */
-    width: 100%;
-    padding: 1rem;
-    border-radius: 8px;
-    
-}
-
-.claim-content {
-    width: 60%;
-    min-height: 200px;
-    background-color: rgb(211, 151, 151);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.claim-content label{
-    font-size: large;
-}
-
-.claim-actions {
-    display: flex;
-    gap: 1rem;
-}
-
-.claim-actions button {
-    padding: 0.5rem 1rem;
-    border: none;
-    background-color: #fff;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-</style>
-{% extends 'AdminHomepage.html' %}
-
-
-
-{% block body %}
+{% extends 'VendorHomepage.html'%} {% block body%}
 <section class="Main">
-    <section class="ProPageContainer">
-        <aside class="ProSideNav">
-            <ul class="ProPageNav">
-                <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=return'">Return Claims</li>
-                <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=refund'">Refund Claims</li>
-                <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=warranty'">Warranty Claims</li>
-            </ul>            
-        </aside>
-
-        <section class="admin-claim-history">
-            {% for request in chatroom %}
-            <form action="{{ url_for('admin_bp.updateClaimStatus') }}" method="POST">
-                <div class="claim-card">
-                    <div class="claim-content">
-        
-                        <input type="hidden" name="chat_id" value="{{ request.CHAT_ID }}">
-        
-                        <label>Chat ID: {{ request.CHAT_ID }}</label><br>
-        
-                        {% if request.returns == 'YES' %}
-                            <label>Request Type: Return</label><br>
-                        {% elif request.refund == 'YES' %}
-                            <label>Request Type: Refund</label><br>
-                        {% elif request.warranty_claim == 'YES' %}
-                            <label>Request Type: Warranty Claim</label><br>
-                        {% endif %}
-        
-                        <label>Status: {{ request.request_status }}</label><br>
-                        <div>
-                            {% if request.request_status|lower == 'pending' %}
-                                <button type="submit" name="status" value="confirmed">Process</button>
-                                <button type="submit" name="status" value="rejected">Reject</button>
-                            {% endif %}
-                        </div>
-        
-                    </div>
-                </div>
-            </form>
-            {% endfor %}
-        </section>
-        
-    </section>
+  <h1>{{customer_data['Name'].title()}}'s Profile</h1>
 </section>
-{% endblock %}
+<section class="ProPageContainer">
+<section class="ProSideNav">
+<ul class="ProPageNav">
+    <li onclick="window.location.href='{{ url_for('admin_bp.GetProfileInfo') }}'">Profile</li>
+    <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=return'">Return Claims</li>
+    <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=refund'">Refund Claims</li>
+    <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=warranty'">Warranty Claims</li>
+</ul>
+</section>
+<section class="ProfileInfo">
+  <h2>Name:</h2>
+  <input type="text" disabled placeholder="{{customer_data['Name'].title()}}" />
+  <h2>Email:</h2>
+  <input type="text" disabled placeholder="{{customer_data['Email']}}" />
+  <h2>User:</h2>
+  <input type="text" disabled placeholder="{{customer_data['User'].title()}}" />
+</section>
+</section>
 
-
-
-{% block scripts %}
+</section>
+{% endblock body %} 
+{% block scripts %} 
 {% endblock scripts %}
+
