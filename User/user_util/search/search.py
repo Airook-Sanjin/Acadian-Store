@@ -2,14 +2,10 @@ from globals import Blueprint, render_template, request,g,session,redirect,url_f
 from datetime import datetime
 search_bp = Blueprint('search_bp', __name__, url_prefix='/search', template_folder='templates')
 
-conn = Connecttodb()
+
 @search_bp.before_request # Before each request it will look for the values below
 def load_user():
-    try:
-        conn.execute(text('SELECT 1')).fetchone()
-    except Exception:
-        print("Reconnecting to DB....")
-        conn=Connecttodb()
+    
         
     if "User" in session:
         g.User = session["User"]
@@ -18,7 +14,10 @@ def load_user():
 
 @search_bp.route("/Search",methods=["POST"])
 def searchedItem():
+    conn=None
     try:
+        conn=Connecttodb()
+        conn.begin
         CategoryChoice = request.form.get('Category','')
         PriceMin = request.form.get('MinPrice', type =float )
         PriceMax = request.form.get('MaxPrice', type =float)
@@ -33,8 +32,16 @@ def searchedItem():
         print(PriceMin)
         # print(CategoryChoice)
         
-        session['CategoryChoice'] = CategoryChoice 
-        session['InvChoice'] = InvChoice 
+        if CategoryChoice =='':
+            session.pop('CategoryChoice',None)
+        else:
+            session['CategoryChoice'] = CategoryChoice 
+            
+        if InvChoice =='':
+            session.pop('InvChoice',None)
+        else:
+            session['InvChoice'] = InvChoice 
+        
             
         if SearchText:
             session['SearchedTerm'] = SearchText.strip()
@@ -46,11 +53,19 @@ def searchedItem():
             session['PriceMax'] = PriceMax if PriceMax is not None else 1000
         return redirect(url_for('search_bp.SeeResults'))
     except Exception as e:
+        if conn:
+            conn.rollback()
         print(f"ERROR: {e}")
         return redirect(url_for('search_bp.SeeResults'))
+    finally:
+        if conn:
+            conn.close()
 @search_bp.route("/Search",methods=["GET"])
 def SeeResults():
+    conn = None
     try:
+        conn= Connecttodb()
+        conn.begin
         CategoryChoice = session.get('CategoryChoice', '')
         InvChoice = session.get('InvChoice', '')
         PriceMin = session.get('PriceMin', 0) 
@@ -72,12 +87,15 @@ def SeeResults():
         p.description,p.warranty,p.discount,p.discount_date,p.availability,
 	    p.VID,p.AID,p.image_url 
         from product as p LEFT JOIN vendor as v ON p.VID=v.VID LEFT JOIN users AS u ON v.email = u.email
-        WHERE (p.title LIKE :Searched OR p.description like :Searched OR u.name like :Searched)"""
+        WHERE 1=1"""
         
-        params = {'Searched':f'%{searchedItem}%'}
+        params = {}
+        if searchedItem:
+            Query+= " AND (p.title LIKE :Searched OR p.description like :Searched OR u.name like :Searched)"
+            params['Searched'] = f"%{searchedItem}%"
         
         if CategoryChoice and CategoryChoice != '':
-            Query+=' AND p.category = :category'
+            Query+=' AND TRIM(p.category) = :category'
             params['category']=CategoryChoice
             
         if InvChoice and InvChoice != '':
@@ -86,20 +104,20 @@ def SeeResults():
             
         
         if PriceMin is not None  or PriceMax is not None:
-            Query += """ AND (CASE
-                WHEN p.discount_date > curdate() 
-                THEN (p.price - (p.price * p.discount)) BETWEEN :PriceMin AND :PriceMax
-                WHEN p.discount_date < curdate() 
-                THEN p.price BETWEEN :PriceMin AND :PriceMax
-                END)"""
+            Query += """ AND (
+        (p.discount_date > CURDATE() AND (p.price - (p.price * p.discount)) BETWEEN :PriceMin AND :PriceMax)
+        OR
+        (p.discount_date <= CURDATE() AND p.price BETWEEN :PriceMin AND :PriceMax)
+        )"""
                 
                 # Updates Parameters
             params.update({
-                'PriceMin':PriceMin,
-                'PriceMax':PriceMax
+                'PriceMin': PriceMin if PriceMin is not None else 0,
+                'PriceMax': PriceMax if PriceMax is not None else 1000
             })
             
         Results = conn.execute(text(Query),params).mappings().fetchall()
+        print(Results)
         
         ResultAmount= len(Results)
         
@@ -112,6 +130,10 @@ def SeeResults():
         
         return Page
     except Exception as e:
+        if conn:
+            conn.rollback()
         print(f'Error : {e}')
         return render_template('search.html',ResultAmount=ResultAmount,products = [],CategoryChoice=currentCategory,InvChoice=currentInv,CurDate=CurDate)
+    finally:
+        conn.close()
         
