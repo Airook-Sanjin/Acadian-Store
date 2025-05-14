@@ -523,8 +523,7 @@ def VendRecievedOrders():
                 "ItemQuantity":row['ItemQuantity'],
                 "ItemPrice":row['ItemPrice'],
                 "ItemStatus":row['ItemStatus'],
-                "DateShipped":row['DateShipped'],
-                "ItemDeliveryDate":row['DeliveryDate']
+                "DateShipped":row['DateShipped']
                 
                 })
         GroupedOrdersList = list(GroupedOrders.values())

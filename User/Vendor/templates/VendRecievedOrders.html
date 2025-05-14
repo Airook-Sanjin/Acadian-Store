@@ -135,10 +135,8 @@
           </form>
           {% elif item['ItemStatus'] == 'Rejected' %}
           <h3 id = "rejected">ITEM WAS REJECTED</h3>
-          {% elif item['ItemStatus']=='Shipping' %}
-          <h3 id="shipped">ITEM BEGAN SHIPPING ON {{item['DateShipped']}}</h3>
           {% else %}
-           <h3 id="shipped">ITEM Delivered ON {{item['ItemDeliveryDate']}}</h3>
+          <h3 id="shipped">ITEM BEGAN SHIPPING ON {{item['DateShipped']}}</h3>
           {% endif %}
         </section></td>
      </tr>
