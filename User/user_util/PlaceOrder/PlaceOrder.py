@@ -3,15 +3,11 @@ from datetime import datetime
 
 OrderPlace_bp = Blueprint('OrderPlace_bp', __name__, url_prefix='/order', template_folder='templates')
 
-conn = Connecttodb()
+
 
 @OrderPlace_bp.before_request # Before each request it will look for the values below
 def load_user():
-    try:
-        conn.execute(text('SELECT 1')).fetchone()
-    except Exception:
-        print("Reconnecting to DB....")
-        conn=Connecttodb()
+   
         
     if "User" in session:
         g.User = session["User"]
@@ -20,14 +16,14 @@ def load_user():
 
 @OrderPlace_bp.route('/OrderPlaced', methods=["POST"])
 def placeOrder():
+    conn=None
     try:
+        conn = Connecttodb()
+        conn.begin()
+        
         checkAndUpdateOrder()
         CheckOrderDelivered()
-        ADDRESS = request.form.get('Address1')
-        CITY= request.form.get('City')
-        STATE = request.form.get('State')
-        ZIP = request.form.get('ZIP')
-        EMAIL = request.form.get('Email')
+        
         
         
         total = request.form.get('Total')
@@ -49,13 +45,24 @@ def placeOrder():
         
         print(listofitemid)
         # * Get Count of cart items
-        CartQuantity = conn.execute(text(
-            """
-                SELECT sum(ca.quantity) as CartQuantity, ca.ORDER_ID as OrderID 
-                FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
-                WHERE ca.CID = :ID AND ca.ORDER_ID is Null
-                Group By ca.ORDER_ID"""),{'ID': g.User['ID']}).mappings().fetchone()
+        CartQuantity = conn.execute(text("""
+            SELECT COALESCE(SUM(quantity), 0) as CartQuantity
+            FROM cart
+            WHERE CID = :ID 
+            AND ORDER_ID IS NULL
+        """), {'ID': g.User['ID']}).mappings().fetchone()
     
+        if not CartQuantity or CartQuantity['CartQuantity'] == 0:
+            raise ValueError("Cart is empty")
+        
+        ADDRESS = request.form.get('Address1')
+        CITY= request.form.get('City')
+        STATE = request.form.get('State')
+        ZIP = request.form.get('ZIP')
+        EMAIL = request.form.get('Email')
+        
+        if not all([ADDRESS, CITY, STATE, ZIP, total]):
+            raise ValueError("Missing required fields")
         # print(CartQuantity['CartQuantity'])
         # print(CartQuantity) #!DEBUG
         
@@ -65,7 +72,7 @@ def placeOrder():
 	                (date,total,amount,ContactInfo)
                 VALUES
 	                (now(),:total, :quantity,:ContactInfo);"""),{'total':total,'quantity':int(CartQuantity['CartQuantity']),'ContactInfo':f'{ADDRESS},{CITY},{STATE},{ZIP}'})
-        conn.commit()
+        
         # * Gets Recent OrderID
         RecentOrder=conn.execute(text("""
                 SELECT max(ORDER_ID) as ID from orders""")).mappings().fetchone()
@@ -97,11 +104,20 @@ def placeOrder():
         print(session['recentOrderId'])
         return redirect(url_for('OrderPlace_bp.ShowOrder'))
     except Exception as e:
+        if conn:
+            conn.rollback()
         print(f'Error: {e}')
         return redirect(url_for('OrderPlace_bp.ShowOrder'))
+    finally:
+        if conn:
+            conn.close()
 @OrderPlace_bp.route('/OrderPlaced', methods=["GET"])
 def ShowOrder():
+    conn=None
     try:
+        conn = Connecttodb()
+        conn.begin()
+        
         checkAndUpdateOrder()
         CheckOrderDelivered()
         ADDRESS = request.form.get('Address1')
@@ -135,7 +151,13 @@ def ShowOrder():
             print("REG OID")
         #* ORDER HISTORY
         OrderHistory = conn.execute(text(query),params).mappings().fetchall() #! Change this back to :recent
+        conn.commit()
         return render_template('OrderPlaced.html',OrderHistory= OrderHistory)
     except Exception as e:
+        if conn:
+            conn.rollback()
         print(f'Error: {e}')
         return render_template('OrderPlaced.html', OrderHistory=[])
+    finally:
+        if conn:
+            conn.close()

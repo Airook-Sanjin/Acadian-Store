@@ -21,7 +21,7 @@
   }
 .ProPageContainer{
   display:flex;
-  height:50vh;
+  height:100%;
   flex-direction: row;
 }
 

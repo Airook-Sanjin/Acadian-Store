@@ -1,13 +1,18 @@
 <style>
-  
+  .Main{
+    height: auto;
+  }
   .OrderContainter {
     display: grid;
-    height: 70vh;
+    /* height: 100%; */
     grid-template-columns: repeat(auto-fit,minmax(min(50vw,100%), 1fr));
     /* grid-template-rows: repeat(3, auto) ; */
     /* background-color: var(--Primary); */
     padding: 2em;
     gap: 3em;
+  
+  }
+  .OrderHistory{
     overflow: scroll;
     overflow-x: hidden;
   }
@@ -16,7 +21,7 @@
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    max-height: 40.112vh;
+    height: 250px;
     background-color: hsl(0, 0%, 89%);
     padding: 2em;
     border-radius: 20px;
@@ -36,7 +41,6 @@
     border-radius: 20px;
     background-color: #F8F2F4;
   }
-  
   
   .ItemTable tbody{
     text-align: center;
@@ -134,19 +138,17 @@
           </form>
           {% elif item['ItemStatus'] == 'Rejected' %}
           <h3 id = "rejected">ITEM WAS REJECTED</h3>
-          {% elif item['ItemStatus']=='Shipping' %}
-          <h3 id="shipped">ITEM BEGAN SHIPPING ON {{item['DateShipped']}}</h3>
           {% else %}
-           <h3 id="shipped">ITEM Delivered ON {{item['ItemDeliveryDate']}}</h3>
+          <h3 id="shipped">ITEM BEGAN SHIPPING ON {{item['DateShipped']}}</h3>
           {% endif %}
         </section></td>
      </tr>
      
         
       </tbody>
-      </table>
+      </table>{% endfor %}
     </section>
-      {% endfor %}
+      
       
     
 

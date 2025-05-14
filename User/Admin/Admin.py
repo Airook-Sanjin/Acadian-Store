@@ -1,5 +1,5 @@
 
-from globals import Blueprint,render_template,g,session,Connecttodb,text,request,checkAndUpdateOrder
+from globals import Blueprint, render_template, request,g,session,Connecttodb,text,checkAndUpdateOrder,CheckOrderDelivered
 from datetime import datetime
 from User.chat import chat_bp
 from threading import Timer
@@ -245,6 +245,7 @@ def AdminEditProduct():
         warranty = request.form.get('warranty') if request.form.get('add_warranty') == 'yes' else None
         discount = float(request.form.get('discount')) / 100 if request.form.get('add_discount') == 'yes' else None
         discount_date = request.form.get('discount_date') if request.form.get('add_discount') == 'yes' else None
+        category = request.form.get('category')
         availability = request.form.get('availability')
         vid = request.form.get('VID')
 
@@ -259,6 +260,7 @@ def AdminEditProduct():
                 discount = :discount,
                 discount_date = :discount_date,
                 availability = :availability,
+                category = :category,
                 VID = :vid
             WHERE PID = :pid
         """), {
@@ -270,6 +272,7 @@ def AdminEditProduct():
             'discount': discount,
             'discount_date': discount_date,
             'availability': availability,
+            'category' : category,
             'vid': vid,
             'pid': pid
         })
@@ -455,6 +458,31 @@ def AdminEditProductImages():
         print(f"ERROR UPDATING PRODUCT IMAGE: {e}")
         return redirect(url_for('admin_bp.AdminViewProducts', message="Product image update failed", success=False))
     
+@admin_bp.route('/deleteImage', methods=["POST"])
+def AdminDeleteProductImage():
+    try:
+        pid = request.form.get('PID')
+        img_id = request.form.get('IMG_ID')
+
+        if not pid or not img_id:
+            raise ValueError("Missing PID or IMG_ID")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            DELETE FROM product_images
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+        conn.execute(text("""
+            DELETE FROM product_inventory
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+
+        conn.commit()
+        return redirect(url_for("admin_bp.AdminViewProducts", message="Image deleted successfully", success=True))
+    except Exception as e:
+        print(f"ERROR DELETING IMAGE: {e}")
+        return redirect(url_for("admin_bp.AdminViewProducts", message="Failed to delete image", success=False))
+    
 @admin_bp.route('/Profile',methods=["GET","POST"])
 def GetProfileInfo():
     try:
@@ -538,6 +566,74 @@ def updateClaimStatus():
         print("Error updating status:", e)
 
     return redirect(url_for('admin_bp.claimHistory'))
+
+
+@admin_bp.route('/RecievedOrder',methods=["POST"])
+def GetProfileOrderHistory():
+    conn.commit()
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
+        return redirect(url_for('admin_bp.AdminRecievedOrders'))
+    except Exception as e:
+        print(f"Error POST: {e}")
+        return redirect(url_for('admin_bp.AdminRecievedOrders'))
+
+@admin_bp.route('/RecievedHistory',methods=["GET"])
+def AdminRecievedOrders():
+    
+    try:
+        if not g.User: #* Handles if signed in or not
+            return redirect(url_for('login_bp.Login'))
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
+        PlacedOrders= conn.execute(text("""
+            select o.ORDER_ID as OID,o.total as total, o.status as OrderStatus,o.DateShipped as DateShipped,date(date_add(o.DateShipped, interval 5 DAY)) as DeliveryDate, ca.ITEM_ID as ItemID, p.title as Itemtitle, ca.color as ItemColor,ca.quantity as ItemQuantity,
+            CASE
+            	WHEN p.discount IS NULL OR p.discount_date > curdate() THEN p.price * ca.quantity
+            	WHEN p.discount IS NOT NULL OR p.discount_date < curdate() THEN (p.price - (p.price * p.discount)) * ca.quantity 
+            END AS ItemPrice, ca.ItemStatus AS ItemStatus, ca.CID as CustID,Date(ca.DateShipped) as DateShipped, v.email as CustEmail FROM cart AS ca 
+            LEFT JOIN orders as o on ca.ORDER_ID = o.ORDER_ID 
+            LEFT JOIN product as p on ca.PID =p.PID 
+            LEFT JOIN admin as v on p.AID = v.AID
+            LEFT JOIN users as u on v.email = u.email
+            WHERE v.AID = :ID and o.ORDER_ID is Not Null
+            Order By o.ORDER_ID; """),{'ID': g.User['ID']}).mappings().fetchall()
+        GroupedOrders={} #* Dictionary to keep all the values of PlacedOrder
+        for row in PlacedOrders:
+            OrderId = row['OID'] #* Extracts order ID
+            if OrderId not in GroupedOrders:
+                GroupedOrders[OrderId]={
+                    "OrderId":OrderId,
+                    "OrderStatus":row['OrderStatus'],
+                    "OrderDateShipped":row['DateShipped'],
+                    "OrderTotal":row['total'],
+                    "Items":[]
+                }
+            # * 
+            GroupedOrders[OrderId]["Items"].append({
+                "ItemID":row['ItemID'],
+                "ItemTitle":row['Itemtitle'],
+                "ItemColor":row['ItemColor'],
+                "ItemQuantity":row['ItemQuantity'],
+                "ItemPrice":row['ItemPrice'],
+                "ItemStatus":row['ItemStatus'],
+                "DateShipped":row['DateShipped'],
+                "ItemDeliveryDate":row['DeliveryDate']
+                
+                })
+        GroupedOrdersList = list(GroupedOrders.values())
+        print(f"Grouped Orders: {GroupedOrdersList}")
+            
+        
+        return render_template('AdminRecievedOrders.html', GroupedOrders=GroupedOrdersList)
+        
+        
+    except Exception as e:
+        print(f"Error GET: {e}")
+        return render_template('AdminRecievedOrders.html',GroupedOrders=[])
 
 
 

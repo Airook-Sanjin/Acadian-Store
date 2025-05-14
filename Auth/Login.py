@@ -1,73 +1,81 @@
-from flask import Blueprint
+from flask import Blueprint, render_template, request, redirect, url_for, session, g
+from werkzeug.security import check_password_hash
+from globals import Connecttodb, text
 
-from globals import Flask, secrets, redirect, url_for, Connecttodb, text ,render_template,request,session,g
-from Auth.Register import register_who
-from User.Admin.Admin import admin_bp
-from User.Customer.Customer import customer_bp
-from User.Vendor.Vendor import vendor_bp
-
-login_bp = Blueprint('login_bp',__name__,url_prefix='/auth',template_folder='templates',static_folder='static',static_url_path='/static')
-
+login_bp = Blueprint('login_bp', __name__, url_prefix='/auth', template_folder='templates', static_folder='static')
 
 conn = Connecttodb()
 
-@login_bp.route('/Login',methods = ["GET"])
+@login_bp.route('/Login', methods=["GET"])
 def Login():
-    conn.commit() #* Added so that the app stays updated with the database
-    print('in Login')
+    conn.commit()
     return render_template('login.html')
 
 @login_bp.route('/Login', methods=["POST"])
 def Signin():
-    message = None
-    # Creates dictionary view of all users,customer, vendor and admin
-    try:
-        result = conn.execute(text(
-        """ SELECT u.username,c.email as email, 'customer' AS role, CID as ID FROM customer as c Natural JOIN users as u
-            WHERE c.email = :email and u.password = :password
-            UNION
-            SELECT u.username, a.email as email, 'admin' AS role, AID as ID FROM admin as a Natural JOIN users as u
-            WHERE a.email = :email and u.password = :password
-            UNION
-            SELECT u.username, v.email as email,'vendor' AS role, VID as ID FROM vendor as v Natural JOIN users as u
-            WHERE v.email = :email and u.password = :password """
-        ),{'email':request.form.get('Email'),'password':request.form.get('Pass')}).mappings().fetchone()
-        
-        role = result['role']
-        ID= result['ID']
-        session['User'] = {'Name':result['username'],'Role':role,'ID': ID,'Email':result['email']}
-        g.User = session['User']
-        if role=='customer': # * Looks through all customers and see if any match with the email
-            print('INTO Customer')
-            return redirect(url_for('customer_bp.CustomerHomePage')) # * Takes you to Customer page
-        
-        
-        elif role=='admin':
-            Authorized = conn.execute(text("""SELECT * FROM admin WHERE AID = :ID AND Authorization = 'granted'"""),{'ID':ID}).mappings().fetchone()
-            if Authorized:
-                print('INTO Admin')
-                return redirect(url_for('admin_bp.AdminHomePage')) # * Takes you to admin page
-            else:
-                message = "You have not been authorized to access this page."
-                return render_template('login.html', message=message)
-        
-        elif role=='vendor': # * Looks through all Vendors and see if any match with the email
-            Authorized = conn.execute(text("""SELECT * FROM vendor WHERE VID = :ID AND Authorization = 'granted'"""),{'ID':ID}).mappings().fetchone()
-            if Authorized:
-                print('INTO VENDOR')
-                return redirect(url_for('vendor_bp.VendorHomePage')) # * Takes you to vendor page
-            else:
-                message = "You have not been authorized to access this page."
-                return render_template('login.html', message=message)
+    email = request.form.get('Email')
+    password_input = request.form.get('Pass')
 
-        else:
-            message = "Email not found."
-            return render_template('login.html', message=message)
+    try:
+        user_data = conn.execute(text("""
+            SELECT u.username, u.email, u.password,
+                CASE 
+                    WHEN c.email IS NOT NULL THEN 'customer'
+                    WHEN a.email IS NOT NULL THEN 'admin'
+                    WHEN v.email IS NOT NULL THEN 'vendor'
+                END AS role,
+                c.CID AS customer_id,
+                a.AID AS admin_id,
+                v.VID AS vendor_id
+            FROM users u
+            LEFT JOIN customer c ON u.email = c.email
+            LEFT JOIN admin a ON u.email = a.email
+            LEFT JOIN vendor v ON u.email = v.email
+            WHERE u.email = :email
+        """), {'email': email}).mappings().fetchone()
+
+        if not user_data:
+            return render_template('login.html', message="Email not found.")
+
+        if not check_password_hash(user_data['password'], password_input):
+            return render_template('login.html', message="Incorrect password.")
+
+        role = user_data['role']
+        user_id = user_data['customer_id'] or user_data['admin_id'] or user_data['vendor_id']
+
+        session['User'] = {
+            'Name': user_data['username'],
+            'Role': role,
+            'ID': user_id,
+            'Email': user_data['email']
+        }
+        g.User = session['User']
+
+        if role == 'customer':
+            return redirect(url_for('customer_bp.CustomerHomePage'))
+
+        elif role == 'admin':
+            authorized = conn.execute(text("SELECT * FROM admin WHERE AID = :ID AND Authorization = 'granted'"),
+                                      {'ID': user_id}).mappings().fetchone()
+            if authorized:
+                return redirect(url_for('admin_bp.AdminHomePage'))
+            else:
+                return render_template('login.html', message="You are not authorized as an admin.")
+
+        elif role == 'vendor':
+            authorized = conn.execute(text("SELECT * FROM vendor WHERE VID = :ID AND Authorization = 'granted'"),
+                                      {'ID': user_id}).mappings().fetchone()
+            if authorized:
+                return redirect(url_for('vendor_bp.VendorHomePage'))
+            else:
+                return render_template('login.html', message="You are not authorized as a vendor.")
+
+        return render_template('login.html', message="Invalid user role.")
     except Exception as e:
-        print(e)
-        message = "An error occurred during login."
-        return render_template('login.html', message=message)
+        print(f"Login error: {e}")
+        return render_template('login.html', message="An error occurred during login.")
 
 @login_bp.route('/Logout')
 def Logout():
-    return 'logout'
+    session.pop('User', None)
+    return redirect(url_for('login_bp.Login'))

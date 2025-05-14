@@ -186,10 +186,8 @@ def editInventory():
         Color = request.form.get("Color")
         Amount = request.form.get("Amount")
 
-        PID = int(PID)
-        
         conn = Connecttodb()
-        print(PID)
+
         is_main = IMG_ID == 'main'
 
         # Check if inventory exists
@@ -289,6 +287,30 @@ def AddImages():
         print("Failed to add image.")
         return redirect(url_for("vendor_bp.VendorViewProducts"))
 
+@vendor_bp.route('/deleteImage', methods=["POST"])
+def DeleteProductImage():
+    try:
+        pid = request.form.get('PID')
+        img_id = request.form.get('IMG_ID')
+
+        if not pid or not img_id:
+            raise ValueError("Missing PID or IMG_ID")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            DELETE FROM product_images
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+        conn.execute(text("""
+            DELETE FROM product_inventory
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+
+        conn.commit()
+        return redirect(url_for("vendor_bp.VendorViewProducts", message="Image deleted successfully", success=True))
+    except Exception as e:
+        print(f"ERROR DELETING IMAGE: {e}")
+        return redirect(url_for("vendor_bp.VendorViewProducts", message="Failed to delete image", success=False))
 
 
 
@@ -311,6 +333,7 @@ def VendorEditProduct():
         discount = float(request.form.get('discount')) / 100 if request.form.get('add_discount') == 'yes' else None
         discount_date = request.form.get('discount_date') if request.form.get('add_discount') == 'yes' else None
         availability = request.form.get('availability')
+        category = request.form.get('category')
         vid = request.form.get('VID')
 
         conn = Connecttodb()
@@ -324,6 +347,7 @@ def VendorEditProduct():
                 discount = :discount,
                 discount_date = :discount_date,
                 availability = :availability,
+                category = :category,
                 VID = :vid
             WHERE PID = :pid
         """), {
@@ -335,6 +359,7 @@ def VendorEditProduct():
             'discount': discount,
             'discount_date': discount_date,
             'availability': availability,
+            'category' : category,
             'vid': vid,
             'pid': pid
         })
