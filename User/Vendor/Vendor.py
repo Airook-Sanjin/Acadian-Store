@@ -478,7 +478,8 @@ def GetProfileOrderHistory():
     try:
         if not g.User: #* Handles if signed in or not
             return redirect(url_for('login_bp.Login'))
-        
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
         return redirect(url_for('vendor_bp.VendRecievedOrders'))
     except Exception as e:
         print(f"Error POST: {e}")
@@ -523,7 +524,8 @@ def VendRecievedOrders():
                 "ItemQuantity":row['ItemQuantity'],
                 "ItemPrice":row['ItemPrice'],
                 "ItemStatus":row['ItemStatus'],
-                "DateShipped":row['DateShipped']
+                "DateShipped":row['DateShipped'],
+                "ItemDeliveryDate":row['DeliveryDate']
                 
                 })
         GroupedOrdersList = list(GroupedOrders.values())
