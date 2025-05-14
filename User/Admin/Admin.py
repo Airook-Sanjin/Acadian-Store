@@ -245,6 +245,7 @@ def AdminEditProduct():
         warranty = request.form.get('warranty') if request.form.get('add_warranty') == 'yes' else None
         discount = float(request.form.get('discount')) / 100 if request.form.get('add_discount') == 'yes' else None
         discount_date = request.form.get('discount_date') if request.form.get('add_discount') == 'yes' else None
+        category = request.form.get('category')
         availability = request.form.get('availability')
         vid = request.form.get('VID')
 
@@ -259,6 +260,7 @@ def AdminEditProduct():
                 discount = :discount,
                 discount_date = :discount_date,
                 availability = :availability,
+                category = :category,
                 VID = :vid
             WHERE PID = :pid
         """), {
@@ -270,6 +272,7 @@ def AdminEditProduct():
             'discount': discount,
             'discount_date': discount_date,
             'availability': availability,
+            'category' : category,
             'vid': vid,
             'pid': pid
         })

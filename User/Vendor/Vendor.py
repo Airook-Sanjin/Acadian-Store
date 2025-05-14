@@ -186,10 +186,8 @@ def editInventory():
         Color = request.form.get("Color")
         Amount = request.form.get("Amount")
 
-        PID = int(PID)
-        
         conn = Connecttodb()
-        print(PID)
+
         is_main = IMG_ID == 'main'
 
         # Check if inventory exists
@@ -311,6 +309,7 @@ def VendorEditProduct():
         discount = float(request.form.get('discount')) / 100 if request.form.get('add_discount') == 'yes' else None
         discount_date = request.form.get('discount_date') if request.form.get('add_discount') == 'yes' else None
         availability = request.form.get('availability')
+        category = request.form.get('category')
         vid = request.form.get('VID')
 
         conn = Connecttodb()
@@ -324,6 +323,7 @@ def VendorEditProduct():
                 discount = :discount,
                 discount_date = :discount_date,
                 availability = :availability,
+                category = :category,
                 VID = :vid
             WHERE PID = :pid
         """), {
@@ -335,6 +335,7 @@ def VendorEditProduct():
             'discount': discount,
             'discount_date': discount_date,
             'availability': availability,
+            'category' : category,
             'vid': vid,
             'pid': pid
         })
