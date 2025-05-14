@@ -458,6 +458,31 @@ def AdminEditProductImages():
         print(f"ERROR UPDATING PRODUCT IMAGE: {e}")
         return redirect(url_for('admin_bp.AdminViewProducts', message="Product image update failed", success=False))
     
+@admin_bp.route('/deleteImage', methods=["POST"])
+def AdminDeleteProductImage():
+    try:
+        pid = request.form.get('PID')
+        img_id = request.form.get('IMG_ID')
+
+        if not pid or not img_id:
+            raise ValueError("Missing PID or IMG_ID")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            DELETE FROM product_images
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+        conn.execute(text("""
+            DELETE FROM product_inventory
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+
+        conn.commit()
+        return redirect(url_for("admin_bp.AdminViewProducts", message="Image deleted successfully", success=True))
+    except Exception as e:
+        print(f"ERROR DELETING IMAGE: {e}")
+        return redirect(url_for("admin_bp.AdminViewProducts", message="Failed to delete image", success=False))
+    
 @admin_bp.route('/Profile',methods=["GET","POST"])
 def GetProfileInfo():
     try:

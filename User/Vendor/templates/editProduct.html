@@ -225,7 +225,7 @@ input[type="radio"] {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        background-color: #f0f0f0;
+        background-color: transparent;
         padding: 1rem;
         border-radius: 4px;
     }
@@ -343,7 +343,8 @@ input[type="radio"] {
         #InventoryModal,
         #EditInventoryModal,
         #ImageModal,
-        #EditImageModal {
+        #EditImageModal,
+        #DeleteImageModal {
             flex-direction: row;
             justify-content: center;
             position: fixed;
@@ -722,8 +723,8 @@ input[type="radio"] {
                             </div>
                         {% endif %}
                         <div class="button-holder">
-                            <button onclick="OpenEditProductModal('{{ Product['product_id'] }}')" class="edit-button">Edit Control</button>  
-                            <button onclick="OpenModal('{{ Product['product_id'] }}')" class="edit-button">Product Control</button>                               
+                            <button onclick="OpenEditProductModal('{{ Product['product_id'] }}')" class="edit-button">Product Control</button>  
+                            <button onclick="OpenModal('{{ Product['product_id'] }}')" class="edit-button">Edit Control</button>                                  
                         </div>
                     </div>
                 </div>
@@ -752,6 +753,7 @@ input[type="radio"] {
                         <button class="inventory-button" onclick="OpenDeleteModal()">Delete Product</button>
                         <button class="inventory-button" onclick="OpenImageModal()">Add Images</button>
                         <button class="inventory-button" onclick="OpenEditImageModal()">Edit Images</button>
+                        <button class="inventory-button" onclick="OpenDeleteImageModal()">Delete Images</button>
                         <!-- <button class="inventory-button" onclick="OpenInventoryModal()">Add Inventory Item</button> -->
                         <button class="inventory-button" onclick="OpenEditInvetoryModal()">Edit Inventory Item</button>
                     </div>
@@ -1111,7 +1113,47 @@ input[type="radio"] {
     </div>
   </div>
   
-    
+ <!-- Delete Image Modal -->
+<div id="DeleteImageModal" class="modal" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content edit-image-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Delete Product Image</h1>
+                <p style="margin: 0; color: rgb(136, 136, 136);">Delete an additional image</p>
+            </div>
+            <div class="modal-body">
+                <form class="Inventory-form" method="POST" action="{{ url_for('vendor_bp.DeleteProductImage') }}">
+                    <input type="hidden" id="delete-img-PID" name="PID">
+                    <input type="hidden" id="delete-img-ID" name="IMG_ID">
+
+                    <label>Product ID: <span id="delete-img-modal-PID"></span></label>
+                    <label>Image ID: <span id="delete-img-modal-IMG_ID"></span></label>
+
+                    {% for product in AllProducts %}
+                    <div class="product-images-group-delete" data-pid="{{ product['product_id'] }}" style="display: none;">
+                        <div class="thumbnail-bar">
+                            {% for img, img_id in product['additional_images'] %}
+                            <div class="thumbnail placeholder-thumb" style="justify-content: center;">
+                                <div class="thumbnail-item">
+                                    <img src="{{ img }}" alt="Thumbnail" class="thumbnail"
+                                         onclick="setDeleteImage('{{ product['product_id'] }}', '{{ img_id }}', '{{ img }}')">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary">Delete Image</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="CloseDeleteImageModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+   
     
     
      </section>
@@ -1349,6 +1391,30 @@ input[type="radio"] {
             if (colorInput) colorInput.value = color;
             if (amountInput) amountInput.value = amount;
         }
+
+        function OpenDeleteImageModal(PID) {
+            currentPID = PID || currentPID;
+            document.getElementById("DeleteImageModal").style.display = "flex";
+            document.getElementById("delete-img-modal-PID").textContent = currentPID;
+            document.getElementById("delete-img-PID").value = currentPID;
+            document.querySelectorAll('.product-images-group-delete').forEach(g => g.style.display = 'none');
+            const selectedGroup = document.querySelector(`.product-images-group-delete[data-pid="${currentPID}"]`);
+            if (selectedGroup) selectedGroup.style.display = 'block';
+        }
+
+        function CloseDeleteImageModal() {
+            document.getElementById("DeleteImageModal").style.display = "none";
+            document.getElementById("delete-img-modal-PID").textContent = "";
+            document.getElementById("delete-img-modal-IMG_ID").textContent = "";
+            document.getElementById("delete-img-ID").value = "";
+        }
+
+    function setDeleteImage(pid, imgId, imageUrl) {
+        document.getElementById("delete-img-PID").value = pid;
+        document.getElementById("delete-img-ID").value = imgId;
+        document.getElementById("delete-img-modal-IMG_ID").textContent = imgId;
+    }
+
     </script>
     
      {% endblock body%}
