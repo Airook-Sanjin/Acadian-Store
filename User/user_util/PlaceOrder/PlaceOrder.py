@@ -7,7 +7,11 @@ conn = Connecttodb()
 
 @OrderPlace_bp.before_request # Before each request it will look for the values below
 def load_user():
-    
+    try:
+        conn.execute(text('SELECT 1')).fetchone()
+    except Exception:
+        print("Reconnecting to DB....")
+        conn=Connecttodb()
         
     if "User" in session:
         g.User = session["User"]
@@ -17,7 +21,8 @@ def load_user():
 @OrderPlace_bp.route('/OrderPlaced', methods=["POST"])
 def placeOrder():
     try:
-        
+        checkAndUpdateOrder()
+        CheckOrderDelivered()
         ADDRESS = request.form.get('Address1')
         CITY= request.form.get('City')
         STATE = request.form.get('State')
@@ -46,7 +51,7 @@ def placeOrder():
         # * Get Count of cart items
         CartQuantity = conn.execute(text(
             """
-                SELECT COALESCE(SUM(ca.quantity), 0) as CartQuantity, ca.ORDER_ID as OrderID 
+                SELECT sum(ca.quantity) as CartQuantity, ca.ORDER_ID as OrderID 
                 FROM cart AS ca LEFT JOIN CUSTOMER AS cu ON ca.CID = cu.CID LEFT JOIN product as p on ca.PID = p.PID
                 WHERE ca.CID = :ID AND ca.ORDER_ID is Null
                 Group By ca.ORDER_ID"""),{'ID': g.User['ID']}).mappings().fetchone()
@@ -63,7 +68,7 @@ def placeOrder():
         conn.commit()
         # * Gets Recent OrderID
         RecentOrder=conn.execute(text("""
-                SELECT LAST_INSERT_ID() as ID from orders""")).mappings().fetchone()
+                SELECT max(ORDER_ID) as ID from orders""")).mappings().fetchone()
         
         conn.commit()
         #* Sends money to the proper Vendor
@@ -99,7 +104,11 @@ def ShowOrder():
     try:
         checkAndUpdateOrder()
         CheckOrderDelivered()
-       
+        ADDRESS = request.form.get('Address1')
+        CITY= request.form.get('City')
+        STATE = request.form.get('State')
+        ZIP = request.form.get('ZIP')
+        EMAIL = request.form.get('Email')
        
         query = """SELECT ca.title AS ItemTitle,p.PID as PID,
             CASE
