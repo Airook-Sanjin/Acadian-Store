@@ -18,7 +18,7 @@
       flex-direction: column;
       width: 100%;
       max-width: 100%;
-      max-height: 40.112vh;
+      height: 250px;
       background-color: hsl(0, 0%, 89%);
       padding: 2em;
       border-radius: 20px;
@@ -82,6 +82,13 @@
   </section>
   <section class="ProPageContainer">
     <section class="ProSideNav">
+      <ul class="ProPageNav">
+  <li onclick="window.location.href='{{ url_for('admin_bp.GetProfileInfo') }}'">Profile</li>
+    <li onclick="window.location.href='{{url_for('admin_bp.AdminRecievedOrders')}}'">Order History</li>
+    <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=return'">Return Claims</li>
+    <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=refund'">Refund Claims</li>
+    <li onclick="window.location.href='{{ url_for('admin_bp.claimHistory') }}?type=warranty'">Warranty Claims</li>
+</ul>
   <ul class="ProPageNav">
   </ul>
   </section>
