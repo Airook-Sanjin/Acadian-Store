@@ -1,4 +1,4 @@
-from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify,checkAndUpdateOrder
+from globals import Flask, redirect, url_for,render_template,session,g,Connecttodb,text,request,jsonify
 
 import secrets
 from datetime import datetime
@@ -12,7 +12,6 @@ from User.chat import chat_bp
 from User.user_util.cart.cart import cart_bp
 from User.user_util.search.search import search_bp
 from User.user_util.PlaceOrder.PlaceOrder import OrderPlace_bp
-from jinja2 import Environment
 
 
 
@@ -23,12 +22,9 @@ app.secret_key = secrets.token_hex(15) # Generates and sets A secret Key for ses
 
 conn = Connecttodb()
 
-
-
 @app.before_request # Before each request it will look for the values below
 def load_user():
     try:
-        
         conn.execute(text('SELECT 1')).fetchone()
     except Exception:
         print("Reconnecting to DB....")
@@ -39,7 +35,6 @@ def load_user():
     else:
         g.User = None
         
-
 
  # Get database connection
 
@@ -62,7 +57,6 @@ app.register_blueprint(vendor_bp)
 @app.route('/', methods=["GET"])
 def start():
     try:
-        checkAndUpdateOrder()
         CurDate = datetime.now().date()
         products = conn.execute(text("""
            SELECT 
@@ -100,20 +94,20 @@ def ProductView():
         pid = request.args.get('pid')
 
         product = conn.execute(text("""
-         SELECT 
-            PID, title, CAST(price AS DECIMAL(10,2)) AS price,
-            (price * discount) as saving_discount,
-            price - (price * discount) AS discounted_price,
-            description,
-            warranty,
-            discount, discount_date,
-            availability,
-            VID,
-            AID,
-            image_url
-        FROM product
-        WHERE PID = :pid
-    """), {"pid": pid}).mappings().first()
+             SELECT 
+                PID, title, CAST(price AS DECIMAL(10,2)) AS price,
+                (price * discount) as saving_discount,
+                price - (price * discount) AS discounted_price,
+                description,
+                warranty,
+                discount, discount_date,
+                availability,
+                VID,
+                AID,
+                image_url
+            FROM product
+            WHERE PID = :pid
+        """), {"pid": pid}).mappings().first()
 
         inventory = conn.execute(text("""
             SELECT color, amount
@@ -157,29 +151,15 @@ def ProductView():
         
         # Calculate rating percentages
         total_reviews = Review_Count["review_count"] if Review_Count and Review_Count["review_count"] else 0
-        rating_percentages = {
-            star: (rating_counts.get(star, 0) / total_reviews * 100)
-            if total_reviews > 0 else 0
-            for star in range(1, 6)
-        }
-
-        can_review = False
-        if g.User and g.User.get("role") == "customer":
-            cid = g.User.get("ID")
-            has_purchased = conn.execute(text("""
-                SELECT 1 FROM cart 
-                WHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL 
-                LIMIT 1
-            """), {"cid": cid, "pid": pid}).fetchone()
-            can_review = bool(has_purchased)
-
-        return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages, can_review=can_review)
+        rating_percentages = {star: (rating_counts.get(star, 0) / total_reviews * 100) if total_reviews > 0 else 0 for star in range(1, 6)}
+        
+        return render_template('Product.html', product=product, inventory=inventory, CurDate=CurDate, images=images, Reviews=Reviews, Review_Count=total_reviews, Avg_Rating=round(Avg_Rating["average_rating"], 1) if Avg_Rating else 0, Rating_Percentages=rating_percentages)
 
     except Exception as e:
         print("##############################################") 
         print("Error:", e)  
         print("##############################################") 
-        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[], CurDate=datetime.now().date(), Review_Count=0, Avg_Rating=0, Rating_Percentages={}, can_review=False)
+        return render_template('Product.html', product=None, inventory=[], images=[], Reviews=[],CurDate=CurDate, Review_Count=0, Avg_Rating=0, Rating_Percentages={})
 
 @app.route('/api/inventory')
 def GetInventory():
@@ -193,6 +173,8 @@ def GetInventory():
     return jsonify({'amount':inventory.amount if inventory.amount > 0 else 'Out of Stock' })
 
     
+    
+    
 
 @app.route('/Review', methods=["POST"])
 def Review():
@@ -200,41 +182,26 @@ def Review():
         if not g.User:
             return redirect(url_for('login_bp.Login'))
 
-        if g.User.get('role') in ['vendor', 'admin']:
-            return redirect(url_for('ProductView', pid=request.form.get('pid')))
-        
         pid = request.form.get('pid')
-        can_review = False
-        if g.User and g.User.get("role") == "customer":
-            cid = g.User.get("ID")
-            has_purchased = conn.execute(text("SELECT 1 FROM cart WHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL LIMIT 1"),
-                                        {"cid": cid, "pid": pid}).fetchone()
-            can_review = bool(has_purchased)
-
-
         rating = request.form.get('rating')
         title = request.form.get('title', '')
         review = request.form.get('description', '')
         cid = g.User.get('ID')
 
         # Ensure rating is an integer and properly handled
-        rating = int(rating) if rating else 0
-
-        purchase = conn.execute(text("SELECT 1 FROM cartWHERE CID = :cid AND PID = :pid AND ORDER_ID IS NOT NULL LIMIT 1"), {"cid": cid, "pid": pid}).fetchone()
-
-        if not purchase:
-            return redirect(url_for('ProductView', pid=pid))
-    
-        conn.execute(text("""
-            INSERT INTO reviews (CID, PID, rating, title, description) 
-            VALUES (:CID, :PID, :rating, :title, :description)
-        """), {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
+        if rating:
+            rating = int(rating)
+        else:
+            rating = 0  # Default to 0 if no rating is selected
+        conn.execute(text("""INSERT INTO reviews (CID, PID, rating, title, description) 
+                             VALUES (:CID, :PID, :rating, :title, :description)"""), 
+                     {"CID": cid, "PID": pid, "rating": rating, "title": title, "description": review})
         conn.commit()
         print(f"Redirecting to ProductView with PID: {pid}")  # Log the pid
         return redirect(url_for('ProductView', pid=pid))
     except Exception as e:
         print(f"Error: {e}")
-        return redirect(url_for('ProductView', can_review=can_review, pid=request.form.get('pid')))
+        return redirect(url_for('ProductView', pid=request.form.get('pid')))
 
 
 
