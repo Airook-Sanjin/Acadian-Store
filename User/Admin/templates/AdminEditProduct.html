@@ -659,6 +659,15 @@ input[type="radio"] {
                                 <option value="OUT OF STOCK">OUT OF STOCK</option>
                             </select>
                         </div>
+                        <div>
+                            <label for="Vendors">Vendors:</label>
+                            <select name="vendors" required>
+                                <option value="" disabled selected>Select Vendor</option>
+                                {% for vendor in vendors %}
+                                    <option value="{{ vendor['VID'] }}">{{ vendor['username'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <input class="BTN" type="submit" value="Add Product to Acadia">
                         </div>
                 </section>
