@@ -505,35 +505,25 @@
                      {% endfor %}
                  </div>
              </div>
-             {% if session.get('User') %}
-                {% if session['User']['role'] == 'vendor' %}
-                    <p>Vendors cannot write reviews for products.</p>
-                {% elif session['User']['role'] == 'admin' %}
-                    <p>Admins cannot write reviews for products.</p>
-                {% elif can_review %}
-                    <!-- Review Form -->
-                    <form class="write-review" method="POST" action="{{ url_for('Review') }}">
-                        <input type="hidden" name="pid" value="{{ product.PID }}">
-                        <input type="hidden" name="rating" id="rating-input">
-                        <h3 class="review-form-title">Write a Review</h3>
-                        <div class="rating-input">
-                            <span class="star" data-rating="1">★</span>
-                            <span class="star" data-rating="2">★</span>
-                            <span class="star" data-rating="3">★</span>
-                            <span class="star" data-rating="4">★</span>
-                            <span class="star" data-rating="5">★</span>
-                        </div>
-                        <input class="review-title-text" type="text" name="title" placeholder="Title" required>
-                        <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
-                        <button type="submit" class="submit-review">Submit Review</button>
-                    </form>
-                {% else %}
-                    <p>You can only write a review for this product if you've purchased it.</p>
-                {% endif %}
-            {% else %}
-                <p>You must be logged in to write a review.</p>
-            {% endif %}
-            
+             <!-- ############### -->
+             <!-- # Review Form # -->
+             <!-- ############### -->
+             <form class="write-review" method="POST" action="{{ url_for('Review') }}">
+                 <input type="hidden" name="pid" value="{{ product.PID }}">
+                 <input type="hidden" name="rating" id="rating-input">
+                 <h3 class="review-form-title">Write a Review</h3>
+                 <div class="rating-input">
+                     <span class="star" data-rating="1">★</span>
+                     <span class="star" data-rating="2">★</span>
+                     <span class="star" data-rating="3">★</span>
+                     <span class="star" data-rating="4">★</span>
+                     <span class="star" data-rating="5">★</span>
+                 </div>
+                 <input class="review-title-text" type="text" name="title" placeholder="Title" required>
+                 <textarea placeholder="Share your honest thoughts about this product..." name="description" required></textarea>
+                 <button type="submit" class="submit-review">Submit Review</button>
+             </form>
+ 
          </div>
          
          <!-- Right Side - Review List -->           
@@ -553,8 +543,6 @@
                      </div>     
                      <div class="review-meta">
                          <span class="review-author">Customer ID: {{ review['CID'] }}</span>
-                         <span class="review-verified">✓ Verified Purchaser</span>
-                         <span>• Owned for < 1 week</span>
                      </div>
                  </div>
                  <h3>{{ review['title'] }}</h3>

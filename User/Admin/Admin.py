@@ -168,12 +168,18 @@ def AdminViewProducts():
             product['additional_images'] = list(zip(image_urls, image_ids))
             product['inventory_map'] = {str(row.IMG_ID): {'color': row.color, 'amount': row.amount} for row in inventory if row.IMG_ID}
             product['main_inventory'] = [dict(row) for row in inventory if row.IMG_ID is None]
+            
+            vendors = conn.execute(text("""
+                SELECT v.VID, u.username FROM vendor as v 
+                LEFT JOIN users as u on v.email = u.email
+                WHERE v.Authorization = 'granted'
+            """)).mappings().fetchall()
 
-        return render_template('AdminEditProduct.html', AllProducts=AllProducts, CurDate=CurDate, message="Successfully added", success=True)
+        return render_template('AdminEditProduct.html', AllProducts=AllProducts, CurDate=CurDate, message="Successfully added", success=True, vendors=vendors)
 
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('AdminEditProduct.html', AllProducts=[], CurDate=CurDate, message="Failed to add product.", success=False)
+        return render_template('AdminEditProduct.html', AllProducts=[], CurDate=CurDate, message="Failed to add product.", success=False, vendors=[])
     
 @admin_bp.route('/AddProduct', methods=["POST"])
 def AdminAddProduct():
@@ -189,7 +195,7 @@ def AdminAddProduct():
         DISCOUNT = request.form.get("discount")
         DISCOUNT_DATE = request.form.get("discount_date")
         AVAILABILITY = request.form.get("availability")
-        AID = g.User['ID']
+        VID = request.form.get("vendors")
         IMAGE = request.form.get("URL")
         CATEGORY = request.form.get("category")
         COLOR = request.form.get('Color')
@@ -201,8 +207,8 @@ def AdminAddProduct():
         WARRANTY = WARRANTY if WARRANTY else None
 
         conn.execute(text("""
-            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, AID, image_url, category)
-            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :AID, :image_url, :category)
+            INSERT INTO product (title, price, description, warranty, discount, discount_date, availability, VID, image_url, category)
+            VALUES (:title, :price, :description, :warranty, :discount, :discount_date, :availability, :VID, :image_url, :category)
         """), {
             'title': TITLE,
             'price': PRICE,
@@ -211,7 +217,7 @@ def AdminAddProduct():
             'discount': DISCOUNT,
             'discount_date': DISCOUNT_DATE,
             'availability': AVAILABILITY,
-            'AID': AID,
+            'VID': VID,
             'image_url': IMAGE,
             'category': CATEGORY
         })
@@ -245,6 +251,7 @@ def AdminEditProduct():
         warranty = request.form.get('warranty') if request.form.get('add_warranty') == 'yes' else None
         discount = float(request.form.get('discount')) / 100 if request.form.get('add_discount') == 'yes' else None
         discount_date = request.form.get('discount_date') if request.form.get('add_discount') == 'yes' else None
+        category = request.form.get('category')
         availability = request.form.get('availability')
         vid = request.form.get('VID')
 
@@ -259,6 +266,7 @@ def AdminEditProduct():
                 discount = :discount,
                 discount_date = :discount_date,
                 availability = :availability,
+                category = :category,
                 VID = :vid
             WHERE PID = :pid
         """), {
@@ -270,6 +278,7 @@ def AdminEditProduct():
             'discount': discount,
             'discount_date': discount_date,
             'availability': availability,
+            'category' : category,
             'vid': vid,
             'pid': pid
         })
@@ -454,6 +463,31 @@ def AdminEditProductImages():
     except Exception as e:
         print(f"ERROR UPDATING PRODUCT IMAGE: {e}")
         return redirect(url_for('admin_bp.AdminViewProducts', message="Product image update failed", success=False))
+    
+@admin_bp.route('/deleteImage', methods=["POST"])
+def AdminDeleteProductImage():
+    try:
+        pid = request.form.get('PID')
+        img_id = request.form.get('IMG_ID')
+
+        if not pid or not img_id:
+            raise ValueError("Missing PID or IMG_ID")
+
+        conn = Connecttodb()
+        conn.execute(text("""
+            DELETE FROM product_images
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+        conn.execute(text("""
+            DELETE FROM product_inventory
+            WHERE PID = :pid AND IMG_ID = :img_id
+        """), {'pid': pid, 'img_id': img_id})
+
+        conn.commit()
+        return redirect(url_for("admin_bp.AdminViewProducts", message="Image deleted successfully", success=True))
+    except Exception as e:
+        print(f"ERROR DELETING IMAGE: {e}")
+        return redirect(url_for("admin_bp.AdminViewProducts", message="Failed to delete image", success=False))
     
 @admin_bp.route('/Profile',methods=["GET","POST"])
 def GetProfileInfo():
