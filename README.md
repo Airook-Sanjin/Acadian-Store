@@ -40,9 +40,6 @@ The platform uses:
   Secure account system to protect user information
   
   Organized database to track products, orders and users
-
-  Nice-to-Have Features
-  Option to save favorite pickup locations
   
   Simple checkout process (no real payments)
   
